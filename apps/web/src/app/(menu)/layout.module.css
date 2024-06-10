@@ -1,0 +1,47 @@
+.parent {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    height: 100%;
+}
+
+.menu {
+    grid-area: 1 / 1 / 2 / 2;
+    background-color: var(--primary-dark);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-top: 4em;
+    width: 80%;
+}
+
+.content {
+    grid-area: 1 / 2 / 2 / 7;
+    height: 100%;
+    padding-right: 3em;
+    padding-top: 4em;
+}
+
+.link {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    padding: 0.5em;
+    margin: 0.5em;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5em;
+    transition: background-color 0.5s;
+    width: 90%;
+    height: 4em;
+}
+
+.link:hover {
+    background-color: var(--primary);
+    border: 1px solid white;
+}

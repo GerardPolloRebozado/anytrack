@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@anytrack/joi": ["libs/joi/src/index.ts"],
+      "@anytrack/joiSchemas": ["tools/joiSchemas/src/index.ts"],
+      "@anytrack/type": ["libs/types/src/index.ts"],
+      "@anytrack/types": ["tools/types/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

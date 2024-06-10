@@ -1,0 +1,20 @@
+{
+  "name": "joi",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/joi/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/joi",
+        "tsConfig": "libs/joi/tsconfig.lib.json",
+        "packageJson": "libs/joi/package.json",
+        "main": "libs/joi/src/index.ts",
+        "assets": ["libs/joi/*.md"]
+      }
+    }
+  }
+}

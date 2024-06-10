@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String?
+  password      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  settings      Settings?
+  UserMediaItem UserMediaItem[]
+}
+
+model Settings {
+  userId   String    @id
+  user     User      @relation(fields: [userId], references: [id])
+  theme    theme?
+  language language? @default(english)
+}
+
+model MediaItem {
+  id            Int             @id @default(autoincrement())
+  tmdbId        String?         @unique
+  mediaType     MediaType
+  seasons       Int?
+  status        status?
+  title         String
+  overview      String?
+  poster        String?
+  tmdbRating    Float?
+  releaseDate   DateTime?
+  url           String?
+  runtime       Int?
+  genres        genre[]
+  authors       String?
+  Season        Season[]
+  UserMediaItem UserMediaItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model UserMediaItem {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  mediaId     Int
+  mediaItem   MediaItem @relation(fields: [mediaId], references: [id])
+  seasonId    Int?
+  season      Season?   @relation(fields: [seasonId], references: [id])
+  episodeId   Int?
+  episode     Episode?  @relation(fields: [episodeId], references: [id])
+  watched     Boolean   @default(false)
+  review      String?
+  watchedDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, mediaId, seasonId, episodeId], name: "unique_user_media_series")
+}
+
+model Season {
+  id            Int             @id @default(autoincrement())
+  seasonNumber  Int
+  title         String
+  poster        String?
+  releaseDate   DateTime?
+  overview      String?
+  mediaItemId   Int?
+  mediaItem     MediaItem?      @relation(fields: [mediaItemId], references: [id])
+  episodes      Episode[]
+  userMediaItem UserMediaItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([mediaItemId, seasonNumber])
+}
+
+model Episode {
+  id            Int             @id @default(autoincrement())
+  episodeNumber Int
+  title         String
+  overview      String?
+  runtime       Int?
+  releaseDate   DateTime?
+  seasonId      Int
+  season        Season?         @relation(fields: [seasonId], references: [id])
+  userMediaItem UserMediaItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([seasonId, episodeNumber])
+}
+
+model genre {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  MediaItem MediaItem[]
+}
+
+enum theme {
+  light
+  dark
+}
+
+enum status {
+  ongoing
+  finished
+  canceled
+}
+
+enum language {
+  english
+}
+
+enum MediaType {
+  movie
+  show
+}

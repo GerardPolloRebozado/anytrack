@@ -1,0 +1,57 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "master",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/src/test-setup.[jt]s",
+      "!{projectRoot}/test-setup.[jt]s",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.js"
+    ],
+    "sharedGlobals": []
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/next/plugin",
+      "options": {
+        "startTargetName": "start",
+        "buildTargetName": "build",
+        "devTargetName": "dev",
+        "serveStaticTargetName": "serve-static"
+      }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    },
+    {
+      "plugin": "@nx/webpack/plugin",
+      "options": {
+        "buildTargetName": "build",
+        "serveTargetName": "serve",
+        "previewTargetName": "preview"
+      }
+    }
+  ],
+  "generators": {
+    "@nx/next": {
+      "application": {
+        "style": "css",
+        "linter": "eslint"
+      }
+    }
+  },
+  "targetDefaults": {
+    "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    }
+  }
+}

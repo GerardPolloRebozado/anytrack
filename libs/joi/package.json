@@ -1,0 +1,8 @@
+{
+  "name": "@anytrack/joi",
+  "version": "0.0.1",
+  "dependencies": {
+    "@hapi/tlds": "^1.0.4",
+    "joi": "^17.13.1"
+  }
+}

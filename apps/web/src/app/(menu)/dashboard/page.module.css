@@ -1,0 +1,43 @@
+.chartContainer {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+  grid-gap: 1.2em;
+}
+
+.chart {
+  background-color: var(--primary-dark);
+  border-radius: 6px;
+  padding: 1em;
+  width: auto;
+  height: auto;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-gap: 3.5em;
+}
+
+.overview div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  flex-direction: row;
+  background-color: var(--primary-dark);
+  border-radius: 5px;
+}
+
+.overview div p {
+  font-size: 1.3rem;
+}
+
+.overview span {
+  margin: 0 0.5rem;
+}
+
+.overview svg {
+  margin-right: 0.5rem;
+}

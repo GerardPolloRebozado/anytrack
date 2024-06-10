@@ -1,0 +1,55 @@
+'use client'
+import MovieCard from '@/components/MediaCard/MediaCard';
+import { useEffect, useState } from 'react'
+import styles from './page.module.css'
+import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
+import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
+import { deleteUserMediaItem, getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
+import { MediaType } from 'libs/types/src';
+
+function MyMovies() {
+  const [movies, setMovies] = useState([])
+  const [reload, setReload] = useState(false)
+
+  useEffect(() => {
+    async function fetchMovies() {
+      const response = await getManyUserMediaItem({
+        mediaType: MediaType.movie,
+        includeMediaItem: true
+      })
+      setMovies(await response.body)
+    }
+    fetchMovies()
+  }, [reload]);
+
+  async function deleteMarkedMedia(id: number) {
+    const response = await deleteUserMediaItem({ tmdbId: id })
+    setReload(!reload)
+  }
+
+  return (
+    <div>
+      <h1>My Movies</h1>
+      <h2>Watched Movies</h2>
+      <div className={styles.cardContainer}>
+        {movies.length > 0 && movies.map((movie: any) => (
+          movie.watched && (
+            <MovieCard key={movie.mediaItem.tmdbId} id={movie.mediaItem.tmdbId} title={movie.mediaItem.title} poster={movie.mediaItem.poster} year={movie.mediaItem.year} mediaType={MediaType.movie}>
+              <PrimaryButton onClick={() => deleteMarkedMedia(movie.id)}>Remove</PrimaryButton>
+            </MovieCard>)
+        ))}
+      </div>
+      <h2>Watchlist</h2>
+      <div className={styles.cardContainer}>
+        {movies.length > 0 && movies.map((movie: any) => (
+          !movie.watched && (
+            <MovieCard key={movie.mediaItem.tmdbId} id={movie.mediaItem.tmdbId} title={movie.mediaItem.title} poster={movie.mediaItem.poster} year={movie.mediaItem.year} mediaType={MediaType.movie}>
+              <PrimaryButton onClick={() => deleteMarkedMedia(movie.id)}>Remove</PrimaryButton>
+            </MovieCard>)
+        ))}
+      </div>
+    </div >
+  )
+}
+
+export default withProtectedRoute(MyMovies);
