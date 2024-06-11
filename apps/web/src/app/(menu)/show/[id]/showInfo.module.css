@@ -1,171 +1,201 @@
 .errorModal {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
 }
 
 .errorModal div {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 25%;
-    height: 3rem;
-    font-size: xx-large;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 25%;
+  height: 3rem;
+  font-size: xx-large;
 }
 
 .closeModal {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 1rem;
-    font-size: 2rem;
-    cursor: pointer;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 1rem;
+  font-size: 2rem;
+  cursor: pointer;
 }
 
 .grid {
-    display: flex;
-    grid-template-columns: repeat(2, 1fr);
-    grid-column-gap: 0px;
-    grid-row-gap: 0px;
-    margin-top: 2rem;
-    margin-right: 10rem;
+  display: flex;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  margin-top: 2rem;
+  margin-right: 10rem;
 }
 
 .poster {
-    flex: 0.7;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin: 1rem;
-    width: 10%;
+  flex: 0.7;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin: 1rem;
+  width: 10%;
 }
 
 .poster img {
-    border-radius: 5px;
+  border-radius: 5px;
 }
 
 .showDetails {
-    flex: 1.3;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 0 1rem;
+  flex: 1.3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 1rem;
 }
 
 .hr {
-    width: 50%;
-    border: 1px solid var(--secondary);
-    margin: 0;
+  width: 50%;
+  border: 1px solid var(--secondary);
+  margin: 0;
 }
 
 .title {
-    font-size: 2rem;
-    margin: 1rem 0 0 0rem;
+  font-size: 2rem;
+  margin: 1rem 0 0 0rem;
 }
 
 .genres {
-    display: flex;
-    flex-direction: row;
-    font-size: 0.8rem;
+  display: flex;
+  flex-direction: row;
+  font-size: 0.8rem;
 }
 
 .back {
-    margin: 1rem;
-    cursor: pointer;
+  margin: 1rem;
+  cursor: pointer;
 }
 
 .runtime {
-    font-size: 0.8rem;
-    margin: 0.1rem;
+  font-size: 0.8rem;
+  margin: 0.1rem;
 }
 
-.seasons {
-    width: 80%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+.listContainer {
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+  width: 60vw;
+  gap: 1rem;
 }
 
 .episodeList {
-    overflow-y: scroll;
-    overflow-x: hidden;
-    height: 70vh;
-    width: 30vw;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 70vh;
+  width: 30vw;
 }
 
 .episodeItem {
-    display: grid;
-    grid-template-rows: repeat(2);
-    gap: 0.5rem;
-    overflow: hidden;
-    background-color: var(--primary-dark);
-    width: 98%;
-    height: min-content;
-    border: 1px solid var(--secondary);
-    border-radius: 5px;
-    margin: 0.5rem 0;
-    padding: 1rem;
+  display: grid;
+  grid-template-rows: repeat(2);
+  gap: 0.5rem;
+  overflow: hidden;
+  background-color: var(--primary-dark);
+  width: 98%;
+  height: min-content;
+  border: 1px solid var(--secondary);
+  border-radius: 5px;
+  margin: 0.5rem 0;
+  padding: 1rem;
 }
 
+.tabs {
+  display: flex;
+}
+
+.tabs div {
+  margin: 0 0.2rem;
+  background-color: var(--primary-dark);
+  border-radius: 5px 5px 0 0;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.activeTab {
+  border: 1px solid white;
+  border-bottom: 0 solid transparent;
+}
+
+.tabs div:hover {
+  cursor: pointer;
+}
+
+
 .episodeImg {
-    width: auto;
-    height: 5rem;
-    border-radius: 5px;
+  width: auto;
+  height: 5rem;
+  border-radius: 5px;
 }
 
 .ImageTitle {
-    display: grid;
-    grid-template-columns: 1fr 4fr;
-    gap: 0.5rem;
-}
-
-.episodeList::-webkit-scrollbar {
-    width: 0.6rem;
-}
-
-.episodeList::-webkit-scrollbar-track {
-    background: var(--primary-dark);
-    border-radius: 8px;
-}
-
-.episodeList::-webkit-scrollbar-thumb {
-    background: var(--secondary);
-    border-radius: 8px;
-}
-
-@supports not selector(::-webkit-scrollbar) {
-    .episodeList {
-        scrollbar-color: var(--secondary) var(--primary-dark);
-    }
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  gap: 0.5rem;
 }
 
 .seasonTitle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .seasonTitle svg {
-    margin-left: 0.5rem;
+  margin-left: 0.5rem;
 }
 
 .season {
-    transition: all 0.5s;
-    border-radius: 5px;
+  transition: all 0.5s;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.season img {
+  border-radius: 5px;
 }
 
 .season:hover {
-    cursor: pointer;
-    border: 1px solid var(--secondary);
-    box-shadow: rgba(0, 0, 0, 0.7) 5px 25px 35px -10px;
-    transform: scale(1.05);
+  cursor: pointer;
+  border: 1px solid var(--secondary);
+  box-shadow: rgba(0, 0, 0, 0.7) 5px 25px 35px -10px;
+  transform: scale(1.05);
+}
+
+.creditCard img {
+  border-radius: 5px;
+}
+
+.creditCard {
+  background-color: var(--primary-dark);
+  margin: 0;
+  height: 27vh !important;
+  border-radius: 5px;
+}
+
+.creditCard p,
+.creditCard h5 {
+  padding: 0 0.6rem;
+}
+
+.castList {
+  height: 30vh;
+  overflow-y: hidden;
 }
