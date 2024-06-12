@@ -8,16 +8,19 @@ import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { getShow } from "@/utils/fetch/show";
 import { getSeasons } from "@/utils/fetch/tmdb";
-import { deleteUserMediaItem, getWatchedEpisodes } from "@/utils/fetch/userMediaItem";
+import { deleteUserMediaItem, getCredits, getWatchedEpisodes } from "@/utils/fetch/userMediaItem";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
+import { MediaType } from "@prisma/client";
+import Tabs from "@/components/Tabs/Tabs";
 
 function ShowDetails({ params }: { params: { id: string } }) {
   const [show, setShow] = useState<any>();
+  const [tab, setTab] = useState('seasons');
+  const [credits, setCredits] = useState<any>();
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [error, setError] = useState('')
-  const [errorModal, setErrorModal] = useState(false)
   const router = useRouter();
   const [reload, setReload] = useState(false);
 
@@ -32,7 +35,6 @@ function ShowDetails({ params }: { params: { id: string } }) {
         setShow(show);
       } else {
         setError(response.body.error);
-        setErrorModal(true);
       }
     }
     fetchShow();
@@ -42,14 +44,22 @@ function ShowDetails({ params }: { params: { id: string } }) {
         setWatchedEpisodes(await response.body)
       } else {
         setError(response.body.error);
-        setErrorModal(true);
       }
     }
     fetchWatchedEpisodes();
+    async function fetchCredits() {
+      const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.show });
+      if (response.status === 200) {
+        setCredits(response.body)
+      } else {
+        setError(response.body.error)
+      }
+    }
+    fetchCredits();
   }, [params.id, reload]);
 
   const closeModal = () => {
-    setErrorModal(false);
+    setError('')
   }
   function setIcon(season: any) {
     if (season.episodes.length === watchedEpisodes[season.season_number]?.count) {
@@ -79,13 +89,13 @@ function ShowDetails({ params }: { params: { id: string } }) {
   return (
     <div className={styles.container}>
       <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
-      {error && errorModal && (
-        <div className={styles.errorModal} onClick={closeModal}>
-          <p className={styles.closeModal}>X</p>
-          <Callout type="error">{error}</Callout>
-        </div>
-      )}
       <div>
+        {error && (
+          <div className={styles.errorModal} onClick={closeModal}>
+            <p className={styles.closeModal}>X</p>
+            <Callout type="error">{error}</Callout>
+          </div>
+        )}
         {show && (
           <div className={styles.grid}>
             <div className={styles.poster}>
@@ -100,25 +110,49 @@ function ShowDetails({ params }: { params: { id: string } }) {
               <p className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
               <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>
               <p className={styles.overview}>{show.overview}</p>
-              <h2>Seasons</h2>
-              <div className={styles.seasons}>
-                {show.seasons.map((season: any) => (
-                  <div className={styles.season} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
-                    <Image
-                      src={season.poster_path}
-                      alt={season.name}
-                      width={150}
-                      height={225} />
-                    <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
-                    {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
-                  </div>
-                ))}
+              <div className={styles.tabs}>
+                <div className={tab === 'seasons' ? styles.activeTab : ''} onClick={() => setTab('seasons')}>Seasons</div>
+                <div className={tab === 'cast' ? styles.activeTab : ''} onClick={() => setTab('cast')}>Cast</div>
               </div>
+              <Tabs>
+                <div className={styles.listContainer} id="Seasons">
+                  {show.seasons.map((season: any) => (
+                    <div className={`${styles.season}`} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
+                      <Image
+                        src={season.poster_path}
+                        alt={season.name}
+                        width={150}
+                        height={225} />
+                      <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
+                      {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
+                    </div>
+                  ))}
+                </div>
+                <div className={`${styles.listContainer} ${styles.seasonList} ${styles.castList}`} id="Credits">
+                  {credits.cast.map((credit: any) => (
+                    <div key={credit.id} className={styles.creditCard}>
+                      <Image
+                        src={credit.profile_path}
+                        alt={credit.name}
+                        objectFit="contain"
+                        width={143}
+                        height={192} />
+                      <div className={styles.castDetails}>
+                        <h5>{credit.name}</h5>
+                        <p>{credit.roles.map((role: any) => {
+                          return role.character
+                        })}</p>
+                        <p>Episodes: {credit.total_episode_count}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Tabs>
             </div>
-          </div>
+          </div >
         )}
       </div>
-    </div >
+    </div>
   );
 }
 

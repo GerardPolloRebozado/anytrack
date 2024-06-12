@@ -9,11 +9,14 @@ import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
+import Tabs from "@/components/Tabs/Tabs";
+import { getCredits } from "@/utils/fetch/userMediaItem";
+import { MediaType } from "@prisma/client";
 
 function MovieDetails({ params }: { params: { id: string } }) {
   const [movie, setMovie] = useState<any>();
-  const [error, setError] = useState('')
-  const [errorModal, setErrorModal] = useState(false)
+  const [error, setError] = useState('');
+  const [credits, setCredits] = useState<any>();
   const router = useRouter();
 
   useEffect(() => {
@@ -24,20 +27,29 @@ function MovieDetails({ params }: { params: { id: string } }) {
         setMovie(await response.body);
       } else {
         setError(response.body.error);
-        setErrorModal(true);
       }
     }
     fetchMovie();
+
+    async function fetchCredits() {
+      const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.movie })
+      if (response.status === 200) {
+        setCredits(await response.body.cast)
+      } else {
+        setError(await response.body.error)
+      }
+    }
+    fetchCredits()
   }, [params.id]);
 
   const closeModal = () => {
-    setErrorModal(false);
+    setError('')
   }
 
   return (
     <div className={styles.container}>
       <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
-      {error && errorModal && (
+      {error && (
         <div className={styles.errorModal} onClick={closeModal}>
           <p className={styles.closeModal}>X</p>
           <Callout type="error">{error}</Callout>
@@ -59,6 +71,23 @@ function MovieDetails({ params }: { params: { id: string } }) {
               <p className={styles.genres}>{movie.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
               <p className={styles.runtime}> {movie.runtime} min</p>
               <p className={styles.overview}>{movie.overview}</p>
+              <div id="Credits" className={styles.creditList}>
+                {credits && credits.length > 0 && (
+                  credits.map((credit: any) => (
+                    <div key={credit.id} className={styles.creditCard}>
+                      <Image
+                        src={credit.profile_path}
+                        alt={credit.name}
+                        objectFit="contain"
+                        width={143}
+                        height={192} />
+                      <div className={styles.castDetails}>
+                        <h5>{credit.name}</h5>
+                        <p>{credit.character}</p>
+                      </div>
+                    </div>
+                  )))}
+              </div>
             </div>
           </div>
         )}

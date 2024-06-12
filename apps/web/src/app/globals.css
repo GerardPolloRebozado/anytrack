@@ -66,8 +66,30 @@ a {
   color: var(--warning);
 }
 
-.chartTooltip, .chartTooltip * {
-  background-color: var(--primary)!important;
-  color: var(--secondary)!important;
+.chartTooltip,
+.chartTooltip * {
+  background-color: var(--primary) !important;
+  color: var(--secondary) !important;
   border-radius: 5px;
+}
+
+
+*::-webkit-scrollbar {
+  width: 0.6rem;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--primary-dark);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 8px;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--secondary) var(--primary-dark);
+  }
 }

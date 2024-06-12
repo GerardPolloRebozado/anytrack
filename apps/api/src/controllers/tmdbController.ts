@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { getAgregatedShowCreditsService, getMovieCredits, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { MediaType } from '@prisma/client';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
   try {
@@ -31,5 +32,24 @@ export const getShowSeasons = async (req: Request, res: Response) => {
     res.status(200).json(seasons);
   } catch (error) {
     res.status(500).json(error);
+  }
+}
+
+export const getCredits = async (req: Request, res: Response) => {
+  try {
+    const mediaType = req.query.mediaType as MediaType;
+    const tmdbId = req.query.tmdbId as string;
+    let response;
+    if (mediaType === MediaType.show) {
+      response = await getAgregatedShowCreditsService(tmdbId)
+    } else if (mediaType === MediaType.movie) {
+      response = await getMovieCredits(tmdbId)
+    }
+    await Promise.all(response.cast.map(async (credit: any) => {
+      credit.profile_path = `https://image.tmdb.org/t/p/original${credit.profile_path}`
+    }))
+    res.status(200).json(response)
+  } catch (error) {
+    res.status(500).json(error)
   }
 }
