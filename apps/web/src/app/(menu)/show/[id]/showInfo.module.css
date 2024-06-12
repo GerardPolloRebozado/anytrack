@@ -91,13 +91,13 @@
 .listContainer {
   display: flex;
   flex-direction: row;
-  overflow-x: scroll;
+  overflow-x: auto;
   width: 60vw;
   gap: 1rem;
 }
 
 .episodeList {
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   height: 70vh;
   width: 30vw;
@@ -116,29 +116,6 @@
   margin: 0.5rem 0;
   padding: 1rem;
 }
-
-.tabs {
-  display: flex;
-}
-
-.tabs div {
-  margin: 0 0.2rem;
-  background-color: var(--primary-dark);
-  border-radius: 5px 5px 0 0;
-  padding: 0.5rem;
-  font-size: 1.2rem;
-  color: white;
-}
-
-.activeTab {
-  border: 1px solid white;
-  border-bottom: 0 solid transparent;
-}
-
-.tabs div:hover {
-  cursor: pointer;
-}
-
 
 .episodeImg {
   width: auto;

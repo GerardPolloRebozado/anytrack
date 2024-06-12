@@ -86,3 +86,10 @@
     font-size: 0.8rem;
     margin: 0.1rem;
 }
+
+.creditList {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    width: 60vw;
+} 

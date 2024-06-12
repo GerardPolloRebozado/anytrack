@@ -42,12 +42,12 @@ export const getCredits = async (req: Request, res: Response) => {
     let response;
     if (mediaType === MediaType.show) {
       response = await getAgregatedShowCreditsService(tmdbId)
-      await Promise.all(response.cast.map(async (credit: any) => {
-        credit.profile_path = `https://image.tmdb.org/t/p/original/${credit.profile_path}`
-      }))
-    } else {
+    } else if (mediaType === MediaType.movie) {
       response = await getMovieCredits(tmdbId)
     }
+    await Promise.all(response.cast.map(async (credit: any) => {
+      credit.profile_path = `https://image.tmdb.org/t/p/original${credit.profile_path}`
+    }))
     res.status(200).json(response)
   } catch (error) {
     res.status(500).json(error)

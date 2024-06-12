@@ -13,6 +13,7 @@ import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
 import { MediaType } from "@prisma/client";
+import Tabs from "@/components/Tabs/Tabs";
 
 function ShowDetails({ params }: { params: { id: string } }) {
   const [show, setShow] = useState<any>();
@@ -113,52 +114,45 @@ function ShowDetails({ params }: { params: { id: string } }) {
                 <div className={tab === 'seasons' ? styles.activeTab : ''} onClick={() => setTab('seasons')}>Seasons</div>
                 <div className={tab === 'cast' ? styles.activeTab : ''} onClick={() => setTab('cast')}>Cast</div>
               </div>
-              {tab === 'seasons' && (
-                <>
-                  <div className={styles.listContainer}>
-                    {show.seasons.map((season: any) => (
-                      <div className={`${styles.season}`} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
-                        <Image
-                          src={season.poster_path}
-                          alt={season.name}
-                          width={150}
-                          height={225} />
-                        <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
-                        {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
+              <Tabs>
+                <div className={styles.listContainer} id="Seasons">
+                  {show.seasons.map((season: any) => (
+                    <div className={`${styles.season}`} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
+                      <Image
+                        src={season.poster_path}
+                        alt={season.name}
+                        width={150}
+                        height={225} />
+                      <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
+                      {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
+                    </div>
+                  ))}
+                </div>
+                <div className={`${styles.listContainer} ${styles.seasonList} ${styles.castList}`} id="Credits">
+                  {credits.cast.map((credit: any) => (
+                    <div key={credit.id} className={styles.creditCard}>
+                      <Image
+                        src={credit.profile_path}
+                        alt={credit.name}
+                        objectFit="contain"
+                        width={143}
+                        height={192} />
+                      <div className={styles.castDetails}>
+                        <h5>{credit.name}</h5>
+                        <p>{credit.roles.map((role: any) => {
+                          return role.character
+                        })}</p>
+                        <p>Episodes: {credit.total_episode_count}</p>
                       </div>
-                    ))}
-                  </div>
-                </>
-              )}
-              {credits && credits.cast.length > 0 && tab === 'cast' && (
-                <>
-                  <div className={`${styles.listContainer} ${styles.seasonList} ${styles.castList}`}>
-                    {credits.cast.map((credit: any) => (
-                      <div key={credit.id} className={styles.creditCard}>
-                        <Image
-                          src={credit.profile_path}
-                          alt={credit.name}
-                          objectFit="contain"
-                          width={143}
-                          height={192} />
-                        <div className={styles.castDetails}>
-                          <h5>{credit.name}</h5>
-                          <p>{credit.roles.map((role: any) => {
-                            return role.character
-                          })}</p>
-                          <p>Episodes: {credit.total_episode_count}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-
+                    </div>
+                  ))}
+                </div>
+              </Tabs>
             </div>
-          </div>
+          </div >
         )}
       </div>
-    </div >
+    </div>
   );
 }
 
