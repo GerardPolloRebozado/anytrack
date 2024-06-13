@@ -36,7 +36,6 @@ model MediaItem {
   poster        String?
   tmdbRating    Float?
   releaseDate   DateTime?
-  url           String?
   runtime       Int?
   genres        genre[]
   authors       String?
@@ -111,8 +110,9 @@ enum theme {
 
 enum status {
   ongoing
-  finished
   canceled
+  released
+  finished
 }
 
 enum language {

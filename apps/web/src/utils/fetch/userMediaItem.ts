@@ -2,8 +2,8 @@ import Cookies from 'js-cookie'
 import buildUrl from '../buildUrl';
 import { MediaType } from '@prisma/client';
 
-export const getManyUserMediaItem = async ({ mediaType, watched, includeMediaItem, groupBy }: { mediaType?: MediaType, watched?: boolean, includeMediaItem?: boolean, groupBy?: string }) => {
-  const url = buildUrl('/api/v1/userMediaItem', { mediaType, watched, includeMediaItem, groupBy })
+export const getManyUserMediaItem = async ({ mediaType, watched, groupBy }: { mediaType?: MediaType, watched?: boolean, groupBy?: string }) => {
+  const url = buildUrl('/api/v1/userMediaItem', { mediaType, watched, groupBy })
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${Cookies.get('token')}`

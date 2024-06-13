@@ -31,7 +31,7 @@ export const markMovieService = async (movie: MediaItem, userId: string, watched
   }
 }
 
-export const getMarkedMoviesService = async (userId: string): Promise<UserMediaItem[]> => {
+export const getMarkedMoviesService = async (userId: string) => {
   return await prisma.userMediaItem.findMany({
     where: {
       userId,
@@ -40,7 +40,15 @@ export const getMarkedMoviesService = async (userId: string): Promise<UserMediaI
       }
     },
     include: {
-      mediaItem: true
+      mediaItem: {
+        select: {
+          seasons: false
+        },
+        include: {
+          genres: true,
+        }
+      },
+      episode: false
     }
   })
 }

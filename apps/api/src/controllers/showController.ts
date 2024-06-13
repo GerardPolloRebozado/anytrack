@@ -47,7 +47,6 @@ export const markShow = async (req: Request, res: Response) => {
         poster: `https://image.tmdb.org/t/p/original/${tmdbShow.poster_path}`,
         tmdbRating: tmdbShow.vote_average,
         releaseDate: new Date(tmdbShow.first_air_date),
-        url: `https://www.themoviedb.org/tv/${tmdbShow.id}`,
         seasons: tmdbShow.number_of_seasons,
         genres: {
           connect: await Promise.all(tmdbShow.genres.map(async (genre: any) => {

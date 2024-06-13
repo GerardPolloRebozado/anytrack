@@ -15,7 +15,6 @@ function MyMovies() {
     async function fetchMovies() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.movie,
-        includeMediaItem: true
       })
       setMovies(await response.body)
     }

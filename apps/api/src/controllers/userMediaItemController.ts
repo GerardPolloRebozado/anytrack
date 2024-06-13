@@ -9,7 +9,6 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
   try {
     const mediaType = req.query.mediaType as MediaType | undefined
     const watched: string | undefined = req.query.watched as string | undefined
-    const includeMediaItem = req.query.includeMediaItem as unknown as boolean | undefined
     const userId = res.locals.user.id
     const groupBy = req.query.groupBy as string | undefined
     const userMediaItem = await findManyUserMediaItemService({
@@ -21,8 +20,12 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
         watched: watched !== undefined ? watched !== 'true' ? false : true : undefined,
       },
       include: {
-        mediaItem: includeMediaItem ? true : false,
-        episode: includeMediaItem ? true : false,
+        mediaItem: {
+          include: {
+            genres: true,
+          }
+        },
+        episode: MediaType.show ? true : false,
       },
       orderBy: {
         watchedDate: 'desc',

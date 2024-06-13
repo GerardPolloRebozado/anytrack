@@ -21,7 +21,6 @@ function MyShows() {
     async function fetchWatchedShows() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.show,
-        includeMediaItem: true,
         groupBy: 'mediaItem',
         watched: true
       })
@@ -32,7 +31,6 @@ function MyShows() {
     async function fetchWatchlistShows() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.show,
-        includeMediaItem: true,
         groupBy: 'mediaItem',
         watched: false
       })

@@ -56,7 +56,6 @@ export const markMovie = async (req: Request, res: Response) => {
         poster: `https://image.tmdb.org/t/p/original/${movie.poster_path}`,
         tmdbRating: movie.vote_average,
         releaseDate: new Date(movie.release_date),
-        url: `https://www.themoviedb.org/movie/${movie.id}`,
         runtime: movie.runtime,
         genres: {
           connect: genreData.map((genre) => ({ name: genre.name }))
