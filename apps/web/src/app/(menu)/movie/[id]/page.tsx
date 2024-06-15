@@ -12,6 +12,7 @@ import { randomColor } from "@/utils/randomColor";
 import Tabs from "@/components/Tabs/Tabs";
 import { getCredits } from "@/utils/fetch/userMediaItem";
 import { MediaType } from "@prisma/client";
+import MediaScore from "@/components/MediaScore/MediaScore";
 
 function MovieDetails({ params }: { params: { id: string } }) {
   const [movie, setMovie] = useState<any>();
@@ -70,6 +71,7 @@ function MovieDetails({ params }: { params: { id: string } }) {
               <h1 className={styles.title}>{movie.title} ({movie.year})</h1>
               <p className={styles.genres}>{movie.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
               <p className={styles.runtime}> {movie.runtime} min</p>
+              <MediaScore score={movie.vote_average} />
               <p className={styles.overview}>{movie.overview}</p>
               <div id="Credits" className={styles.creditList}>
                 {credits && credits.length > 0 && (

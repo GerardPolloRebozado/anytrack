@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.progressCircle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-right: 1rem;
+}
+
+.progressCircle .innerCircle {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background-color: var(--background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progressCircle span {
+  position: absolute;
+  font-size: 0.9rem;
+  color: white;
+}
