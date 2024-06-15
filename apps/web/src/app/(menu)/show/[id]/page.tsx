@@ -14,6 +14,7 @@ import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
 import { MediaType } from "@prisma/client";
 import Tabs from "@/components/Tabs/Tabs";
+import MediaScore from "@/components/MediaScore/MediaScore";
 
 function ShowDetails({ params }: { params: { id: string } }) {
   const [show, setShow] = useState<any>();
@@ -109,11 +110,8 @@ function ShowDetails({ params }: { params: { id: string } }) {
               <h1 className={styles.title}>{show.title} {show.name} ({show.year})</h1>
               <p className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
               <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>
+              <MediaScore score={show?.vote_average} />
               <p className={styles.overview}>{show.overview}</p>
-              <div className={styles.tabs}>
-                <div className={tab === 'seasons' ? styles.activeTab : ''} onClick={() => setTab('seasons')}>Seasons</div>
-                <div className={tab === 'cast' ? styles.activeTab : ''} onClick={() => setTab('cast')}>Cast</div>
-              </div>
               <Tabs>
                 <div className={styles.listContainer} id="Seasons">
                   {show.seasons.map((season: any) => (
