@@ -19,15 +19,15 @@ export const findUniqueMediaService = async (where: Prisma.MediaItemWhereUniqueI
   })
 }
 
-export const findManyMediaService = async (where: Prisma.MediaItemWhereInput) => {
+export const findManyMediaService = async (where: Prisma.MediaItemWhereInput, include?: Prisma.MediaItemInclude ) => {
   return await prisma.mediaItem.findMany({
     where,
-  })
-}
+    include,
+})
+};
 
 
 export const updateMediaService = async (where: Prisma.MediaItemWhereUniqueInput, data: Prisma.MediaItemUpdateInput) => {
-  console.log(where, data)
   return await prisma.mediaItem.update({
     where,
     data
