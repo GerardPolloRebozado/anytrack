@@ -46,3 +46,11 @@ export const markEpisodeService = async ({ episode, userId, watched, watchedDate
     })
     return userEpisode
 }
+
+export const upsertEpisodeService = async (where: Prisma.EpisodeWhereUniqueInput, episode: Prisma.EpisodeCreateInput) => {
+    return await prisma.episode.upsert({
+        where,
+        update: episode,
+        create: episode
+    })
+}

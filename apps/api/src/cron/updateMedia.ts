@@ -1,8 +1,9 @@
 import { CronJob } from "cron";
 import { findManyMediaService, updateMediaService } from "../services/mediaService";
 import { MediaType } from "@prisma/client";
-import { searchMoviebyIdService, searchShowTmdbIdService } from "../services/tmdbService";
+import { searchMoviebyIdService, searchShowSeasonsService, searchShowTmdbIdService } from "../services/tmdbService";
 import { upsertSeason } from "../services/seasonService";
+import { upsertEpisodeService } from "../services/episodeService";
 
 export const updateMovies = new CronJob("0 0 */2 * *", async () => {
   const movieItems = await findManyMediaService({
@@ -29,7 +30,7 @@ export const updateMovies = new CronJob("0 0 */2 * *", async () => {
   });
 }, null, true, "Europe/Madrid");
 
-export const updateShows = new CronJob("27 11 * * *", async () => {
+export const updateShows = new CronJob("0 0 * * *", async () => {
   const showItems = await findManyMediaService({
     updatedAt: {
       lte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
@@ -81,6 +82,29 @@ export const updateShows = new CronJob("27 11 * * *", async () => {
           }
         }
       )
+      const seasonTmdb = await searchShowSeasonsService(show.tmdbId, season.season_number);
+      seasonTmdb.episodes.forEach(episode => {
+        const episodeDb = upsertEpisodeService(
+          {
+            seasonId_episodeNumber: {
+              seasonId: seasonDb.id,
+              episodeNumber: episode.episode_number
+            }
+          },
+          {
+            episodeNumber: episode.episode_number,
+            title: episode.name,
+            overview: episode.overview,
+            releaseDate: new Date(episode.air_date),
+            season: {
+              connect: {
+                id: seasonDb.id
+              }
+          }
+          }
+        )
+      });
+
     });
     console.log(`Updated show ${updatedShow.title}`);
   });

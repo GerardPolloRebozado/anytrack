@@ -12,7 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
 updateMovies.start()
 updateShows.start()
-console.log(updateShows.nextDate())
+updateMovies.fireOnTick()
+updateShows.fireOnTick()
 app.use('/api/v1', apiRouter)
 
 app.listen(port, () => {
