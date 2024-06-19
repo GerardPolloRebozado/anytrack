@@ -24,6 +24,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
             <p>My Shows</p>
           </Link>
         </DropDownMenu>
+        <Link href="/settings" className={styles.link}>Settings</Link>
       </div>
       <div className={styles.content}>
         {children}

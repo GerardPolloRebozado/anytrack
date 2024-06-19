@@ -7,8 +7,8 @@ import { MediaType } from "@anytrack/type"
 
 export const getUserMediaItem = async (req: Request, res: Response) => {
   try {
-    const mediaType = req.query.mediaType as MediaType | undefined
-    const watched: string | undefined = req.query.watched as string | undefined
+    const mediaType = req.query.mediaType as MediaType
+    const watched = req.query.watched as string | undefined
     const userId = res.locals.user.id
     const groupBy = req.query.groupBy as string | undefined
     const userMediaItem = await findManyUserMediaItemService({

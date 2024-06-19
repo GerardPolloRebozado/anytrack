@@ -2,6 +2,7 @@ import Joi from "joi";
 import { tlds } from "@hapi/tlds";
 export { Joi };
 import { MediaType } from '@prisma/client';
+import { watch } from "fs";
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
@@ -46,9 +47,10 @@ export const getShowSchema = Joi.object({
 })
 
 export const markShowSchema = Joi.object({
+  tmdbId: Joi.string().required(),
   watchedDate: Joi.date().optional().max("now"),
   watched: Joi.boolean().required(),
-  season: Joi.number().required(),
+  season: Joi.number().optional(),
   episode: Joi.number().optional()
 })
 
@@ -84,4 +86,25 @@ export const getCreditsSchema = Joi.object({
     then: Joi.optional(),
     otherwise: Joi.forbidden()
   })
+})
+
+export const getWatchedEpisodesFromUserSchema = Joi.object({
+  tmdbId: Joi.string().required(),
+  season: Joi.number().optional()
+})
+
+export const getUserMediaItemSchema = Joi.object({
+  mediaType: Joi.string().valid(...Object.values(MediaType)).required(),
+  watched: Joi.string().valid('true', 'false').optional(),
+  groupBy: Joi.string().valid('month').optional()
+})
+
+export const deleteOneUserMediaItemShowSchema = Joi.object({
+  tmdbId: Joi.string().required(),
+  season: Joi.number().when('episode', {
+    is: Joi.exist(),
+    then: Joi.number().required(),
+    otherwise: Joi.number().optional()
+  }),
+  episode: Joi.number().optional()
 })
