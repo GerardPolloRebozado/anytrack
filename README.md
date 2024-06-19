@@ -99,6 +99,12 @@ To get a local copy up and running follow these simple example steps.
 npm install
 ```
 ```sh
+docker compose up -d
+```
+```sh
+npx prisma db push --schema apps/api/prisma/schema.prisma
+```
+```sh
 nx run api:serve:production
 ```
 ```sh
