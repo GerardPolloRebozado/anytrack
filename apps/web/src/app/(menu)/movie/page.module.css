@@ -7,3 +7,18 @@
     gap: 1.5rem;
     overflow: hidden;
 }
+
+.chartContainer {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+  grid-gap: 1.2em;
+}
+
+.chart {
+  background-color: var(--primary-dark);
+  border-radius: 6px;
+  padding: 1em;
+  width: auto;
+  height: auto;
+}

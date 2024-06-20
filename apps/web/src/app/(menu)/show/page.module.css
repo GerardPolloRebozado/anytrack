@@ -1,11 +1,11 @@
 .cardContainer {
-    padding: 2rem;
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    grid-auto-rows: 1fr;
-    gap: 1.5rem;
-    overflow: hidden;
+  padding: 2rem;
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 1.5rem;
+  overflow: hidden;
 }
 
 .chartContainer {
@@ -22,4 +22,3 @@
   width: auto;
   height: auto;
 }
-

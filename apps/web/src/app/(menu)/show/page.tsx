@@ -3,7 +3,7 @@ import MediaCard from '@/components/MediaCard/MediaCard';
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import {getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
+import { getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
 import { MediaType } from 'libs/types/src';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -19,7 +19,6 @@ function MyShows() {
     async function fetchWatchedShows() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.show,
-        includeMediaItem: true,
         groupBy: 'mediaItem',
         watched: true
       })
@@ -30,7 +29,6 @@ function MyShows() {
     async function fetchWatchlistShows() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.show,
-        includeMediaItem: true,
         groupBy: 'mediaItem',
         watched: false
       })
@@ -53,7 +51,7 @@ function MyShows() {
                     <Cell key={`cell-${index}`} fill={pieColors[index].hex()} />
                   ))}
                 </Pie>
-                <Tooltip wrapperClassName='chartTooltip'/>
+                <Tooltip wrapperClassName='chartTooltip' />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
