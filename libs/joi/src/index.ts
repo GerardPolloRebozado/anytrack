@@ -36,10 +36,15 @@ export const markMediaSchema = Joi.object({
     (),
 })
 
-export const getMarkedMediaSchema = Joi.object({
-  mediaType: Joi.string().valid("movie", "show").optional(),
+export const getUserMediaItemSchema = Joi.object({
+  mediaType: Joi.string().valid(...Object.values(MediaType)).optional(),
   watched: Joi.boolean().optional(),
-  groupBy: Joi.string().valid('month').optional(),
+  groupBy: Joi.string().optional().when('mediaType', {
+    is: MediaType.show,
+    then: Joi.valid('mediaItem', 'month'),
+    otherwise: Joi.valid('month')
+  }
+  )
 })
 
 export const getShowSchema = Joi.object({
@@ -65,13 +70,16 @@ export const markMovieSchemaForm = Joi.object({
   watched: Joi.boolean().required()
 })
 
+export const markShowSchemaForm = Joi.object({
+  watchedDate: Joi.date().optional().max("now"),
+  watched: Joi.boolean().required(),
+  season: Joi.number().optional(),
+  episode: Joi.number().optional()
+})
+
 export const getShowSeasonsSchema = Joi.object({
   tmdbId: Joi.string().required(),
   season: Joi.number().optional()
-})
-
-export const getMarkedMoviesSchema = Joi.object({
-  groupBy: Joi.string().valid('month').optional()
 })
 
 export const removeMarkedMovieSchema = Joi.object({
@@ -91,12 +99,6 @@ export const getCreditsSchema = Joi.object({
 export const getWatchedEpisodesFromUserSchema = Joi.object({
   tmdbId: Joi.string().required(),
   season: Joi.number().optional()
-})
-
-export const getUserMediaItemSchema = Joi.object({
-  mediaType: Joi.string().valid(...Object.values(MediaType)).required(),
-  watched: Joi.string().valid('true', 'false').optional(),
-  groupBy: Joi.string().valid('month').optional()
 })
 
 export const deleteOneUserMediaItemShowSchema = Joi.object({

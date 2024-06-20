@@ -1,6 +1,6 @@
 'use client'
 import { joiResolver } from "@hookform/resolvers/joi";
-import { markShowSchema } from "libs/joi/src";
+import { markShowSchemaForm } from "libs/joi/src";
 import { useForm } from "react-hook-form";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { useEffect, useState } from "react";
@@ -25,7 +25,7 @@ export default function MarkShowForm({ params }: { params: { tmdbId: string } })
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<markShowType>({
-    resolver: joiResolver(markShowSchema),
+    resolver: joiResolver(markShowSchemaForm),
     defaultValues: {
       season,
       episode,
@@ -49,6 +49,7 @@ export default function MarkShowForm({ params }: { params: { tmdbId: string } })
       season: season,
       episode: episode
     })
+    console.log(await response)
     if (response.status === 200) {
       setResult(true)
     } else {
@@ -129,6 +130,7 @@ export default function MarkShowForm({ params }: { params: { tmdbId: string } })
               {result == false && <Callout type="error" >Error adding Show</Callout>}
               {errors.watchedDate && <Callout type="error">{errors.watchedDate.message}</Callout>}
               {errors.season && <Callout type="error">{errors.season.message}</Callout>}
+              {errors.episode && <Callout type="error">{errors.episode.message}</Callout>}
               {errors.episode && <Callout type="error">{errors.episode.message}</Callout>}
               {error !== '' && <Callout type="error">{error}</Callout>}
             </div>

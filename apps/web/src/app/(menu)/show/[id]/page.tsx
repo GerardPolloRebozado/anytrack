@@ -108,7 +108,7 @@ function ShowDetails({ params }: { params: { id: string } }) {
             </div>
             <div className={styles.showDetails}>
               <h1 className={styles.title}>{show.title} {show.name} ({show.year})</h1>
-              <p className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
+              <div className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</div>
               <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>
               <MediaScore score={show?.vote_average} />
               <p className={styles.overview}>{show.overview}</p>
@@ -127,23 +127,24 @@ function ShowDetails({ params }: { params: { id: string } }) {
                   ))}
                 </div>
                 <div className={`${styles.listContainer} ${styles.seasonList} ${styles.castList}`} id="Credits">
-                  {credits.cast.map((credit: any) => (
-                    <div key={credit.id} className={styles.creditCard}>
-                      <Image
-                        src={credit.profile_path}
-                        alt={credit.name}
-                        objectFit="contain"
-                        width={143}
-                        height={192} />
-                      <div className={styles.castDetails}>
-                        <h5>{credit.name}</h5>
-                        <p>{credit.roles.map((role: any) => {
-                          return role.character
-                        })}</p>
-                        <p>Episodes: {credit.total_episode_count}</p>
+                  {credits && credits?.cast && (
+                    credits.cast.map((credit: any) => (
+                      <div key={credit.id} className={styles.creditCard}>
+                        <Image
+                          src={credit.profile_path}
+                          alt={credit.name}
+                          objectFit="contain"
+                          width={143}
+                          height={192} />
+                        <div className={styles.castDetails}>
+                          <h5>{credit.name}</h5>
+                          <p>{credit.roles.map((role: any) => {
+                            return role.character
+                          })}</p>
+                          <p>Episodes: {credit.total_episode_count}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )))}
                 </div>
               </Tabs>
             </div>
