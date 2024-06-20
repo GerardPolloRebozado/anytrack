@@ -2,14 +2,12 @@
 import MediaCard from '@/components/MediaCard/MediaCard';
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
-import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import { deleteUserMediaItem, getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
+import { getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
 import { MediaType } from 'libs/types/src';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import distinctColors from 'distinct-colors';
-import MovieRuntimeTooltip from '@/components/MovieRuntimeTooltip/MovieRuntimeTooltip';
 
 function MyShows() {
   const [watchedShows, setWatchedShows] = useState([])
@@ -53,7 +51,7 @@ function MyShows() {
                     <Cell key={`cell-${index}`} fill={pieColors[index].hex()} />
                   ))}
                 </Pie>
-                <Tooltip wrapperClassName='chartTooltip'/>
+                <Tooltip wrapperClassName='chartTooltip' />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
