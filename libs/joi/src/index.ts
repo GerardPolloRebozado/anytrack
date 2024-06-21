@@ -110,3 +110,7 @@ export const deleteOneUserMediaItemShowSchema = Joi.object({
   }),
   episode: Joi.number().optional()
 })
+
+export const updateSettingsSchema = Joi.object({
+  public: Joi.boolean().required(),
+});

@@ -21,8 +21,7 @@ model User {
 model Settings {
   userId   String    @id
   user     User      @relation(fields: [userId], references: [id])
-  theme    theme?
-  language language? @default(english)
+  public   Boolean   @default(false)
 }
 
 model MediaItem {
@@ -102,21 +101,11 @@ model genre {
   name      String      @unique
   MediaItem MediaItem[]
 }
-
-enum theme {
-  light
-  dark
-}
-
 enum status {
   ongoing
   canceled
   released
   finished
-}
-
-enum language {
-  english
 }
 
 enum MediaType {
