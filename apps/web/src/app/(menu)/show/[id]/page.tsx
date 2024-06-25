@@ -16,18 +16,19 @@ import { MediaType, Review } from "@prisma/client";
 import Tabs from "@/components/Tabs/Tabs";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import { getReviews, upsertReview } from "@/utils/fetch/reviews";
-import { Notification, ReviewForm } from "libs/types/src";
+import { Notification, ReviewForm, ReviewWithUser } from "libs/types/src";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { upsertReviewSchema } from "libs/joi/src";
 import Input from "@/components/Input/Input";
 import Notifications from "@/components/Notifications/Notifications";
+import ReviewCard from "@/components/ReviewCard/ReviewCard";
 
 function ShowDetails({ params }: { params: { id: string } }) {
   const [show, setShow] = useState<any>();
   const [tab, setTab] = useState('seasons');
   const [credits, setCredits] = useState<any>();
-  const [reviews, setReviews] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [error, setError] = useState('')
   const router = useRouter();
@@ -147,7 +148,7 @@ function ShowDetails({ params }: { params: { id: string } }) {
               <h1 className={styles.title}>{show.title} {show.name} ({show.year})</h1>
               <div className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</div>
               <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>
-              <MediaScore score={show?.vote_average} />
+              <MediaScore score={show?.vote_average} source="tmdb"/>
               <p className={styles.overview}>{show.overview}</p>
               <Tabs>
                 <div className={styles.listContainer} id="Seasons">
@@ -156,8 +157,10 @@ function ShowDetails({ params }: { params: { id: string } }) {
                       <Image
                         src={season.poster_path}
                         alt={season.name}
-                        width={150}
-                        height={225} />
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        style={{ width: '5.7dvw', height: 'auto' }} />
                       <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
                       {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
                     </div>
@@ -173,7 +176,7 @@ function ShowDetails({ params }: { params: { id: string } }) {
                           width={0}
                           height={0}
                           sizes="100vw"
-                          style={{ width: '5dvw', height: 'auto' }} />
+                          style={{ width: '5.7dvw', height: 'auto' }} />
                         <div className={styles.castDetails}>
                           <h5>{credit.name}</h5>
                           <p>{credit.roles.map((role: any) => {
@@ -186,12 +189,8 @@ function ShowDetails({ params }: { params: { id: string } }) {
                 </div>
                 <div id="Reviews" className={styles.reviewsContainer}>
                   <div className={styles.reviewList}>
-                    {reviews.length > 0 ? reviews.map((review: Review) => (
-                      <div key={review.id} className={styles.review}>
-                        <p>{review.user.name}</p>
-                        <p>{review.review}</p>
-                        <p>{review.rating}</p>
-                      </div>
+                    {reviews.length > 0 ? reviews.map((review: ReviewWithUser) => (
+                      <ReviewCard key={review.id} {...review} />
                     )) : <p>No reviews found</p>}
                   </div>
                   <form onSubmit={handleSubmit(onSubmit)}>

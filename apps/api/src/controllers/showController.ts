@@ -8,16 +8,16 @@ export const searchShow = async (req: Request, res: Response) => {
     let data: any = {};
     if (term.startsWith("tmdb:")) {
       data = await searchShowTmdbIdService(Number(term.split(":")[1]));
+      const localId = await prisma.mediaItem.findUnique({
+        where: {
+          tmdbId: await data.id
+        }
+      });
+      if (localId) {
+        data.localId = localId.id;
+      }
     } else {
       data = await searchShowService(term);
-    }
-    const localId = await prisma.mediaItem.findUnique({
-      where: {
-        tmdbId: data.id
-      }
-    });
-    if (localId) {
-      data.localId = localId.id;
     }
     res.status(200).json(data);
   } catch (error) {

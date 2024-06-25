@@ -67,6 +67,12 @@
   font-size: 0.8rem;
 }
 
+.mediaScore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .back {
   margin: 1rem;
   cursor: pointer;
@@ -152,7 +158,6 @@
 .creditCard {
   background-color: var(--primary-dark);
   margin: 0;
-  height: 27vh !important;
   border-radius: 5px;
 }
 
@@ -165,3 +170,10 @@
   height: 30vh;
   overflow-y: hidden;
 }
+
+.reviewList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+

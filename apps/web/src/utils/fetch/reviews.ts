@@ -1,6 +1,6 @@
 import { Review } from "@prisma/client"
 import Cookies from "js-cookie"
-import { ReviewForm } from "libs/types/src"
+import { ReviewForm, ReviewWithUser } from "libs/types/src"
 
 export const upsertReview = async (data: ReviewForm) => {
   return await fetch('/api/v1/review', {
@@ -13,7 +13,7 @@ export const upsertReview = async (data: ReviewForm) => {
   })
 }
 
-export const getReviews = async (mediaId: number): Promise<Review[]> => {
+export const getReviews = async (mediaId: number): Promise<ReviewWithUser[]> => {
   const response = await fetch(`/api/v1/review/${mediaId}`, {
     headers: {
       'Content-Type': 'application/json',

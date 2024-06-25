@@ -71,7 +71,7 @@ function MovieDetails({ params }: { params: { id: string } }) {
               <h1 className={styles.title}>{movie.title} ({movie.year})</h1>
               <p className={styles.genres}>{movie.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
               <p className={styles.runtime}> {movie.runtime} min</p>
-              <MediaScore score={movie.vote_average} />
+              <MediaScore score={movie.vote_average} source="tmdb" />
               <p className={styles.overview}>{movie.overview}</p>
               <div id="Credits" className={styles.creditList}>
                 {credits && credits.length > 0 && (
@@ -83,7 +83,7 @@ function MovieDetails({ params }: { params: { id: string } }) {
                         width={0}
                         height={0}
                         sizes="100vw"
-                        style={{ width: '5dvw', height: 'auto' }}
+                        style={{ width: '5.7dvw', height: 'auto' }}
                       />
                       <div className={styles.castDetails}>
                         <h5>{credit.name}</h5>

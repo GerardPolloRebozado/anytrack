@@ -7,6 +7,11 @@ export const getReviews = async (req: Request, res: Response) => {
     const reviews = await prisma.review.findMany({
       where: {
         mediaId,
+        user: {
+          settings: {
+            public: true
+          }
+        }
       },
       include: {
         user: true,
