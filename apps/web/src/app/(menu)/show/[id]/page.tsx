@@ -12,30 +12,58 @@ import { deleteUserMediaItem, getCredits, getWatchedEpisodes } from "@/utils/fet
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
-import { MediaType } from "@prisma/client";
+import { MediaType, Review } from "@prisma/client";
 import Tabs from "@/components/Tabs/Tabs";
 import MediaScore from "@/components/MediaScore/MediaScore";
+import { getReviews, upsertReview } from "@/utils/fetch/reviews";
+import { Notification, ReviewForm } from "libs/types/src";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { joiResolver } from "@hookform/resolvers/joi";
+import { upsertReviewSchema } from "libs/joi/src";
+import Input from "@/components/Input/Input";
+import Notifications from "@/components/Notifications/Notifications";
 
 function ShowDetails({ params }: { params: { id: string } }) {
   const [show, setShow] = useState<any>();
   const [tab, setTab] = useState('seasons');
   const [credits, setCredits] = useState<any>();
+  const [reviews, setReviews] = useState<any[]>([]);
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [error, setError] = useState('')
   const router = useRouter();
   const [reload, setReload] = useState(false);
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ReviewForm>({
+    resolver: joiResolver(upsertReviewSchema),
+  });
+  const [notifications, setNotifications] = useState<Notification[]>([])
+
+  function addNotification(notification: Notification) {
+    setNotifications((prevNotifications) => [...prevNotifications, notification]);
+  };
 
   useEffect(() => {
+    async function fetchReviews(mediaId: number) {
+      try {
+        const response = await getReviews(mediaId);
+        setReviews(response)
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
+      }
+    }
     async function fetchShow() {
-      const response = await getShow(`tmdb:${params.id}`);
-      if (response.status === 200) {
+      try {
+        const response = await getShow(`tmdb:${params.id}`);
         response.body.year = response.body.first_air_date.split('-')[0];
         const seasons = await getSeasons({ tmdbId: params.id });
         const show = await response.body
         show.seasons = seasons.body;
         setShow(show);
-      } else {
-        setError(response.body.error);
+        setValue('mediaId', await show.localId)
+        if (await show.localId) {
+          await fetchReviews(await show.localId)
+        }
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
       }
     }
     fetchShow();
@@ -59,6 +87,12 @@ function ShowDetails({ params }: { params: { id: string } }) {
     fetchCredits();
   }, [params.id, reload]);
 
+  const onSubmit: SubmitHandler<ReviewForm> = async (data: ReviewForm) => {
+    const response = await upsertReview(data)
+    if (response.status === 200) {
+      setReload(!reload)
+    }
+  }
   const closeModal = () => {
     setError('')
   }
@@ -88,9 +122,10 @@ function ShowDetails({ params }: { params: { id: string } }) {
 
 
   return (
-    <div className={styles.container}>
+    <>
       <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
-      <div>
+      <Notifications notifications={notifications} setNotifications={setNotifications} />
+      <>
         {error && (
           <div className={styles.errorModal} onClick={closeModal}>
             <p className={styles.closeModal}>X</p>
@@ -103,8 +138,10 @@ function ShowDetails({ params }: { params: { id: string } }) {
               <Image
                 src={show.poster_path}
                 alt={show.name}
-                width={300}
-                height={420} />
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: '15dvw', height: 'auto' }} />
             </div>
             <div className={styles.showDetails}>
               <h1 className={styles.title}>{show.title} {show.name} ({show.year})</h1>
@@ -133,9 +170,10 @@ function ShowDetails({ params }: { params: { id: string } }) {
                         <Image
                           src={credit.profile_path}
                           alt={credit.name}
-                          objectFit="contain"
-                          width={143}
-                          height={192} />
+                          width={0}
+                          height={0}
+                          sizes="100vw"
+                          style={{ width: '5dvw', height: 'auto' }} />
                         <div className={styles.castDetails}>
                           <h5>{credit.name}</h5>
                           <p>{credit.roles.map((role: any) => {
@@ -146,12 +184,44 @@ function ShowDetails({ params }: { params: { id: string } }) {
                       </div>
                     )))}
                 </div>
+                <div id="Reviews" className={styles.reviewsContainer}>
+                  <div className={styles.reviewList}>
+                    {reviews.length > 0 ? reviews.map((review: Review) => (
+                      <div key={review.id} className={styles.review}>
+                        <p>{review.user.name}</p>
+                        <p>{review.review}</p>
+                        <p>{review.rating}</p>
+                      </div>
+                    )) : <p>No reviews found</p>}
+                  </div>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                    <Input
+                      label="Rating"
+                      register={register}
+                      name="rating"
+                      type="number"
+                      required={true}
+                      placeholder="Rating"
+                      error={errors.rating}
+                    />
+                    <Input
+                      label="Review"
+                      register={register}
+                      name="review"
+                      type="text"
+                      required={false}
+                      placeholder="Type your review"
+                      error={errors.review}
+                    />
+                    <PrimaryButton type="submit">Submit</PrimaryButton>
+                  </form>
+                </div>
               </Tabs>
             </div>
           </div >
         )}
-      </div>
-    </div>
+      </>
+    </>
   );
 }
 

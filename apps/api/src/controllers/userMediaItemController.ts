@@ -94,7 +94,7 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
 
 export const deleteOneUserMediaItemShow = async (req: Request, res: Response) => {
   try {
-    const tmdbId = req.query.tmdbId as string;
+    const tmdbId = Number(req.query.tmdbId);
     const userId: string = res.locals.user.id;
     const season = Number(req.query.season);
     const episode = Number(req.query.episode);
@@ -168,7 +168,7 @@ export const deleteOneUserMediaItemShow = async (req: Request, res: Response) =>
 
 export const getWatchedEpisodesFromUser = async (req: Request, res: Response) => {
   try {
-    const tmdbId: string = req.params.tmdbId
+    const tmdbId = Number(req.params.tmdbId)
     const userId: string = res.locals.user.id
     const season = req.params.season as string | undefined
     const userMediaItem = await prisma.$transaction([

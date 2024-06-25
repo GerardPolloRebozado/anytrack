@@ -62,8 +62,10 @@ function MovieDetails({ params }: { params: { id: string } }) {
               <Image
                 src={movie.poster}
                 alt={movie.title}
-                width={300}
-                height={420} />
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: '15dvw', height: 'auto' }} />
             </div>
             <div className={styles.movieDetails}>
               <h1 className={styles.title}>{movie.title} ({movie.year})</h1>
@@ -78,9 +80,11 @@ function MovieDetails({ params }: { params: { id: string } }) {
                       <Image
                         src={credit.profile_path}
                         alt={credit.name}
-                        objectFit="contain"
-                        width={143}
-                        height={192} />
+                        width={0}
+                        height={0}
+                        sizes="100vw"
+                        style={{ width: '5dvw', height: 'auto' }}
+                      />
                       <div className={styles.castDetails}>
                         <h5>{credit.name}</h5>
                         <p>{credit.character}</p>

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
-import { genre } from "@prisma/client";
 import prisma from "../services/prisma";
+import { Genre } from "@prisma/client";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
   try {
@@ -18,7 +18,7 @@ export const getMovieByTerm = async (req: Request, res: Response) => {
 
 export const getMoviebyId = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = Number(req.params.id);
     // const movieLocal = await prisma.mediaItem.findFirst({
     //     where: { tmdbId: id },
     // });
@@ -39,7 +39,7 @@ export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
     const watched = req.body.watched;
-    const tmdbId = String(req.body.tmdbId);
+    const tmdbId = Number(req.body.tmdbId);
     const userId = res.locals.user.id;
     let mediaItem = await prisma.mediaItem.findFirst({
       where: {
@@ -48,11 +48,11 @@ export const markMovie = async (req: Request, res: Response) => {
     });
     if (!mediaItem) {
       const movie = await searchMoviebyIdService(tmdbId);
-      const genreData = await Promise.all(movie.genres.map((genre: genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
+      const genreData = await Promise.all(movie.genre.map((genre: Genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
       if (movie.status_code === 34) throw new Error("Movie not found");
       mediaItem = await prisma.mediaItem.create({
         data: {
-          tmdbId: String(movie.id),
+          tmdbId: movie.id,
           mediaType: "movie",
           title: movie.title,
           overview: movie.overview,

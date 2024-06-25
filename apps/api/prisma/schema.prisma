@@ -15,33 +15,35 @@ model User {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   settings      Settings?
-  UserMediaItem UserMediaItem[]
+  userMediaItem UserMediaItem[]
+  review      Review[]
 }
 
 model Settings {
-  userId   String    @id
-  user     User      @relation(fields: [userId], references: [id])
-  public   Boolean   @default(false)
+  userId String  @id
+  user   User    @relation(fields: [userId], references: [id])
+  public Boolean @default(false)
 }
 
 model MediaItem {
-  id            Int             @id @default(autoincrement())
-  tmdbId        String?         @unique
-  mediaType     MediaType
-  seasons       Int?
-  status        status?
-  title         String
-  overview      String?
-  poster        String?
-  tmdbRating    Float?
-  releaseDate   DateTime?
-  runtime       Int?
-  genres        genre[]
-  authors       String?
-  Season        Season[]
-  UserMediaItem UserMediaItem[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id             Int             @id @default(autoincrement())
+  tmdbId         Int?         @unique
+  mediaType      MediaType
+  seasons        Int?
+  status         status?
+  title          String
+  overview       String?
+  poster         String?
+  tmdbRating     Float?
+  releaseDate    DateTime?
+  runtime        Int?
+  genres         Genre[]
+  authors        String?
+  season         Season[]
+  userMediaItem UserMediaItem[]
+  userReview   Review[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model UserMediaItem {
@@ -55,7 +57,6 @@ model UserMediaItem {
   episodeId   Int?
   episode     Episode?  @relation(fields: [episodeId], references: [id])
   watched     Boolean   @default(false)
-  review      String?
   watchedDate DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -81,26 +82,39 @@ model Season {
 }
 
 model Episode {
-  id            Int             @id @default(autoincrement())
-  episodeNumber Int
-  title         String
-  overview      String?
-  runtime       Int?
-  releaseDate   DateTime?
-  seasonId      Int
-  season        Season?         @relation(fields: [seasonId], references: [id])
-  userMediaItem UserMediaItem[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id             Int             @id @default(autoincrement())
+  episodeNumber  Int
+  title          String
+  overview       String?
+  runtime        Int?
+  releaseDate    DateTime?
+  seasonId       Int
+  season         Season?         @relation(fields: [seasonId], references: [id])
+  usserMediaItem UserMediaItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@unique([seasonId, episodeNumber])
 }
 
-model genre {
+model Genre {
   id        Int         @id @default(autoincrement())
   name      String      @unique
   MediaItem MediaItem[]
 }
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  review    String?
+  rating    Float
+  mediaId   Int
+  mediaItem MediaItem @relation(fields: [mediaId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, mediaId])
+}
+
 enum status {
   ongoing
   canceled

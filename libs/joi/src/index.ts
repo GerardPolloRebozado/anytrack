@@ -29,7 +29,7 @@ export const deleteMediaSchema = Joi.object({
 })
 
 export const markMediaSchema = Joi.object({
-  tmdbId: Joi.alternatives(Joi.string(), Joi.number()).required(),
+  tmdbId: Joi.number().required(),
   watched: Joi.boolean().required(),
   watchedDate: Joi.date().optional(),
   mediaType: Joi.string().valid("movie", "show").required
@@ -52,7 +52,7 @@ export const getShowSchema = Joi.object({
 })
 
 export const markShowSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   watchedDate: Joi.date().optional().max("now"),
   watched: Joi.boolean().required(),
   season: Joi.number().optional(),
@@ -60,7 +60,7 @@ export const markShowSchema = Joi.object({
 })
 
 export const markMovieSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   watchedDate: Joi.date().max("now").optional(),
   watched: Joi.boolean().required()
 })
@@ -78,7 +78,7 @@ export const markShowSchemaForm = Joi.object({
 })
 
 export const getShowSeasonsSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   season: Joi.number().optional()
 })
 
@@ -87,7 +87,7 @@ export const removeMarkedMovieSchema = Joi.object({
 })
 
 export const getCreditsSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   mediaType: Joi.string().valid(...Object.values(MediaType)).required(),
   season: Joi.number().when('mediaType', {
     is: MediaType.show,
@@ -97,12 +97,12 @@ export const getCreditsSchema = Joi.object({
 })
 
 export const getWatchedEpisodesFromUserSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   season: Joi.number().optional()
 })
 
 export const deleteOneUserMediaItemShowSchema = Joi.object({
-  tmdbId: Joi.string().required(),
+  tmdbId: Joi.number().required(),
   season: Joi.number().when('episode', {
     is: Joi.exist(),
     then: Joi.number().required(),
@@ -114,3 +114,16 @@ export const deleteOneUserMediaItemShowSchema = Joi.object({
 export const updateSettingsSchema = Joi.object({
   public: Joi.boolean().required(),
 });
+
+export const upsertReviewSchema = Joi.object({
+  review: Joi.string().optional(),
+  rating: Joi.alternatives().try(
+    Joi.number().min(0).max(9.9).precision(1),
+    Joi.number().valid(10)
+  ),
+  mediaId: Joi.number().required()
+})
+
+export const getReviewsSchema = Joi.object({
+  mediaId: Joi.number().required()
+})

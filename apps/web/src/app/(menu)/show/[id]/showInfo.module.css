@@ -32,21 +32,11 @@
 }
 
 .grid {
-  display: flex;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-column-gap: 3rem;
   margin-top: 2rem;
-  margin-right: 10rem;
-}
-
-.poster {
-  flex: 0.7;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin: 1rem;
-  width: 10%;
+  margin-left: 6rem;
 }
 
 .poster img {
@@ -54,11 +44,10 @@
 }
 
 .showDetails {
-  flex: 1.3;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin: 0 1rem;
+  width: 50dvw;
 }
 
 .hr {
@@ -92,8 +81,8 @@
   display: flex;
   flex-direction: row;
   overflow-x: auto;
-  width: 60vw;
   gap: 1rem;
+  width: 50dvw;
 }
 
 .episodeList {

@@ -1,3 +1,4 @@
+import { Review, User } from '@prisma/client';
 import React from 'react';
 
 export type signupForm = {
@@ -51,4 +52,10 @@ export enum state {
 export enum MediaType {
   show = 'show',
   movie = 'movie'
+}
+
+export type ReviewForm = {
+  review?: string;
+  rating: number;
+  mediaId: number;
 }

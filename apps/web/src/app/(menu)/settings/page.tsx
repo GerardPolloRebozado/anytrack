@@ -13,11 +13,10 @@ import { getSettings, updateSettings } from "@/utils/fetch/settings";
 function SettingsPage() {
   const [user, setUser] = useState({} as any)
   const [settings, setSettings] = useState<Settings>()
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const [reload, setReload] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   function addNotification(notification: Notification) {
-    console.log(notification)
     setNotifications((prevNotifications) => [...prevNotifications, notification]);
   };
 

@@ -1,6 +1,6 @@
 :root {
   --primary: #252525;
-  --primary-dark: #1a1a1a;
+  --primary-dark: rgba(0, 0, 0, 1);
   --secondary: #f0f0f0;
   --background: #25272c;
   --accent: #00ADB5;
@@ -29,12 +29,39 @@
 }
 
 body {
-  background-color: var(--background);
+  /* background-color: var(--background); */
+  height: 100%;
+  width: 100%;
+  background:
+    radial-gradient(ellipse at 0% 50%, rgb(2 7 23 / 1) 0%, rgb(2 7 23 / 0.62) 31.6%, rgb(2 7 23 / 0) 65.97%) 0% 0% / 100% 100% no-repeat no-repeat,
+    radial-gradient(ellipse at 0% 100%, rgb(76 74 194 / 1) 0%, rgb(76 74 194 / 0.85) 4.17%, rgb(76 74 194 / 0.48) 13.89%, rgb(76 74 194 / 0.32) 20.49%, rgb(76 74 194 / 0.14) 31.25%, rgb(76 74 194 / 0) 45.49%) 0% 0% / 100% 100% no-repeat no-repeat,
+    radial-gradient(circle at 100% 50%, rgb(2 7 23 / 1) 0%, rgb(2 7 23 / 0.53) 14.24%, rgb(2 7 23 / 0) 28.13%) 0% 0% / 100% 100% no-repeat no-repeat,
+    radial-gradient(ellipse at 100% 0%, rgb(76 74 194 / 1) 0%, rgb(76 74 194 / 0.73) 8.33%, rgb(76 74 194 / 0.51) 15.28%, rgb(76 74 194 / 0.18) 37.5%, rgb(76 74 194 / 0) 54.86%) 0% 0% / 100% 100% no-repeat no-repeat,
+    linear-gradient(rgb(2 7 23 / 1), rgb(2 7 23 / 1)) 0% 0% / 100% 100% no-repeat no-repeat;
+    animation: gradient 5s linear;
+    animation-fill-mode: forwards;
+  /* background-size: 300% 300%; */
+  background-attachment: fixed;
   color: white;
   margin: 0;
   padding: 0;
-  height: 100%;
 }
+
+/* @keyframes gradient {
+  0% {
+    background-position: 0% 0%;
+    background-size: 300% 300%;
+  }
+  50% {
+    background-position: 100% 0%;
+    background-size: 200% 200%;
+  }
+
+  100% {
+    background-position: 100% 100%;
+    background-size: contain;
+  }
+} */
 
 :root * {
   box-sizing: border-box;

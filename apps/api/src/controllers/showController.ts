@@ -7,9 +7,17 @@ export const searchShow = async (req: Request, res: Response) => {
     const term = req.query.term as string;
     let data: any = {};
     if (term.startsWith("tmdb:")) {
-      data = await searchShowTmdbIdService(term.split(":")[1]);
+      data = await searchShowTmdbIdService(Number(term.split(":")[1]));
     } else {
       data = await searchShowService(term);
+    }
+    const localId = await prisma.mediaItem.findUnique({
+      where: {
+        tmdbId: data.id
+      }
+    });
+    if (localId) {
+      data.localId = localId.id;
     }
     res.status(200).json(data);
   } catch (error) {
@@ -19,7 +27,7 @@ export const searchShow = async (req: Request, res: Response) => {
 
 export const markShow = async (req: Request, res: Response) => {
   try {
-    const tmdbId = req.body.tmdbId;
+    const tmdbId = Number(req.body.tmdbId);
     const userId = res.locals.user.id;
     const season = req.body.season;
     const episode = req.body.episode;
@@ -28,7 +36,7 @@ export const markShow = async (req: Request, res: Response) => {
 
     let show = await prisma.mediaItem.findFirst({
       where: {
-        tmdbId: String(tmdbId),
+        tmdbId: tmdbId,
         mediaType: 'show'
       }
     });
@@ -38,7 +46,7 @@ export const markShow = async (req: Request, res: Response) => {
       if (tmdbShow.status_code === 34) throw new Error("Show not found");
       show = await prisma.mediaItem.create({
         data: {
-          tmdbId: String(tmdbShow.id),
+          tmdbId: tmdbShow.id,
           mediaType: "show",
           title: tmdbShow.name,
           overview: tmdbShow.overview,

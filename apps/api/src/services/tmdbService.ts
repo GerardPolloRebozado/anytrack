@@ -1,5 +1,3 @@
-import { MediaType } from "@prisma/client";
-
 const token = process.env.TMDB_API_KEY;
 
 export const searchMovieService = async (query: string) => {
@@ -16,7 +14,7 @@ export const searchMovieService = async (query: string) => {
   return data;
 }
 
-export const searchMoviebyIdService = async (id: string) => {
+export const searchMoviebyIdService = async (id: number) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/movie/${id}`,
     {
@@ -46,7 +44,7 @@ export const searchShowService = async (query: string) => {
   return data;
 }
 
-export const searchShowTmdbIdService = async (id: string) => {
+export const searchShowTmdbIdService = async (id: number) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/tv/${id}`,
     {
@@ -60,7 +58,7 @@ export const searchShowTmdbIdService = async (id: string) => {
   return data;
 }
 
-export const searchShowSeasonsService = async (tmdbId: string, season: number) => {
+export const searchShowSeasonsService = async (tmdbId: number, season: number) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/tv/${tmdbId}/season/${season}`,
     {
@@ -72,7 +70,7 @@ export const searchShowSeasonsService = async (tmdbId: string, season: number) =
   return await response.json();
 }
 
-export const getAgregatedShowCreditsService = async (tmdbId: string) => {
+export const getAgregatedShowCreditsService = async (tmdbId: number) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/tv/${tmdbId}/aggregate_credits`,
     {
@@ -84,7 +82,7 @@ export const getAgregatedShowCreditsService = async (tmdbId: string) => {
   return await response.json()
 }
 
-export const getMovieCredits = async (tmdbId: string) => {
+export const getMovieCredits = async (tmdbId: number) => {
   const response = await fetch(
     `https://api.themoviedb.org/3/movie/${tmdbId}/credits`,
     {

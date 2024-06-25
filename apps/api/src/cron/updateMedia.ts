@@ -42,7 +42,7 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
       mediaType: MediaType.show,
     },
     include: {
-      Season: true,
+      season: true,
     }
   });
   console.log(`Found ${showItems.length} shows to update`);
