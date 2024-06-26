@@ -1,4 +1,3 @@
-import { Review } from "@prisma/client"
 import Cookies from "js-cookie"
 import { ReviewForm, ReviewWithUser } from "libs/types/src"
 
@@ -28,3 +27,13 @@ export const getReviews = async (mediaId: number): Promise<ReviewWithUser[]> => 
   const data = await response.json();
   return data;
 };
+
+export const deleteReview = async (mediaId: number) => {
+  return await fetch(`/api/v1/review/${mediaId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`
+    }
+  });
+}

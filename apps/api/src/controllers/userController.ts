@@ -32,7 +32,7 @@ export async function signin(req: Request, res: Response) {
         throw new Error("JWT_SECRET not found");
       }
       const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET, { expiresIn: "30d" });
-      return res.status(200).json({ token });
+      return res.status(200).json({ token, userId: foundUser.id });
     } else {
       return res.status(400).json({ error: "Invalid email or password" });
     }

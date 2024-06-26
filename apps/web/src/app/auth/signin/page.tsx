@@ -25,6 +25,7 @@ export default function LoginPage() {
       setError(await response.body.error);
     } else {
       Cookies.set('token', response.body.token, { expires: 30 });
+      Cookies.set('userId', response.body.userId, { expires: 30 });
       router.push('/');
     }
   }

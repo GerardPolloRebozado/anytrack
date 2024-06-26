@@ -125,7 +125,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                 <div id="Reviews" className={styles.reviewsContainer}>
                   <div className={styles.reviewList}>
                     {reviews.length > 0 ? reviews.map((review: ReviewWithUser) => (
-                      <ReviewCard key={review.id} {...review} />
+                      <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
                   </div>
                   {movie.localId && <UpsertReviewForm mediaId={movie.localId} addNotification={addNotification} setReload={() => setReload(!reload)} />}

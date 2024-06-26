@@ -14,3 +14,12 @@
 .title span {
   font-size: 0.7rem;
 }
+
+.deleteButton {
+  float: right;
+  border-radius: 5px;
+  border: none;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+}
