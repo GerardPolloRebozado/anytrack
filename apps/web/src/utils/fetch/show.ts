@@ -12,7 +12,7 @@ export const getShow = async (query: string) => {
     }
 }
 
-export const markShow = async (data: { tmdbId: string, watched: boolean, watchedDate?: string, season?: number, episode?: number }) => {
+export const markShow = async (data: { tmdbId: number, watched: boolean, watchedDate?: string, season?: number, episode?: number }) => {
     const response = await fetch(`/api/v1/show/mark`, {
         method: 'POST',
         headers: {

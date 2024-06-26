@@ -13,7 +13,7 @@ import { markShowType } from "libs/types/src";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
-export default function MarkShowForm({ params }: { params: { tmdbId: string } }) {
+export default function MarkShowForm({ params }: { params: { tmdbId: number } }) {
   const searchParams = useSearchParams();
   const [seasons, setSeasons] = useState<any[]>([]);
   const [show, setShow] = useState<any>(null)

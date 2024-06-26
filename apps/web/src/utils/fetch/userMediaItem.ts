@@ -29,7 +29,7 @@ export const deleteUserMediaItem = async ({ tmdbId, season, episode }: { tmdbId:
   }
 }
 
-export const getWatchedEpisodes = async (tmdbId: string, season?: number) => {
+export const getWatchedEpisodes = async (tmdbId: number, season?: number) => {
   const response = await fetch(`/api/v1/userMediaItem/${tmdbId}${season !== undefined ? `/${season}` : ''}`, {
     headers: {
       Authorization: `Bearer ${Cookies.get('token')}`
@@ -41,15 +41,11 @@ export const getWatchedEpisodes = async (tmdbId: string, season?: number) => {
   }
 }
 
-export const getCredits = async (data: { tmdbId: string, mediaType: MediaType, season?: number }) => {
+export const getCredits = async (data: { tmdbId: number, mediaType: MediaType, season?: number }) => {
   const url = buildUrl('/api/v1/tmdb/credits', { tmdbId: data.tmdbId, mediaType: data.mediaType, season: data.season })
-  const response = await fetch(url, {
+  return await fetch(url, {
     headers: {
       Authorization: `Bearer ${Cookies.get('token')}`
     },
   })
-  return {
-    status: response.status,
-    body: await response.json()
-  }
 }

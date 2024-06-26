@@ -27,8 +27,6 @@ export const upsertReview = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const { review, rating, mediaId } = req.body;
-    console.log(req.body)
-    console.log(userId)
     const reviewFromDb = await prisma.review.upsert({
       where: {
         userId_mediaId: {

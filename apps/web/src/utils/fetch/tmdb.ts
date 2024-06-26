@@ -1,7 +1,7 @@
 import buildUrl from "../buildUrl";
 import Cookies from "js-cookie";
 
-const getSeasons = async ({ tmdbId, season }: { tmdbId: string, season?: number }) => {
+const getSeasons = async ({ tmdbId, season }: { tmdbId: number, season?: number }) => {
     const url = buildUrl('/api/v1/tmdb/show/seasons', { tmdbId, season })
     const response = await fetch(url, {
         headers: {

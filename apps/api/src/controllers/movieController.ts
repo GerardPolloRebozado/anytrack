@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
-import { Genre } from "@prisma/client";
+import { Genre, MediaType } from "@prisma/client";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
   try {
@@ -29,6 +29,14 @@ export const getMoviebyId = async (req: Request, res: Response) => {
     const data = await searchMoviebyIdService(id);
     if (data.status_code === 34) return res.status(404).json({ error: "Movie not found" });
     data.poster = `https://image.tmdb.org/t/p/original/${data.poster_path}`;
+    const localId = await prisma.mediaItem.findUnique({
+      where: {
+        tmdbId: id
+      }
+    });
+    if (localId) {
+      data.localId = localId.id;
+    }
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -48,7 +56,7 @@ export const markMovie = async (req: Request, res: Response) => {
     });
     if (!mediaItem) {
       const movie = await searchMoviebyIdService(tmdbId);
-      const genreData = await Promise.all(movie.genre.map((genre: Genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
+      const genreData = await Promise.all(await movie.genres.map((genre: Genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
       if (movie.status_code === 34) throw new Error("Movie not found");
       mediaItem = await prisma.mediaItem.create({
         data: {
@@ -63,35 +71,34 @@ export const markMovie = async (req: Request, res: Response) => {
           genres: {
             connect: genreData.map((genre) => ({ name: genre.name }))
           }
-
         }
       });
     }
     if (watchedDate) watchedDate = new Date(watchedDate);
-    const userMediaItem = await prisma.userMediaItem.upsert({
+    let userMediaItem = await prisma.userMediaItem.findFirst({
       where: {
-        unique_user_media_series: {
-          userId,
-          mediaId: mediaItem.id,
-          seasonId: null,
-          episodeId: null,
-        }
-      },
-      update: {
-        watched,
-        watchedDate
-      },
-      create: {
         userId,
-        watched,
-        watchedDate,
-        mediaId: mediaItem.id
-      }
+        mediaId: mediaItem.id,
+        mediaItem: {
+          mediaType: MediaType.movie
+        },
+      },
     });
+
+    if (!userMediaItem) {
+      userMediaItem = await prisma.userMediaItem.create({
+        data: {
+          userId,
+          watched,
+          watchedDate,
+          mediaId: mediaItem.id
+        }
+      });
+    }
     return res.status(200).json(userMediaItem);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error });
+    return res.status(500).json({ error: error.message });
   }
 }
 

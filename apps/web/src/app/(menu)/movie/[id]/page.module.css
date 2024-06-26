@@ -81,3 +81,9 @@
     overflow-x: auto;
     width: 50dvw;
 }
+
+.reviewList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}

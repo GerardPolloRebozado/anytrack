@@ -16,7 +16,7 @@ model User {
   updatedAt     DateTime        @updatedAt
   settings      Settings?
   userMediaItem UserMediaItem[]
-  review      Review[]
+  review        Review[]
 }
 
 model Settings {
@@ -26,24 +26,24 @@ model Settings {
 }
 
 model MediaItem {
-  id             Int             @id @default(autoincrement())
-  tmdbId         Int?         @unique
-  mediaType      MediaType
-  seasons        Int?
-  status         status?
-  title          String
-  overview       String?
-  poster         String?
-  tmdbRating     Float?
-  releaseDate    DateTime?
-  runtime        Int?
-  genres         Genre[]
-  authors        String?
-  season         Season[]
+  id            Int             @id @default(autoincrement())
+  tmdbId        Int?            @unique
+  mediaType     MediaType
+  seasons       Int?
+  status        status?
+  title         String
+  overview      String?
+  poster        String?
+  tmdbRating    Float?
+  releaseDate   DateTime?
+  runtime       Int?
+  genres        Genre[]
+  authors       String?
+  season        Season[]
   userMediaItem UserMediaItem[]
-  userReview   Review[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  userReview    Review[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model UserMediaItem {

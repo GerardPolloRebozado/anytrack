@@ -18,7 +18,7 @@ function SearchMovie() {
       return;
     }
     const response = await searchMovies(query)
-    const body = await response.body;
+    const body = await response.json();
     if (await body.results) setMovies(await body.results);
   }
 

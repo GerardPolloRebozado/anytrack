@@ -37,7 +37,6 @@ export default function LoginPage() {
         <Input
           label="Email"
           register={register}
-          required
           name="email"
           type="email"
           placeholder="Type your email ✉️"
@@ -46,7 +45,6 @@ export default function LoginPage() {
         <Input
           label="Password"
           register={register}
-          required
           name="password"
           type="password"
           placeholder="Type you secret password 🔒"

@@ -1,10 +1,9 @@
 import Callout from '../Callout/Callout';
 import styles from './Input.module.css';
 
-export default function Input({ label, register, required, name, type, placeholder = "", error, className }: {
+export default function Input({ label, register, name, type, placeholder = "", error, className }: {
   label: string;
   register: any;
-  required: boolean;
   name: string;
   type: string;
   placeholder: string;
@@ -16,7 +15,7 @@ export default function Input({ label, register, required, name, type, placehold
       <label htmlFor={name} className={styles.label}>
         {label + ":"}
       </label>
-      <input id={name} {...register(name, { required })} type={type} placeholder={placeholder} className={styles.input}
+      <input id={name} {...register(name)} type={type} placeholder={placeholder} className={styles.input}
       />
       {error && <Callout type="error">{error.message}</Callout>}
     </div>
