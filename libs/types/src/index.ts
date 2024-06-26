@@ -1,3 +1,4 @@
+import { Prisma, Review, User } from '@prisma/client';
 import React from 'react';
 
 export type signupForm = {
@@ -34,6 +35,12 @@ export type ButtonProps = {
 export type InfoProps = {
   type: 'error' | 'warning' | 'info' | 'success';
   children: React.ReactNode;
+  onClick?: () => void;
+};
+
+export type Notification = {
+  type: 'error' | 'warning' | 'info' | 'success';
+  message: string;
 };
 
 export enum state {
@@ -46,3 +53,13 @@ export enum MediaType {
   show = 'show',
   movie = 'movie'
 }
+
+export type ReviewForm = {
+  review?: string;
+  rating: number;
+  mediaId: number;
+}
+
+export type ReviewWithUser = Prisma.ReviewGetPayload<{
+  include: { user: true };
+}>

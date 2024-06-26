@@ -4,7 +4,7 @@ import { MediaType } from '@prisma/client';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
   try {
-    const tmdbId = req.query.tmdbId as string;
+    const tmdbId = Number(req.query.tmdbId);
     const seasonNumber: number | undefined = req.query.season as unknown as number | undefined;
     const show = await searchShowTmdbIdService(tmdbId);
     let seasons: any
@@ -22,7 +22,7 @@ export const getShowSeasons = async (req: Request, res: Response) => {
       })
       if (seasons.status_code === 34) {
         throw new Error("Show or season not found");
-      }
+      }null
     } else {
       seasons = await Promise.all(show.seasons.map(async (season: any) => {
         return await searchShowSeasonsService(tmdbId, season.season_number);
@@ -38,7 +38,7 @@ export const getShowSeasons = async (req: Request, res: Response) => {
 export const getCredits = async (req: Request, res: Response) => {
   try {
     const mediaType = req.query.mediaType as MediaType;
-    const tmdbId = req.query.tmdbId as string;
+    const tmdbId = Number(req.query.tmdbId);
     let response;
     if (mediaType === MediaType.show) {
       response = await getAgregatedShowCreditsService(tmdbId)

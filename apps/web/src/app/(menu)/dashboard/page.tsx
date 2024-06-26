@@ -19,7 +19,6 @@ function DashboardPage() {
       const movies = await getManyUserMediaItem({
         mediaType: MediaType.movie,
         watched: true,
-        includeMediaItem: true,
         groupBy: 'month'
       })
       setMovieHistory(await movies.body.media)
@@ -27,7 +26,6 @@ function DashboardPage() {
       const shows = await getManyUserMediaItem({
         mediaType: MediaType.show,
         watched: true,
-        includeMediaItem: true,
         groupBy: 'month'
       })
       setShowHistory(await shows.body.media)

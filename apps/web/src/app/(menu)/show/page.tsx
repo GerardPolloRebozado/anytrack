@@ -38,7 +38,7 @@ function MyShows() {
   }, [reload]);
 
   return (
-    <div>
+    <>
       <h3>Show stats</h3>
       <div className={styles.chartContainer}>
         {watchedShows && watchedShows.length > 0 && (
@@ -71,7 +71,7 @@ function MyShows() {
           <MediaCard key={show.mediaItem.tmdbId} id={show.mediaItem.tmdbId} title={show.mediaItem.title} poster={show.mediaItem.poster} year={show.mediaItem.year} mediaType={MediaType.show} />
         ))}
       </div>
-    </div >
+    </ >
   )
 }
 

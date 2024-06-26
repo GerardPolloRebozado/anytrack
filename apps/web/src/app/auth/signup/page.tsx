@@ -37,7 +37,6 @@ export default function RegisterPage() {
         <Input
           label="Name"
           register={register}
-          required
           name="name"
           type="text"
           placeholder="A cool name 🦄"
@@ -46,7 +45,6 @@ export default function RegisterPage() {
         <Input
           label="Email"
           register={register}
-          required
           name="email"
           type="email"
           placeholder="Type your email ✉️"
@@ -55,7 +53,6 @@ export default function RegisterPage() {
         <Input
           label="Password"
           register={register}
-          required
           name="password"
           type="password"
           placeholder="Super secret password 🤫"
@@ -64,7 +61,6 @@ export default function RegisterPage() {
         <Input
           label="Confirm Password"
           register={register}
-          required
           name="confirmPassword"
           type="password"
           placeholder="Repeat the same password 🔒"

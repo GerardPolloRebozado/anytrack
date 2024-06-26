@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './MediaScore.module.css';
 
-export default function MediaScore({ score }: { score: number }) {
+export default function MediaScore({ score, source }: { score: number, source?: string }) {
   let color;
   if (score >= 7 && score <= 10) {
     color = 'var(--ok)';
@@ -18,7 +18,7 @@ export default function MediaScore({ score }: { score: number }) {
           <span>{score.toFixed(1)}</span>
         </div>
       </div>
-      <Image src={'/icons/tmdb.png'} alt="tmdb logo" width={35} height={25} />
+      {source === 'tmdb' && <Image src={'/icons/tmdb.png'} alt="tmdb logo" width={0} height={0} sizes="100vw" style={{ width: '2dvw', height: 'auto' }} />}
     </div>
   );
 }

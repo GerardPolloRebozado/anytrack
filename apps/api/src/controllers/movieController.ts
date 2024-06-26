@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
-import { upsertGenreService } from "../services/genresService";
-import { createMediaService } from "../services/mediaService";
-import { getMarkedMoviesService, markMovieService, removeMarkedMovieService, searchMovieBytmdbIdService } from "../services/movieService";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
-import { genre } from "@prisma/client";
+import prisma from "../services/prisma";
+import { Genre, MediaType } from "@prisma/client";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
   try {
@@ -20,7 +18,7 @@ export const getMovieByTerm = async (req: Request, res: Response) => {
 
 export const getMoviebyId = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = Number(req.params.id);
     // const movieLocal = await prisma.mediaItem.findFirst({
     //     where: { tmdbId: id },
     // });
@@ -31,6 +29,14 @@ export const getMoviebyId = async (req: Request, res: Response) => {
     const data = await searchMoviebyIdService(id);
     if (data.status_code === 34) return res.status(404).json({ error: "Movie not found" });
     data.poster = `https://image.tmdb.org/t/p/original/${data.poster_path}`;
+    const localId = await prisma.mediaItem.findUnique({
+      where: {
+        tmdbId: id
+      }
+    });
+    if (localId) {
+      data.localId = localId.id;
+    }
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -41,33 +47,58 @@ export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
     const watched = req.body.watched;
-    const tmdbId = String(req.body.tmdbId);
+    const tmdbId = Number(req.body.tmdbId);
     const userId = res.locals.user.id;
-    let mediaItem = await searchMovieBytmdbIdService(tmdbId);
+    let mediaItem = await prisma.mediaItem.findFirst({
+      where: {
+        tmdbId
+      }
+    });
     if (!mediaItem) {
       const movie = await searchMoviebyIdService(tmdbId);
-      const genreData = await Promise.all(movie.genres.map((genre: genre) => upsertGenreService(genre.name)));
+      const genreData = await Promise.all(await movie.genres.map((genre: Genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
       if (movie.status_code === 34) throw new Error("Movie not found");
-      mediaItem = await createMediaService({
-        tmdbId: String(movie.id),
-        mediaType: "movie",
-        title: movie.title,
-        overview: movie.overview,
-        poster: `https://image.tmdb.org/t/p/original/${movie.poster_path}`,
-        tmdbRating: movie.vote_average,
-        releaseDate: new Date(movie.release_date),
-        runtime: movie.runtime,
-        genres: {
-          connect: genreData.map((genre) => ({ name: genre.name }))
+      mediaItem = await prisma.mediaItem.create({
+        data: {
+          tmdbId: movie.id,
+          mediaType: "movie",
+          title: movie.title,
+          overview: movie.overview,
+          poster: `https://image.tmdb.org/t/p/original/${movie.poster_path}`,
+          tmdbRating: movie.vote_average,
+          releaseDate: new Date(movie.release_date),
+          runtime: movie.runtime,
+          genres: {
+            connect: genreData.map((genre) => ({ name: genre.name }))
+          }
         }
-      })
+      });
     }
     if (watchedDate) watchedDate = new Date(watchedDate);
-    const userMediaItem = await markMovieService(mediaItem, userId, watched, watchedDate);
+    let userMediaItem = await prisma.userMediaItem.findFirst({
+      where: {
+        userId,
+        mediaId: mediaItem.id,
+        mediaItem: {
+          mediaType: MediaType.movie
+        },
+      },
+    });
+
+    if (!userMediaItem) {
+      userMediaItem = await prisma.userMediaItem.create({
+        data: {
+          userId,
+          watched,
+          watchedDate,
+          mediaId: mediaItem.id
+        }
+      });
+    }
     return res.status(200).json(userMediaItem);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error });
+    return res.status(500).json({ error: error.message });
   }
 }
 
@@ -75,7 +106,25 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const groupBy = req.query.groupBy as string;
-    const movies = await getMarkedMoviesService(userId);
+    const movies = await prisma.userMediaItem.findMany({
+      where: {
+        userId,
+        mediaItem: {
+          mediaType: "movie"
+        },
+      },
+      include: {
+        mediaItem: {
+          select: {
+            seasons: false
+          },
+          include: {
+            genres: true,
+          }
+        },
+        episode: false
+      }
+    })
     if (groupBy === "month") {
       const grouped: { month: string, totalRuntime: number, movies: any[] }[] = [];
       movies.forEach((movie: any) => {
@@ -105,7 +154,11 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
 export const removeMarkedMovie = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   try {
-    const userMediaItem = await removeMarkedMovieService({ id });
+    const userMediaItem = await prisma.userMediaItem.delete({
+      where: {
+        id
+      }
+    });
     return res.status(200).json(userMediaItem);
   } catch (error) {
     return res.status(500).json({ error: error.message });

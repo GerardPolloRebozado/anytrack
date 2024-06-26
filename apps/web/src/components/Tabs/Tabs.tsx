@@ -5,8 +5,8 @@ export default function Tabs({ children }: { children: any }) {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div>
-      <div >
+    <>
+      <div>
         {children.map((child: any, index: any) => (
           <button
             key={index}
@@ -17,9 +17,9 @@ export default function Tabs({ children }: { children: any }) {
           </button>
         ))}
       </div>
-      <div>
+      <div className={styles.tabContent}>
         {children[activeTab]}
       </div>
-    </div>
+    </>
   );
 }

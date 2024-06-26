@@ -16,3 +16,8 @@
 .tabButton:hover {
   cursor: pointer;
 }
+
+.tabContent {
+  height: 100%;
+  width: 100%;
+}

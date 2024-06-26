@@ -32,21 +32,11 @@
 }
 
 .grid {
-  display: flex;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column-gap: 0px;
-  grid-row-gap: 0px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-column-gap: 3rem;
   margin-top: 2rem;
-  margin-right: 10rem;
-}
-
-.poster {
-  flex: 0.7;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin: 1rem;
-  width: 10%;
+  margin-left: 6rem;
 }
 
 .poster img {
@@ -54,11 +44,10 @@
 }
 
 .showDetails {
-  flex: 1.3;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin: 0 1rem;
+  width: 50dvw;
 }
 
 .hr {
@@ -78,6 +67,12 @@
   font-size: 0.8rem;
 }
 
+.mediaScore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .back {
   margin: 1rem;
   cursor: pointer;
@@ -92,8 +87,8 @@
   display: flex;
   flex-direction: row;
   overflow-x: auto;
-  width: 60vw;
   gap: 1rem;
+  width: 50dvw;
 }
 
 .episodeList {
@@ -163,7 +158,6 @@
 .creditCard {
   background-color: var(--primary-dark);
   margin: 0;
-  height: 27vh !important;
   border-radius: 5px;
 }
 
@@ -176,3 +170,10 @@
   height: 30vh;
   overflow-y: hidden;
 }
+
+.reviewList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+

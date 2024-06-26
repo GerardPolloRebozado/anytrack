@@ -10,7 +10,7 @@ import Callout from "@/components/Callout/Callout"
 import Image from "next/image"
 import { getWatchedEpisodes } from "@/utils/fetch/userMediaItem"
 
-function SeasonPage({ params }: { params: { id: string, seasonNumber: number } }) {
+function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }) {
   const [season, setSeason] = useState<any>(null)
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([])
   const [error, setError] = useState('')

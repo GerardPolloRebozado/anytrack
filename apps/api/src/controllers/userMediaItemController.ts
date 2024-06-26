@@ -1,8 +1,5 @@
 import { Request, Response } from "express"
-import { findUniqueMediaService } from "../services/mediaService"
 import prisma from "../services/prisma"
-import { getSeasonService } from "../services/seasonService"
-import { deleteManyUserMediaItemService, deleteOneUserMediaItemService, findManyUserMediaItemService } from "../services/userMediaService"
 import { MediaType } from "@anytrack/type"
 
 export const getUserMediaItem = async (req: Request, res: Response) => {
@@ -11,7 +8,7 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
     const watched = req.query.watched as string | undefined
     const userId = res.locals.user.id
     const groupBy = req.query.groupBy as string | undefined
-    const userMediaItem = await findManyUserMediaItemService({
+    const userMediaItem = await prisma.userMediaItem.findMany({
       where: {
         userId,
         mediaItem: {
@@ -30,7 +27,7 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
       orderBy: {
         watchedDate: 'desc',
       }
-    });
+    })
     if (groupBy === 'month') {
       const grouped: { month: string, totalRuntime: number, media: any[] }[] = [];
       let mediaCount = 0;
@@ -97,58 +94,72 @@ export const getUserMediaItem = async (req: Request, res: Response) => {
 
 export const deleteOneUserMediaItemShow = async (req: Request, res: Response) => {
   try {
-    const tmdbId = req.query.tmdbId as string;
+    const tmdbId = Number(req.query.tmdbId);
     const userId: string = res.locals.user.id;
     const season = Number(req.query.season);
     const episode = Number(req.query.episode);
-
-    const show = await findUniqueMediaService({
-      tmdbId,
-      mediaType: 'show'
+    const show = await prisma.mediaItem.findUnique({
+      where: {
+        tmdbId,
+        mediaType: 'show'
+      }
     });
     if (!show) throw new Error("Show not found");
     if (season && season !== -1 && episode && episode !== -1) {
-      const seasonFromDB = await getSeasonService({
-        mediaItemId_seasonNumber: {
-          mediaItemId: show.id,
-          seasonNumber: season
-        }
-      }, true);
+      const seasonFromDB = await prisma.season.findUnique({
+        where: {
+          mediaItemId_seasonNumber: {
+            mediaItemId: show.id,
+            seasonNumber: season
+          }
+        },
+        include: {
+          episodes: true
+        },
+      });
       if (!seasonFromDB) throw new Error("Season not found");
       const episodeFromDB = seasonFromDB.episodes.find(episodeDB => episodeDB.episodeNumber === episode);
       if (!episodeFromDB) throw new Error("Episode not found");
-      const deletedMark = await deleteOneUserMediaItemService({
-        unique_user_media_series: {
+      const deletedUserMediaItem = await prisma.userMediaItem.delete({
+        where: {
+          unique_user_media_series: {
+            userId,
+            mediaId: show.id,
+            episodeId: episodeFromDB.id,
+            seasonId: seasonFromDB.id
+          }
+        }
+      });
+      res.status(200).json(deletedUserMediaItem);
+    } else if (season !== -1) {
+      const seasonFromDB = await prisma.season.findUnique({
+        where: {
+          mediaItemId_seasonNumber: {
+            mediaItemId: show.id,
+            seasonNumber: season
+          }
+        },
+        include: {
+          episodes: true
+        },
+      });
+      if (!seasonFromDB) throw new Error("Season not found");
+      const deletedUserMediaItem = await prisma.userMediaItem.deleteMany({
+        where: {
           userId,
           mediaId: show.id,
-          episodeId: episodeFromDB?.id,
-          seasonId: seasonFromDB.id
+          seasonId: seasonFromDB.id,
         }
-      },
-        {
-          mediaItem: true,
-        });
-      res.status(200).json(deletedMark);
-    } else if (season !== -1) {
-      const seasonFromDB = await getSeasonService({
-        mediaItemId_seasonNumber: {
-          mediaItemId: show.id,
-          seasonNumber: season
-        }
-      }, true);
-      if (!seasonFromDB) throw new Error("Season not found");
-      const deletedMedia = await deleteManyUserMediaItemService({
-        userId,
-        seasonId: seasonFromDB.id,
-        mediaId: show.id,
-      })
-      res.status(200).json(`Deleted episodes ${deletedMedia}`);
+      });
+      res.status(200).json(`Deleted episodes ${deletedUserMediaItem}`);
     } else {
-      const deletedMedia = await deleteManyUserMediaItemService({
-        userId,
-        mediaId: show.id,
-      })
-      res.status(200).json(deletedMedia)
+      const deletedUserMediaItem = await prisma.userMediaItem.deleteMany({
+        where: {
+          userId,
+          mediaId: show.id,
+        }
+      });
+      res.status(200).json(deletedUserMediaItem)
     }
   } catch (error) {
     res.status(500).json(error);
@@ -157,7 +168,7 @@ export const deleteOneUserMediaItemShow = async (req: Request, res: Response) =>
 
 export const getWatchedEpisodesFromUser = async (req: Request, res: Response) => {
   try {
-    const tmdbId: string = req.params.tmdbId
+    const tmdbId = Number(req.params.tmdbId)
     const userId: string = res.locals.user.id
     const season = req.params.season as string | undefined
     const userMediaItem = await prisma.$transaction([

@@ -25,6 +25,7 @@ export default function LoginPage() {
       setError(await response.body.error);
     } else {
       Cookies.set('token', response.body.token, { expires: 30 });
+      Cookies.set('userId', response.body.userId, { expires: 30 });
       router.push('/');
     }
   }
@@ -37,7 +38,6 @@ export default function LoginPage() {
         <Input
           label="Email"
           register={register}
-          required
           name="email"
           type="email"
           placeholder="Type your email ✉️"
@@ -46,7 +46,6 @@ export default function LoginPage() {
         <Input
           label="Password"
           register={register}
-          required
           name="password"
           type="password"
           placeholder="Type you secret password 🔒"

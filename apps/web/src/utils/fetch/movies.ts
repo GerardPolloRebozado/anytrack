@@ -1,30 +1,22 @@
 import Cookies from 'js-cookie';
 
-async function searchMoviebyId(id: string) {
-    const response = await fetch(`/api/v1/movie/${id}`, {
+async function searchMoviebyId(id: number) {
+    return await fetch(`/api/v1/movie/${id}`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('token')}`
         }
     });
-    return {
-        status: response.status,
-        body: await response.json()
-    }
 }
 
 async function searchMovies(query: string) {
-    const response = await fetch(`/api/v1/movie/search?query=${query}`, {
+    return await fetch(`/api/v1/movie/search?query=${query}`, {
         headers: {
             Authorization: `Bearer ${Cookies.get('token')}`
         }
     });
-    return {
-        status: response.status,
-        body: await response.json()
-    }
 }
 
-async function markMovie(data: { tmdbId: string, watched: boolean, watchedDate?: string }) {
+async function markMovie(data: { tmdbId: number, watched: boolean, watchedDate?: string }) {
     const response = await fetch('/api/v1/movie/mark', {
         method: 'POST',
         headers: {
@@ -39,7 +31,7 @@ async function markMovie(data: { tmdbId: string, watched: boolean, watchedDate?:
     }
 }
 
-async function removeMarkedMovie(id: string) {
+async function removeMarkedMovie(id: number) {
     const response = await fetch(`/api/v1/movie/mark/${id}`, {
         method: 'DELETE',
         headers: {
