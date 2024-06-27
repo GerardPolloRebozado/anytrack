@@ -46,7 +46,7 @@ export const getMoviebyId = async (req: Request, res: Response) => {
 export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
-    const watched = req.body.watched;
+    const watched = Boolean(req.body.watched);
     const tmdbId = Number(req.body.tmdbId);
     const userId = res.locals.user.id;
     let mediaItem = await prisma.mediaItem.findFirst({
@@ -94,6 +94,16 @@ export const markMovie = async (req: Request, res: Response) => {
           mediaId: mediaItem.id
         }
       });
+    } else {
+      userMediaItem = await prisma.userMediaItem.update({
+        where: {
+          id: userMediaItem.id
+        },
+        data: {
+          watched,
+          watchedDate
+        }
+      })
     }
     return res.status(200).json(userMediaItem);
   } catch (error) {
@@ -153,6 +163,7 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
 
 export const removeMarkedMovie = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
+  console.log(id)
   try {
     const userMediaItem = await prisma.userMediaItem.delete({
       where: {

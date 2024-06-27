@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import prisma from "../services/prisma"
 import { MediaType } from "@anytrack/type"
 
-export const getUserMediaItem = async (req: Request, res: Response) => {
+export const getManyUserMediaItem = async (req: Request, res: Response) => {
   try {
     const mediaType = req.query.mediaType as MediaType
     const watched = req.query.watched as string | undefined
@@ -166,11 +166,12 @@ export const deleteOneUserMediaItemShow = async (req: Request, res: Response) =>
   }
 }
 
-export const getWatchedEpisodesFromUser = async (req: Request, res: Response) => {
+export const getOneUserMediaItem = async (req: Request, res: Response) => {
   try {
     const tmdbId = Number(req.params.tmdbId)
     const userId: string = res.locals.user.id
     const season = req.params.season as string | undefined
+    const watched = req.query.watched as string | undefined
     const userMediaItem = await prisma.$transaction([
       prisma.userMediaItem.findMany({
         where: {

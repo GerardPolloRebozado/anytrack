@@ -22,7 +22,6 @@ function MyShows() {
       const response = await getManyUserMediaItem({
         mediaType: MediaType.show,
         groupBy: 'mediaItem',
-        watched: true
       })
       setWatchedShows(await response.body)
       const tempAgrupation: { id: number, name: string, runtime: number, mediaItems: any[] }[] = [];

@@ -6,6 +6,7 @@ import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
 import { deleteUserMediaItem, getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
 import { MediaType } from 'libs/types/src';
+import { removeMarkedMovie } from '@/utils/fetch/movies';
 
 function MyMovies() {
   const [movies, setMovies] = useState([])
@@ -22,8 +23,12 @@ function MyMovies() {
   }, [reload]);
 
   async function deleteMarkedMedia(id: number) {
-    const response = await deleteUserMediaItem({ tmdbId: id })
-    setReload(!reload)
+    try {
+      await removeMarkedMovie(id)
+      setReload(!reload)
+    } catch (error: any) {
+      console.log(error)
+    }
   }
 
   return (

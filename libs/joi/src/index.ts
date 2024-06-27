@@ -96,9 +96,9 @@ export const getCreditsSchema = Joi.object({
   })
 })
 
-export const getWatchedEpisodesFromUserSchema = Joi.object({
+export const getOneUserMediaItemSchema = Joi.object({
   tmdbId: Joi.number().required(),
-  season: Joi.number().optional()
+  season: Joi.number().optional(),
 })
 
 export const deleteOneUserMediaItemShowSchema = Joi.object({

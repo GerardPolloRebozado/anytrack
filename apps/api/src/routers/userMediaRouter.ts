@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { deleteOneUserMediaItemShow, getUserMediaItem, getWatchedEpisodesFromUser } from "../controllers/userMediaItemController";
+import { deleteOneUserMediaItemShow, getManyUserMediaItem, getOneUserMediaItem } from "../controllers/userMediaItemController";
 import { userMiddleware } from "../middlewares/userMiddleware";
 import joiMiddleware from "../middlewares/joiMiddleware";
-import { deleteOneUserMediaItemShowSchema, getUserMediaItemSchema, getWatchedEpisodesFromUserSchema } from "@anytrack/joi";
+import { deleteOneUserMediaItemShowSchema, getUserMediaItemSchema, getOneUserMediaItemSchema } from "@anytrack/joi";
 
 const userMediaRouter = Router();
 
-userMediaRouter.get('/:tmdbId/:season?', userMiddleware, joiMiddleware(getWatchedEpisodesFromUserSchema, 'params'), getWatchedEpisodesFromUser);
-userMediaRouter.get('/', userMiddleware, joiMiddleware(getUserMediaItemSchema, 'query'), getUserMediaItem);
+userMediaRouter.get('/:tmdbId/:season?', userMiddleware, joiMiddleware(getOneUserMediaItemSchema, 'params'), getOneUserMediaItem);
+userMediaRouter.get('/', userMiddleware, joiMiddleware(getUserMediaItemSchema, 'query'), getManyUserMediaItem);
 userMediaRouter.delete('/', userMiddleware, joiMiddleware(deleteOneUserMediaItemShowSchema, 'query'), deleteOneUserMediaItemShow);
 
 export default userMediaRouter;

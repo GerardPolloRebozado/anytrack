@@ -22,6 +22,7 @@ function DashboardPage() {
         groupBy: 'month'
       })
       setMovieHistory(await movies.body.media)
+      console.log(await movies.body.media.length)
       setMovieStats(await movies.body.statsOverview)
       const shows = await getManyUserMediaItem({
         mediaType: MediaType.show,

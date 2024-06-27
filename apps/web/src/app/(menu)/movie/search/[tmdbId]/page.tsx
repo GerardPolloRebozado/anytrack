@@ -42,6 +42,7 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
   };
 
   const onSubmit = async (data: markMovieType) => {
+    console.log(data)
     const response = await markMovie({
       tmdbId: params.tmdbId,
       watched: data.watched,
