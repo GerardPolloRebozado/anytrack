@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from "react";
 import styles from './page.module.css';
-import MovieRuntimeTooltip from "@/components/MovieRuntimeTooltip/MovieRuntimeTooltip";
+import MovieRuntimeTooltip from "@/components/RechartsTooltip/MovieRuntimeTooltip/MovieRuntimeTooltip";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { getManyUserMediaItem } from "@/utils/fetch/userMediaItem";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
