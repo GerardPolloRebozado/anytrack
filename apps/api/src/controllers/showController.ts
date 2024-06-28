@@ -8,7 +8,7 @@ export const searchShow = async (req: Request, res: Response) => {
     let data: any = {};
     if (term.startsWith("tmdb:")) {
       data = await searchShowTmdbIdService(Number(term.split(":")[1]));
-      const localId = await prisma.mediaItem.findUnique({
+      const localId = await prisma.show.findUnique({
         where: {
           tmdbId: await data.id
         }
@@ -21,6 +21,7 @@ export const searchShow = async (req: Request, res: Response) => {
     }
     res.status(200).json(data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -34,27 +35,24 @@ export const markShow = async (req: Request, res: Response) => {
     const watchedDate = req.body.watchedDate ? new Date(req.body.watchedDate) : undefined;
     const watched: boolean = req.body.watched;
 
-    let show = await prisma.mediaItem.findFirst({
+    let show = await prisma.show.findFirst({
       where: {
         tmdbId: tmdbId,
-        mediaType: 'show'
       }
     });
 
     if (!show) {
       const tmdbShow = await searchShowTmdbIdService(tmdbId);
       if (tmdbShow.status_code === 34) throw new Error("Show not found");
-      show = await prisma.mediaItem.create({
+      show = await prisma.show.create({
         data: {
           tmdbId: tmdbShow.id,
-          mediaType: "show",
           title: tmdbShow.name,
           overview: tmdbShow.overview,
           poster: `https://image.tmdb.org/t/p/original/${tmdbShow.poster_path}`,
           tmdbRating: tmdbShow.vote_average,
           releaseDate: new Date(tmdbShow.first_air_date),
-          seasons: tmdbShow.number_of_seasons,
-          genres: {
+          genre: {
             connect: await Promise.all(tmdbShow.genres.map(async (genre: any) => {
               return {
                 id: (await prisma.genre.upsert({ where: { name: genre.name }, create: { name: genre.name }, update: { name: genre.name } })).id
@@ -75,7 +73,7 @@ export const markShow = async (req: Request, res: Response) => {
             poster: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
             releaseDate: new Date(season.air_date),
             overview: season.overview,
-            mediaItem: {
+            show: {
               connect: {
                 id: show.id
               }
@@ -112,20 +110,16 @@ export const markShow = async (req: Request, res: Response) => {
           episodeNumber: episode,
           season: {
             seasonNumber: season,
-            mediaItem: {
-              id: show.id
-            },
           }
         }
       })
       if (!episodeFromDB) throw new Error("Episode not found");
 
-      const userEpisode = await prisma.userMediaItem.upsert({
+      const userEpisode = await prisma.userShow.upsert({
         where: {
-          unique_user_media_series: {
+          userId_showId_episodeId: {
             userId,
-            mediaId: show.id,
-            seasonId: episodeFromDB.seasonId,
+            showId: show.id,
             episodeId: episodeFromDB.id
           }
         },
@@ -135,8 +129,7 @@ export const markShow = async (req: Request, res: Response) => {
         },
         create: {
           userId,
-          mediaId: show.id,
-          seasonId: episodeFromDB.seasonId,
+          showId: show.id,
           episodeId: episodeFromDB.id,
           watched,
           watchedDate,
@@ -146,23 +139,22 @@ export const markShow = async (req: Request, res: Response) => {
     } else if (season !== -1) {
       const episodes = await prisma.season.findUnique({
         where: {
-          mediaItemId_seasonNumber: {
-            mediaItemId: show.id,
+          showId_seasonNumber: {
+            showId: show.id,
             seasonNumber: season
-          },
+          }
         },
         include: {
-          episodes: true
+          episode: true
         },
       });
 
-      episodes?.episodes.forEach(async (episode) => {
-        await prisma.userMediaItem.upsert({
+      episodes?.episode.forEach(async (episode) => {
+        await prisma.userShow.upsert({
           where: {
-            unique_user_media_series: {
+            userId_showId_episodeId: {
               userId,
-              mediaId: show.id,
-              seasonId: episode.seasonId,
+              showId: show.id,
               episodeId: episode.id
             }
           },
@@ -172,8 +164,7 @@ export const markShow = async (req: Request, res: Response) => {
           },
           create: {
             userId,
-            mediaId: show.id,
-            seasonId: episode.seasonId,
+            showId: show.id,
             episodeId: episode.id,
             watched,
             watchedDate,
@@ -184,20 +175,19 @@ export const markShow = async (req: Request, res: Response) => {
     } else {
       const seasons = await prisma.season.findMany({
         where: {
-          mediaItemId: show.id
+          showId: show.id
         },
         include: {
-          episodes: true
+          episode: true
         },
       });
       seasons.forEach(async (season) => {
-        season.episodes.forEach(async (episode) => {
-          await prisma.userMediaItem.upsert({
+        season.episode.forEach(async (episode) => {
+          await prisma.userShow.upsert({
             where: {
-              unique_user_media_series: {
+              userId_showId_episodeId: {
                 userId,
-                mediaId: show.id,
-                seasonId: episode.seasonId,
+                showId: show.id,
                 episodeId: episode.id
               }
             },
@@ -207,8 +197,7 @@ export const markShow = async (req: Request, res: Response) => {
             },
             create: {
               userId,
-              mediaId: show.id,
-              seasonId: episode.seasonId,
+              showId: show.id,
               episodeId: episode.id,
               watched,
               watchedDate,
@@ -219,6 +208,80 @@ export const markShow = async (req: Request, res: Response) => {
       res.status(200).json(seasons);
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
+}
+
+export const getManyMarkedShows = async (req: Request, res: Response) => {
+  try {
+    const watched = req.query.watched as string | undefined
+    const userId = res.locals.user.id
+    const groupBy = req.query.groupBy as string | undefined
+    const shows = await prisma.userShow.findMany({
+      where: {
+        userId,
+        watched: watched !== undefined ? watched !== 'true' ? false : true : undefined,
+      },
+      include: {
+        show: {
+          include: {
+            genre: true
+          }
+        },
+        episode: true,
+      },
+      orderBy: {
+        watchedDate: 'desc',
+      }
+    })
+    switch (groupBy) {
+      case "month": {
+        const groupedShows: { groupedMedia: { month: string, totalRuntime: number, media: any[] }[], statsOverview: { totalRuntime: number, episodeCount: number } } = {
+          groupedMedia: [],
+          statsOverview: {
+            totalRuntime: 0,
+            episodeCount: 0
+          }
+        };
+        shows.forEach((show) => {
+          const month = show.watchedDate?.toISOString().slice(0, 7);
+          const monthIndex = groupedShows.groupedMedia.findIndex((group) => group.month === month);
+          if (monthIndex === -1) {
+            groupedShows.groupedMedia.push({
+              month,
+              totalRuntime: show.episode.runtime,
+              media: [show]
+            });
+          } else {
+            groupedShows.groupedMedia[monthIndex].totalRuntime += show.episode.runtime;
+            groupedShows.groupedMedia[monthIndex].media.push(show);
+          }
+          groupedShows.statsOverview.totalRuntime += show.episode.runtime;
+          groupedShows.statsOverview.episodeCount++;
+        });
+        res.status(200).json(groupedShows);
+        return;
+      }
+      case "show": {
+        const groupedShows: { show: any, episodes: any[], watchTime: number, title: string }[] = [];
+        shows.forEach((show) => {
+          const existingIndex = groupedShows.findIndex(item => item.show.id === show.show.id);
+          if (existingIndex !== -1) {
+            groupedShows[existingIndex].episodes.push(show);
+            groupedShows[existingIndex].watchTime += show.episode.runtime;
+          } else {
+            groupedShows.push({ show: show.show, episodes: [show], watchTime: show.episode.runtime, title: show.show.title });
+          }
+        });
+        res.status(200).json(groupedShows);
+        return;
+      }
+    }
+    res.status(200).json(shows);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+
 }

@@ -1,4 +1,3 @@
-import { Prisma, Review, User } from '@prisma/client';
 import React from 'react';
 
 export type signupForm = {
@@ -59,7 +58,3 @@ export type ReviewForm = {
   rating: number;
   mediaId: number;
 }
-
-export type ReviewWithUser = Prisma.ReviewGetPayload<{
-  include: { user: true };
-}>

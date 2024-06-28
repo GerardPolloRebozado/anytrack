@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import { comparePasswords, hashPassword } from "../services/bcryptService";
 import jwt from 'jsonwebtoken';
-import { User } from "@prisma/client";
+import { user } from "@prisma/client";
 import prisma from "../services/prisma";
 
 export async function signup(req: Request, res: Response) {
   try {
-    const user: Omit<User, "id" | "createdAt" | "updatedAt"> = req.body;
+    const user: Omit<user, "id" | "createdAt" | "updatedAt"> = req.body;
     if (await prisma.user.findUnique({ where: { email: user.email } })) {
       return res.status(400).json({ error: "User already exists" });
     }
     user.password = await hashPassword(user.password);
     const newUser = await prisma.user.create({ data: user });
-    await prisma.settings.create({ data: { userId: newUser.id } });
+    await prisma.setting.create({ data: { userId: newUser.id } });
     res.status(201).json(newUser);
   } catch (error) {
     console.log(error);
@@ -22,7 +22,7 @@ export async function signup(req: Request, res: Response) {
 
 export async function signin(req: Request, res: Response) {
   try {
-    const user: Pick<User, "email" | "password"> = req.body;
+    const user: Pick<user, "email" | "password"> = req.body;
     const foundUser = await prisma.user.findUnique({ where: { email: user.email } });
     if (!foundUser) {
       return res.status(400).json({ error: "User not found" });

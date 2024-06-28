@@ -1,12 +1,12 @@
-import { Settings } from "@prisma/client";
+import { setting } from "@prisma/client";
 import { Request, Response } from "express";
 import prisma from "../services/prisma";
 
 export async function changeSettings(req: Request, res: Response) {
   try {
     const userId = res.locals.user.id;
-    const settings: Settings = req.body
-    const updatedSettings = await prisma.settings.upsert({
+    const settings: setting = req.body
+    const updatedSettings = await prisma.setting.upsert({
       where: {
         userId,
       },
@@ -24,7 +24,7 @@ export async function changeSettings(req: Request, res: Response) {
 
 export async function getSettings(req: Request, res: Response) {
   try {
-    const settings = await prisma.settings.findUnique({
+    const settings = await prisma.setting.findUnique({
       where: {
         userId: res.locals.user.id
       }

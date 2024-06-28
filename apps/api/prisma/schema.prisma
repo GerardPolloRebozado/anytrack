@@ -7,112 +7,122 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  name          String?
-  password      String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  settings      Settings?
-  userMediaItem UserMediaItem[]
-  review        Review[]
+model user {
+  id        String      @id @default(cuid())
+  email     String      @unique
+  name      String?
+  password  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  setting   setting?
+  userShow  userShow[]
+  userMovie userMovie[]
 }
 
-model Settings {
+model setting {
   userId String  @id
-  user   User    @relation(fields: [userId], references: [id])
+  user   user    @relation(fields: [userId], references: [id])
   public Boolean @default(false)
 }
 
-model MediaItem {
-  id            Int             @id @default(autoincrement())
-  tmdbId        Int?            @unique
-  mediaType     MediaType
-  seasons       Int?
-  status        status?
-  title         String
-  overview      String?
-  poster        String?
-  tmdbRating    Float?
-  releaseDate   DateTime?
-  runtime       Int?
-  genres        Genre[]
-  authors       String?
-  season        Season[]
-  userMediaItem UserMediaItem[]
-  userReview    Review[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+model movie {
+  id          Int         @id @default(autoincrement())
+  tmdbId      Int         @unique
+  tmdbRating  Float?
+  title       String
+  poster      String?
+  releaseDate DateTime?
+  overview    String?
+  runtime     Int?
+  genreId     Int[]
+  genre       genre[]
+  userMovie   userMovie[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
-model UserMediaItem {
+model userMovie {
   id          Int       @id @default(autoincrement())
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  mediaId     Int
-  mediaItem   MediaItem @relation(fields: [mediaId], references: [id])
-  seasonId    Int?
-  season      Season?   @relation(fields: [seasonId], references: [id])
-  episodeId   Int?
-  episode     Episode?  @relation(fields: [episodeId], references: [id])
-  watched     Boolean   @default(false)
+  user        user      @relation(fields: [userId], references: [id])
+  movieId     Int
+  movie       movie     @relation(fields: [movieId], references: [id])
   watchedDate DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  watched     Boolean
+  rating      Int?
+  review      String?
 
-  @@unique([userId, mediaId, seasonId, episodeId], name: "unique_user_media_series")
+  @@unique([userId, movieId])
 }
 
-model Season {
-  id            Int             @id @default(autoincrement())
-  seasonNumber  Int
+model show {
+  id          Int        @id @default(autoincrement())
+  tmdbId      Int        @unique
+  tmdbRating  Float?
+  title       String
+  poster      String?
+  releaseDate DateTime?
+  overview    String?
+  season      season[]
+  genre       genre[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  userShow    userShow[]
+}
+
+model userShow {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        user      @relation(fields: [userId], references: [id])
+  showId      Int
+  show        show      @relation(fields: [showId], references: [id])
+  episodeId   Int
+  episode     episode   @relation(fields: [episodeId], references: [id])
+  watchedDate DateTime?
+  watched     Boolean
+  rating      Int?
+  review      String?
+
+  @@unique([userId, showId, episodeId])
+}
+
+model season {
+  id           Int       @id @default(autoincrement())
+  seasonNumber Int
+  title        String
+  poster       String?
+  releaseDate  DateTime?
+  overview     String?
+  episode      episode[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  show         show?     @relation(fields: [showId], references: [id])
+  showId       Int?
+
+  @@unique([showId, seasonNumber])
+}
+
+model episode {
+  id            Int        @id @default(autoincrement())
+  episodeNumber Int
   title         String
-  poster        String?
-  releaseDate   DateTime?
   overview      String?
-  mediaItemId   Int?
-  mediaItem     MediaItem?      @relation(fields: [mediaItemId], references: [id])
-  episodes      Episode[]
-  userMediaItem UserMediaItem[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  @@unique([mediaItemId, seasonNumber])
-}
-
-model Episode {
-  id             Int             @id @default(autoincrement())
-  episodeNumber  Int
-  title          String
-  overview       String?
-  runtime        Int?
-  releaseDate    DateTime?
-  seasonId       Int
-  season         Season?         @relation(fields: [seasonId], references: [id])
-  usserMediaItem UserMediaItem[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  runtime       Int?
+  releaseDate   DateTime?
+  seasonId      Int
+  season        season     @relation(fields: [seasonId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  userShow      userShow[]
 
   @@unique([seasonId, episodeNumber])
 }
 
-model Genre {
-  id        Int         @id @default(autoincrement())
-  name      String      @unique
-  MediaItem MediaItem[]
-}
-
-model Review {
-  id        Int       @id @default(autoincrement())
-  review    String?
-  rating    Float
-  mediaId   Int
-  mediaItem MediaItem @relation(fields: [mediaId], references: [id])
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-
-  @@unique([userId, mediaId])
+model genre {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  movie movie[]
+  show  show[]
 }
 
 enum status {
@@ -120,9 +130,4 @@ enum status {
   canceled
   released
   finished
-}
-
-enum MediaType {
-  movie
-  show
 }

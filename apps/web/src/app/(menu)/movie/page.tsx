@@ -4,20 +4,17 @@ import { useEffect, useState } from 'react'
 import styles from './page.module.css'
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import { deleteUserMediaItem, getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
 import { MediaType } from 'libs/types/src';
-import { removeMarkedMovie } from '@/utils/fetch/movies';
+import { getMarkedMovies, removeMarkedMovie } from '@/utils/fetch/movies';
 
 function MyMovies() {
-  const [movies, setMovies] = useState([])
+  const [markedMovies, setMarkedMovies] = useState([])
   const [reload, setReload] = useState(false)
 
   useEffect(() => {
     async function fetchMovies() {
-      const response = await getManyUserMediaItem({
-        mediaType: MediaType.movie,
-      })
-      setMovies(await response.body)
+      const response = await getMarkedMovies({})
+      setMarkedMovies(await response.json())
     }
     fetchMovies()
   }, [reload]);
@@ -36,19 +33,19 @@ function MyMovies() {
       <h1>My Movies</h1>
       <h2>Watched Movies</h2>
       <div className={styles.cardContainer}>
-        {movies.length > 0 && movies.map((movie: any) => (
-          movie.watched && (
-            <MovieCard key={movie.mediaItem.tmdbId} id={movie.mediaItem.tmdbId} title={movie.mediaItem.title} poster={movie.mediaItem.poster} year={movie.mediaItem.year} mediaType={MediaType.movie}>
-              <PrimaryButton onClick={() => deleteMarkedMedia(movie.id)}>Remove</PrimaryButton>
+        {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
+          markedMovie.watched && (
+            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.year} mediaType={MediaType.movie}>
+              <PrimaryButton onClick={() => deleteMarkedMedia(markedMovie.id)}>Remove</PrimaryButton>
             </MovieCard>)
         ))}
       </div>
       <h2>Watchlist</h2>
       <div className={styles.cardContainer}>
-        {movies.length > 0 && movies.map((movie: any) => (
-          !movie.watched && (
-            <MovieCard key={movie.mediaItem.tmdbId} id={movie.mediaItem.tmdbId} title={movie.mediaItem.title} poster={movie.mediaItem.poster} year={movie.mediaItem.year} mediaType={MediaType.movie}>
-              <PrimaryButton onClick={() => deleteMarkedMedia(movie.id)}>Remove</PrimaryButton>
+        {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
+          !markedMovie.watched && (
+            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.year} mediaType={MediaType.movie}>
+              <PrimaryButton onClick={() => deleteMarkedMedia(markedMovie.id)}>Remove</PrimaryButton>
             </MovieCard>)
         ))}
       </div>

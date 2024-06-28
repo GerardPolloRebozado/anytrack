@@ -7,6 +7,8 @@ import { getManyUserMediaItem } from "@/utils/fetch/userMediaItem";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { MediaType } from "libs/types/src";
 import { Clapperboard, Tv } from "lucide-react";
+import { getMarkedMovies } from "@/utils/fetch/movies";
+import { getManyMarkedShows } from "@/utils/fetch/show";
 
 function DashboardPage() {
   const [MovieHistory, setMovieHistory] = useState<any>({});
@@ -16,21 +18,20 @@ function DashboardPage() {
 
   useEffect(() => {
     async function fetchWatchtime() {
-      const movies = await getManyUserMediaItem({
-        mediaType: MediaType.movie,
+      const movies = await getMarkedMovies({
         watched: true,
         groupBy: 'month'
       })
-      setMovieHistory(await movies.body.media)
-      console.log(await movies.body.media.length)
-      setMovieStats(await movies.body.statsOverview)
-      const shows = await getManyUserMediaItem({
-        mediaType: MediaType.show,
+      const movieBody = await movies.json()
+      setMovieHistory(await movieBody.groupedMedia)
+      setMovieStats(await movieBody.statsOverview)
+      const shows = await getManyMarkedShows({
         watched: true,
         groupBy: 'month'
       })
-      setShowHistory(await shows.body.media)
-      setShowStats(await shows.body.statsOverview)
+      const showBody = await shows.json()
+      setShowHistory(await showBody.groupedMedia)
+      setShowStats(await showBody.statsOverview)
     }
     fetchWatchtime()
   }, [])
@@ -72,7 +73,7 @@ function DashboardPage() {
               </div>)}
             {ShowStats && (
               <div>
-                <Tv color={'var(--showColor)'} /> <p><strong>{ShowStats.mediaCount} shows</strong></p> <span style={{ color: 'var(--showColor)' }}>|</span> <p><strong>{ShowStats.totalRuntime}</strong> minutes</p>
+                <Tv color={'var(--showColor)'} /> <p><strong>{ShowStats.episodeCount} episodes</strong></p> <span style={{ color: 'var(--showColor)' }}>|</span> <p><strong>{ShowStats.totalRuntime}</strong> minutes</p>
               </div>
             )}
           </div>

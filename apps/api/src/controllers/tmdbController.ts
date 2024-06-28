@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getAgregatedShowCreditsService, getMovieCredits, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
-import { MediaType } from '@prisma/client';
+import { MediaType } from '@anytrack/type';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
   try {
@@ -22,7 +22,7 @@ export const getShowSeasons = async (req: Request, res: Response) => {
       })
       if (seasons.status_code === 34) {
         throw new Error("Show or season not found");
-      }null
+      } null
     } else {
       seasons = await Promise.all(show.seasons.map(async (season: any) => {
         return await searchShowSeasonsService(tmdbId, season.season_number);

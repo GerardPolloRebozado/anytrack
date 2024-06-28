@@ -1,8 +1,7 @@
 import Joi from "joi";
 import { tlds } from "@hapi/tlds";
 export { Joi };
-import { MediaType } from '@prisma/client';
-import { watch } from "fs";
+
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
@@ -37,14 +36,8 @@ export const markMediaSchema = Joi.object({
 })
 
 export const getUserMediaItemSchema = Joi.object({
-  mediaType: Joi.string().valid(...Object.values(MediaType)).optional(),
   watched: Joi.boolean().optional(),
-  groupBy: Joi.string().optional().when('mediaType', {
-    is: MediaType.show,
-    then: Joi.valid('mediaItem', 'month'),
-    otherwise: Joi.valid('month')
-  }
-  )
+  groupBy: Joi.string().optional(),
 })
 
 export const getShowSchema = Joi.object({
@@ -88,12 +81,7 @@ export const removeMarkedMovieSchema = Joi.object({
 
 export const getCreditsSchema = Joi.object({
   tmdbId: Joi.number().required(),
-  mediaType: Joi.string().valid(...Object.values(MediaType)).required(),
-  season: Joi.number().when('mediaType', {
-    is: MediaType.show,
-    then: Joi.optional(),
-    otherwise: Joi.forbidden()
-  })
+  season: Joi.number().optional(),
 })
 
 export const getOneUserMediaItemSchema = Joi.object({
