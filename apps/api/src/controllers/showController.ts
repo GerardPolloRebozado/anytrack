@@ -319,7 +319,6 @@ export const postShowReview = async (req: Request, res: Response) => {
 export const getManyShowReviews = async (req: Request, res: Response) => {
   try {
     const showId = Number(req.params.mediaId);
-    console.log(showId);
     const reviews = await prisma.userShowReview.findMany({
       where: {
         showId,
@@ -371,5 +370,116 @@ export const deleteOneShowReview = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
+  }
+}
+
+export const getOneMarkedShow = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id
+    const showId = Number(req.params.mediaId)
+    let watched: boolean | undefined;
+    if (String(req.query.watched) === 'true') {
+      watched = true
+    } else if (String(req.query.watched) === 'false') {
+      watched = false
+    }
+    const userShow = await prisma.userShow.findMany({
+      where: {
+        userId,
+        showId,
+        watched
+      },
+      include: {
+        episode: {
+          include: {
+            season: true
+          }
+        }
+      },
+      orderBy: {
+        episode: {
+          episodeNumber: 'asc'
+        }
+      }
+    })
+    if (userShow.length === 0) {
+      res.status(404).json("No watched episodes found")
+    }
+    const groupedBySeason: { season: number, episodes: any[], count: number }[] = [];
+    userShow.forEach((episode) => {
+      if (episode.episode.season.seasonNumber) {
+        if (groupedBySeason[episode.episode.season.seasonNumber]) {
+          groupedBySeason[episode.episode.season.seasonNumber].episodes.push(episode);
+          groupedBySeason[episode.episode.season.seasonNumber].count++;
+        } else {
+          groupedBySeason[episode.episode.season.seasonNumber] = {
+            season: episode.episode.season.seasonNumber,
+            episodes: [episode],
+            count: 1
+          }
+        }
+      }
+    })
+    res.status(200).json(groupedBySeason)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export const deleteOneUserShow = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id
+    const showId = Number(req.params.mediaId)
+    const season = req.query.season
+    const episode = req.query.episode
+    if (season && episode) {
+      const episodeFromDB = await prisma.episode.findFirst({
+        where: {
+          episodeNumber: Number(episode),
+          season: {
+            seasonNumber: Number(season)
+          }
+        }
+      })
+      if (!episodeFromDB) throw new Error("Episode not found");
+      const deletedUserShow = await prisma.userShow.delete({
+        where: {
+          userId_showId_episodeId: {
+            userId,
+            showId,
+            episodeId: episodeFromDB.id
+          }
+        }
+      })
+      res.status(200).json(deletedUserShow)
+    } else if (season) {
+      const episodes = await prisma.episode.findMany({
+        where: {
+          season: {
+            seasonNumber: Number(season)
+          }
+        }
+      })
+      const deletedUserShow = await prisma.userShow.deleteMany({
+        where: {
+          userId,
+          showId,
+          episodeId: {
+            in: episodes.map((episode) => episode.id)
+          }
+        }
+      })
+      res.status(200).json(deletedUserShow)
+    } else {
+      const deletedUserShow = await prisma.userShow.deleteMany({
+        where: {
+          userId,
+          showId
+        }
+      })
+      res.status(200).json(deletedUserShow)
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message })
   }
 }

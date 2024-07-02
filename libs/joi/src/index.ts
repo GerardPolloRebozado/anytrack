@@ -55,16 +55,6 @@ export const markShowSchema = Joi.object({
 export const markMovieSchemaForm = Joi.object({
   watchedDate: Joi.date().max("now").required(),
   watched: Joi.boolean().required(),
-  rating: Joi.alternatives().conditional('watched', {
-    is: true,
-    then: Joi.number().min(0).max(10).precision(1).required(),
-    otherwise: Joi.number().forbidden()
-  }),
-  review: Joi.alternatives().conditional('rating', {
-    is: Joi.exist(),
-    then: Joi.string().optional(),
-    otherwise: Joi.string().forbidden()
-  })
 })
 
 export const markMovieSchema = markMovieSchemaForm.keys({
@@ -121,6 +111,19 @@ export const updateReviewSchema = Joi.object({
   mediaId: Joi.number().required()
 })
 
-export const getReviewsSchema = Joi.object({
+export const mediaIdSchema = Joi.object({
   mediaId: Joi.number().required()
+})
+
+export const getOneMarkedShowQuerySchema = Joi.object({
+  watched: Joi.bool().optional()
+})
+
+export const seaonsAndEpisodeSchema = Joi.object({
+  season: Joi.number().when('episode', {
+    is: Joi.exist(),
+    then: Joi.required(),
+    otherwise: Joi.optional()
+  }),
+  episode: Joi.number().optional()
 })

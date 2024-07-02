@@ -9,7 +9,6 @@ import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
-import { getCredits } from "@/utils/fetch/userMediaItem";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import Tabs from "@/components/Tabs/Tabs";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
@@ -20,6 +19,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/components/Input/Input";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { updateReviewSchema } from "libs/joi/src";
+import { getCredits } from "@/utils/fetch/tmdb";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();

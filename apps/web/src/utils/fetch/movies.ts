@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import buildUrl from '../buildUrl';
-import { ReviewForm } from '@anytrack/type';
+import { MediaReviewForm, getMarkedMoviesType } from '@anytrack/type';
 
 async function searchMoviebyId(id: number) {
   return await fetch(`/api/v1/movie/${id}`, {
@@ -47,7 +47,7 @@ async function removeMarkedMovie(id: number) {
   }
 }
 
-async function getMarkedMovies(data: { watched?: boolean, groupBy?: string }) {
+async function getMarkedMovies(data: getMarkedMoviesType) {
   const url = buildUrl('/api/v1/movie/mark', data)
   return await fetch(url, {
     headers: {
@@ -57,7 +57,7 @@ async function getMarkedMovies(data: { watched?: boolean, groupBy?: string }) {
   })
 }
 
-async function updateMovieReview(data: ReviewForm) {
+async function updateMovieReview(data: MediaReviewForm) {
   return await fetch('/api/v1/movie/review', {
     method: 'PUT',
     headers: {
