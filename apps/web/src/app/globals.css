@@ -24,6 +24,7 @@
   --warning: #ffcc00;
   --movieColor: #FF2E63;
   --showColor: #F97300;
+  --semi-transparent: rgba(0, 0, 0, 0.7);
   margin: 0;
   padding: 0;
 }
@@ -105,7 +106,7 @@ a {
 
 .chartTooltip,
 .chartTooltip * {
-  background-color: var(--primary) !important;
+  background-color: var(--primary-dark) !important;
   color: var(--secondary) !important;
   border-radius: 5px;
 }
@@ -129,4 +130,16 @@ a {
   * {
     scrollbar-color: var(--secondary) var(--primary-dark);
   }
+}
+
+.customChartTooltip {
+  background-color: var(--semi-transparent);
+  color: var(--secondary);
+  border-radius: 5px;
+  padding: 0.5rem;
+  border: 1px white;
+}
+
+.recharts-polar-angle-axis-tick-value {
+  color: white!important;
 }

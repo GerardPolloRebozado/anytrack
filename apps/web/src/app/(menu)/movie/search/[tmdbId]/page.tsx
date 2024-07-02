@@ -46,6 +46,8 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
       tmdbId: params.tmdbId,
       watched: data.watched,
       watchedDate: data.watchedDate,
+      rating: data.rating,
+      review: data.review
     })
     if (response.status === 200) {
       setResult(true)
@@ -67,11 +69,15 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
             <option value="true">Watched</option>
             <option value="false">Not watched</option>
           </select>
+          <input type="number" id='rating' {...register('rating')} />
+          <input id='review' {...register('review')} />
           <PrimaryButton type="submit">Submit</PrimaryButton>
           {result === true && <Callout type="success" >Movie added</Callout>}
           {result === false && <Callout type="error" >Error adding movie</Callout>}
           {errors.watchedDate && <Callout type="error" >{errors.watchedDate.message}</Callout>}
           {errors.watched && <Callout type="error" >{errors.watched.message}</Callout>}
+          {errors.rating && <Callout type="error" >{errors.rating.message}</Callout>}
+          {errors.review && <Callout type="error" >{errors.review.message}</Callout>}
         </form>
       </div>
     </>

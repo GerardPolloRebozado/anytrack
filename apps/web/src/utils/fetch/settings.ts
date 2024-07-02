@@ -1,4 +1,4 @@
-import { Settings } from "@prisma/client";
+import { setting } from "@prisma/client";
 import Cookies from "js-cookie";
 
 export async function getSettings() {
@@ -10,10 +10,10 @@ export async function getSettings() {
   });
   return {
     status: response.status,
-    body: await response.json() as Settings,
+    body: await response.json() as setting,
   };
 };
-export async function updateSettings(data: Omit<Settings, "userId">) {
+export async function updateSettings(data: Omit<setting, "userId">) {
   const response = await fetch("/api/v1/setting", {
     method: "POST",
     headers: {

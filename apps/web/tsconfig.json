@@ -14,7 +14,8 @@
     "paths": {
       "@/*": [
         "apps/web/src/*"
-      ]
+      ],
+      "@anytrack/type": ["libs/types/src/index"],
     },
     "plugins": [
       {

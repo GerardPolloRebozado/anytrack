@@ -1,6 +1,6 @@
 'use client'
 import Callout from "@/components/Callout/Callout";
-import { searchMoviebyId } from "@/utils/fetch/movies";
+import { searchMoviebyId, updateMovieReview, getReview } from "@/utils/fetch/movies";
 import { useEffect, useState } from "react";
 import styles from './page.module.css';
 import Image from "next/image";
@@ -10,14 +10,16 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
 import { getCredits } from "@/utils/fetch/userMediaItem";
-import { MediaType } from "@prisma/client";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import Tabs from "@/components/Tabs/Tabs";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { Notification, ReviewWithUser } from "libs/types/src";
-import UpsertReviewForm from "@/components/UpsertReviewForm/UpsertReviewForm";
+import { MediaReviewForm, Notification } from "libs/types/src";
 import Notifications from "@/components/Notifications/Notifications";
-import { getReviews } from "@/utils/fetch/reviews";
+import { joiResolver } from "@hookform/resolvers/joi";
+import { SubmitHandler, useForm } from "react-hook-form";
+import Input from "@/components/Input/Input";
+import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
+import { updateReviewSchema } from "libs/joi/src";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -25,8 +27,30 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const [credits, setCredits] = useState<any>();
   const [reload, setReload] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const router = useRouter();
+  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<MediaReviewForm>({
+    resolver: joiResolver(updateReviewSchema),
+    defaultValues: {
+      mediaId: movie?.localId,
+    }
+  });
+  const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
+    try {
+      const response = await updateMovieReview(data)
+      if (response.status === 200) {
+        addNotification({ type: 'success', message: 'Review added successfully' })
+        setReload(!reload)
+        reset()
+        setValue('mediaId', movie.localId)
+      } else {
+        addNotification({ type: 'error', message: 'Error adding review' })
+      }
+    } catch (error: any) {
+      addNotification({ type: 'error', message: 'Error adding review' })
+    }
+  }
+
 
   function addNotification(notification: Notification) {
     setNotifications((prevNotifications) => [...prevNotifications, notification]);
@@ -35,11 +59,13 @@ function MovieDetails({ params }: { params: { id: number } }) {
     }, 5000)
   };
 
+
+
   useEffect(() => {
     async function fetchReviews(mediaId: number) {
       try {
-        const response = await getReviews(mediaId);
-        setReviews(response)
+        const response = await getReview(mediaId)
+        setReviews(await response.json())
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
       }
@@ -51,6 +77,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         setMovie(await movie)
         if (await movie.localId) {
           fetchReviews(await movie.localId)
+          setValue('mediaId', await movie?.localId)
         }
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
@@ -60,7 +87,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
 
     async function fetchCredits() {
       try {
-        const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.movie })
+        const response = await getCredits({ tmdbId: params.id, mediaType: 'movie' })
         const credits = await response.json()
         setCredits(await credits.cast)
       } catch (error: any) {
@@ -68,11 +95,12 @@ function MovieDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchCredits()
-  }, [params.id, reload]);
+  }, [params.id, reload, setValue]);
 
   const closeModal = () => {
     setError('')
   }
+
 
   return (
     <div className={styles.container}>
@@ -124,11 +152,31 @@ function MovieDetails({ params }: { params: { id: number } }) {
                 </div>
                 <div id="Reviews" className={styles.reviewsContainer}>
                   <div className={styles.reviewList}>
-                    {reviews.length > 0 ? reviews.map((review: ReviewWithUser) => (
+                    {reviews.length > 0 ? reviews.map((review) => (
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
                   </div>
-                  {movie.localId && <UpsertReviewForm mediaId={movie.localId} addNotification={addNotification} setReload={() => setReload(!reload)} />}
+                  {movie.localId && (
+                    <form onSubmit={handleSubmit(submitReview)}>
+                      <Input
+                        label="Rating"
+                        register={register}
+                        name="rating"
+                        type="number"
+                        placeholder="Rating"
+                        error={errors.rating}
+                      />
+                      <Input
+                        label="Review"
+                        register={register}
+                        name="review"
+                        type="text"
+                        placeholder="Type your review"
+                        error={errors.review}
+                      />
+                      <PrimaryButton type="submit">Submit</PrimaryButton>
+                    </form>
+                  )}
                 </div>
               </Tabs>
             </div>
