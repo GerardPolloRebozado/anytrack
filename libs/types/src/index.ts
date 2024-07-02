@@ -22,8 +22,6 @@ export type markShowType = {
 export type markMovieType = {
   watchedDate: string,
   watched: boolean,
-  rating?: number,
-  review?: string,
 }
 
 export type ButtonProps = {
@@ -59,4 +57,9 @@ export type MediaReviewForm = {
   review?: string;
   rating: number;
   mediaId: number;
+}
+
+export type getMarkedMoviesType = {
+  watched?: boolean;
+  groupBy?: string;
 }

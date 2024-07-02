@@ -3,7 +3,6 @@ import MediaCard from '@/components/MediaCard/MediaCard';
 import { useEffect, useState } from 'react'
 import styles from './page.module.css'
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import { getManyUserMediaItem } from '@/utils/fetch/userMediaItem';
 import { MediaType } from 'libs/types/src';
 import { Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts';
 
@@ -22,6 +21,7 @@ function MyShows() {
     async function fetchWatchedShows() {
       const response = await getManyMarkedShows({
         groupBy: 'show',
+        watched: true
       })
       const body = await response.json()
       setWatchedShows(await body)
@@ -42,12 +42,11 @@ function MyShows() {
     fetchWatchedShows()
 
     async function fetchWatchlistShows() {
-      const response = await getManyUserMediaItem({
-        mediaType: MediaType.show,
-        groupBy: 'mediaItem',
+      const response = await getManyMarkedShows({
+        groupBy: 'show',
         watched: false
       })
-      setWatchlistShows(await response.body)
+      setWatchlistShows(await response.json())
     }
     fetchWatchlistShows()
   }, [reload]);
@@ -79,7 +78,7 @@ function MyShows() {
                     <PolarGrid color='white' />
                     <PolarAngleAxis dataKey={'name'} stroke='white' />
                     <Tooltip content={<AgrByCategoryTooltip />} />
-                    <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.random() * pieColors.length]?.hex()} />
+                    <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>

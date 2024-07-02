@@ -6,9 +6,8 @@ import Image from "next/image";
 import { ArrowLeft, CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import { getManyShowReviews, getShow, postShowReview } from "@/utils/fetch/show";
-import { getSeasons } from "@/utils/fetch/tmdb";
-import { deleteUserMediaItem, getCredits, getWatchedEpisodes } from "@/utils/fetch/userMediaItem";
+import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postShowReview } from "@/utils/fetch/show";
+import { getCredits, getSeasons } from "@/utils/fetch/tmdb";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
@@ -61,6 +60,14 @@ function ShowDetails({ params }: { params: { id: number } }) {
   };
 
   useEffect(() => {
+    async function fetchWatchedEpisodes(mediaId: number) {
+      const response = await getOneMarkedShow(mediaId, true);
+      if (response.status === 200) {
+        setWatchedEpisodes(await response.json())
+      } else {
+        addNotification({ type: 'error', message: 'Error fetching watched episodes' })
+      }
+    }
     async function fetchShow() {
       try {
         const response = await getShow(`tmdb:${params.id}`);
@@ -73,21 +80,14 @@ function ShowDetails({ params }: { params: { id: number } }) {
           setValue('mediaId', await show.localId)
           const response = await getManyShowReviews(await show.localId)
           setReviews(await response.json())
+          fetchWatchedEpisodes(await show.localId)
         }
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
       }
     }
     fetchShow();
-    async function fetchWatchedEpisodes() {
-      const response = await getWatchedEpisodes(params.id);
-      if (response.status === 200) {
-        setWatchedEpisodes(await response.body)
-      } else {
-        setError(response.body.error);
-      }
-    }
-    fetchWatchedEpisodes();
+
     async function fetchCredits() {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.show });
@@ -118,7 +118,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
   }
 
   async function deleteSeason({ tmdbId, season }: { tmdbId: number, season: number }) {
-    await deleteUserMediaItem({ tmdbId, season }).then(() => setReload(!reload))
+    await deleteOneUserShow(show.localId, {season}).then(() => setReload(!reload))
   }
 
   async function markSeason({ tmdbId, season }: { tmdbId: string, season: number }) {

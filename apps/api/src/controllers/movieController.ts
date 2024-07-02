@@ -40,10 +40,8 @@ export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
     const watched = Boolean(req.body.watched);
-    const tmdbId = Number(req.body.mediaId);
+    const tmdbId = Number(req.body.tmdbId);
     const userId = res.locals.user.id;
-    const rating = Number(req.body.rating);
-    const review = req.body.review;
 
     let movieItem = await prisma.movie.findFirst({
       where: {
@@ -85,8 +83,6 @@ export const markMovie = async (req: Request, res: Response) => {
           movieId: movieItem.id,
           watched,
           watchedDate,
-          rating,
-          review,
         }
       });
     } else {
@@ -97,11 +93,8 @@ export const markMovie = async (req: Request, res: Response) => {
         data: {
           watched,
           watchedDate,
-          rating,
-          review,
         }
       })
-      console.log('Updating movie', rating, review)
     }
     return res.status(200).json(userMovie);
   } catch (error) {
@@ -114,9 +107,13 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const groupBy = req.query.groupBy as string;
+    let watched: boolean | undefined;
+    if (req.query.watched) watched = req.query.watched === "true";
+    if (req.query.watched === 'false') watched = false;
     const movies = await prisma.userMovie.findMany({
       where: {
         userId,
+        watched
       },
       include: {
         movie: {
@@ -126,29 +123,46 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
         },
       }
     })
-    if (groupBy === "month") {
-      const groupedMedia: { month: string, totalRuntime: number, movies: any[] }[] = [];
-
-      movies.forEach((movie: any) => {
-        const date = new Date(movie.watchedDate);
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-        const group = `${year}-${month}`;
-        const existingIndex = groupedMedia.findIndex(item => item.month === group);
-        if (existingIndex !== -1) {
-          groupedMedia[existingIndex].totalRuntime += movie.movie.runtime;
-          groupedMedia[existingIndex].movies.push(movie);
-        } else {
-          groupedMedia.push({ month: group, totalRuntime: movie.movie.runtime, movies: [movie] });
-        }
-      });
-      const statsOverview: { totalRuntime: number, mediaCount: number } = groupedMedia.reduce((acc, item) => {
-        acc.totalRuntime += item.totalRuntime;
-        acc.mediaCount += item.movies.length;
-        return acc;
-      }, { totalRuntime: 0, mediaCount: 0 });
-      res.status(200).json({ groupedMedia, statsOverview });
-      return;
+    switch (groupBy) {
+      case "month": {
+        const groupedMedia: { month: string, totalRuntime: number, movies: any[] }[] = [];
+        movies.forEach((movie: any) => {
+          const date = new Date(movie.watchedDate);
+          const month = date.getMonth() + 1;
+          const year = date.getFullYear();
+          const group = `${year}-${month}`;
+          const existingIndex = groupedMedia.findIndex(item => item.month === group);
+          if (existingIndex !== -1) {
+            groupedMedia[existingIndex].totalRuntime += movie.movie.runtime;
+            groupedMedia[existingIndex].movies.push(movie);
+          } else {
+            groupedMedia.push({ month: group, totalRuntime: movie.movie.runtime, movies: [movie] });
+          }
+        });
+        const statsOverview: { totalRuntime: number, mediaCount: number } = groupedMedia.reduce((acc, item) => {
+          acc.totalRuntime += item.totalRuntime;
+          acc.mediaCount += item.movies.length;
+          return acc;
+        }, { totalRuntime: 0, mediaCount: 0 });
+        res.status(200).json({ groupedMedia, statsOverview });
+        return;
+      }
+      case "genre": {
+        const tempAgrupation: { id: number, name: string, runtime: number, mediaItems: any[] }[] = [];
+        movies.forEach((movie) => {
+          movie.movie.genre.forEach(genre => {
+            if (tempAgrupation[genre.id]) {
+              tempAgrupation[genre.id].runtime += movie.movie.runtime;
+              tempAgrupation[genre.id].mediaItems.push(movie.movie);
+            } else {
+              tempAgrupation[genre.id] = { id: genre.id, name: genre.name, runtime: movie.movie.runtime, mediaItems: [movie.movie] };
+            }
+          });
+        })
+        const agrupation = tempAgrupation.filter((genre) => genre);
+        res.status(200).json(agrupation);
+        return;
+      }
     }
     return res.status(200).json(movies);
   } catch (error) {
@@ -177,12 +191,9 @@ export const removeMarkedMovie = async (req: Request, res: Response) => {
 export const getReviews = async (req: Request, res: Response) => {
   try {
     const movieId = Number(req.params.mediaId);
-    const reviews = await prisma.userMovie.findMany({
+    const reviews = await prisma.userMovieReview.findMany({
       where: {
         movieId,
-        rating: {
-          not: null
-        },
         OR: [
           {
             user: {
@@ -212,20 +223,26 @@ export const getReviews = async (req: Request, res: Response) => {
   }
 }
 
-export const updateReview = async (req: Request, res: Response) => {
+export const upsertReview = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const { rating, review, mediaId } = req.body;
-    const userMovie = await prisma.userMovie.update({
+    const userMovie = await prisma.userMovieReview.upsert({
       where: {
         userId_movieId: {
           userId,
           movieId: mediaId,
         }
       },
-      data: {
+      update: {
         rating,
         review
+      },
+      create: {
+        rating,
+        review,
+        userId,
+        movieId: mediaId
       }
     });
     return res.status(200).json(userMovie);
@@ -238,17 +255,13 @@ export const deleteReview = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const mediaId = Number(req.params.mediaId);
-    const userMovie = await prisma.userMovie.update({
+    const userMovie = await prisma.userMovieReview.delete({
       where: {
         userId_movieId: {
           userId,
           movieId: mediaId
         }
       },
-      data: {
-        rating: null,
-        review: null
-      }
     });
     return res.status(200).json(userMovie);
   } catch (error) {

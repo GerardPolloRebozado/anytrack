@@ -10,6 +10,7 @@ import { markMovieSchemaForm } from "libs/joi/src";
 import { Notification, markMovieType } from "libs/types/src";
 import Callout from "@/components/Callout/Callout";
 import Notifications from "@/components/Notifications/Notifications";
+import Input from "@/components/Input/Input";
 
 export default function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
   const [movie, setMovie] = useState<any>({})
@@ -46,8 +47,6 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
       tmdbId: params.tmdbId,
       watched: data.watched,
       watchedDate: data.watchedDate,
-      rating: data.rating,
-      review: data.review
     })
     if (response.status === 200) {
       setResult(true)
@@ -64,20 +63,22 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
         <h1>{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
         <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className={styles.poster} />
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          <input type="date" id='watchedDate' {...register('watchedDate', { required: true })} />
+          <Input
+            label="Watched Date"
+            register={register}
+            name="watchedDate"
+            type="date"
+            error={errors.watchedDate}
+            placeholder="Select the date you watched the movie"
+          />
           <select id="watched" {...register('watched', { required: true })}>
             <option value="true">Watched</option>
             <option value="false">Not watched</option>
           </select>
-          <input type="number" id='rating' {...register('rating')} />
-          <input id='review' {...register('review')} />
           <PrimaryButton type="submit">Submit</PrimaryButton>
           {result === true && <Callout type="success" >Movie added</Callout>}
           {result === false && <Callout type="error" >Error adding movie</Callout>}
-          {errors.watchedDate && <Callout type="error" >{errors.watchedDate.message}</Callout>}
           {errors.watched && <Callout type="error" >{errors.watched.message}</Callout>}
-          {errors.rating && <Callout type="error" >{errors.rating.message}</Callout>}
-          {errors.review && <Callout type="error" >{errors.review.message}</Callout>}
         </form>
       </div>
     </>

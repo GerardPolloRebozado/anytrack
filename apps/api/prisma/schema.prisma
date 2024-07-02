@@ -8,16 +8,17 @@ datasource db {
 }
 
 model user {
-  id             String           @id @default(cuid())
-  email          String           @unique
-  name           String?
-  password       String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  setting        setting?
-  userShow       userShow[]
-  userMovie      userMovie[]
-  userShowReview userShowReview[]
+  id              String            @id @default(cuid())
+  email           String            @unique
+  name            String?
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  setting         setting?
+  userShow        userShow[]
+  userMovie       userMovie[]
+  userShowReview  userShowReview[]
+  userMovieReview userMovieReview[]
 }
 
 model setting {
@@ -27,19 +28,20 @@ model setting {
 }
 
 model movie {
-  id          Int         @id @default(autoincrement())
-  tmdbId      Int         @unique
-  tmdbRating  Float?
-  title       String
-  poster      String?
-  releaseDate DateTime?
-  overview    String?
-  runtime     Int?
-  genreId     Int[]
-  genre       genre[]
-  userMovie   userMovie[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id              Int               @id @default(autoincrement())
+  tmdbId          Int               @unique
+  tmdbRating      Float?
+  title           String
+  poster          String?
+  releaseDate     DateTime?
+  overview        String?
+  runtime         Int?
+  genreId         Int[]
+  genre           genre[]
+  userMovie       userMovie[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userMovieReview userMovieReview[]
 }
 
 model userMovie {
@@ -50,8 +52,18 @@ model userMovie {
   movie       movie     @relation(fields: [movieId], references: [id])
   watchedDate DateTime?
   watched     Boolean
-  rating      Int?
-  review      String?
+
+  @@unique([userId, movieId])
+}
+
+model userMovieReview {
+  id      Int     @id @default(autoincrement())
+  userId  String
+  user    user    @relation(fields: [userId], references: [id])
+  movieId Int
+  movie   movie   @relation(fields: [movieId], references: [id])
+  rating  Int?
+  review  String?
 
   @@unique([userId, movieId])
 }

@@ -4,19 +4,29 @@ import { useEffect, useState } from 'react'
 import styles from './page.module.css'
 import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import { MediaType } from 'libs/types/src';
+import { MediaType, getMarkedMoviesType } from 'libs/types/src';
 import { getMarkedMovies, removeMarkedMovie } from '@/utils/fetch/movies';
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts';
+import AgrByCategoryTooltip from '@/components/RechartsTooltip/AgrByCategoryTooltip/AgrByCategoryTooltip';
+import distinctColors from 'distinct-colors';
 
 function MyMovies() {
   const [markedMovies, setMarkedMovies] = useState([])
+  const [agrupatedByGenre, setAgrupatedByGenre] = useState<any>();
   const [reload, setReload] = useState(false)
+  const pieColors = distinctColors({ count: markedMovies.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
 
   useEffect(() => {
-    async function fetchMovies() {
-      const response = await getMarkedMovies({})
-      setMarkedMovies(await response.json())
+    async function fetchMovies(data: getMarkedMoviesType) {
+      return (await getMarkedMovies(data)).json()
     }
-    fetchMovies()
+    fetchMovies({}).then((response) => {
+      setMarkedMovies(response)
+    })
+    fetchMovies({ groupBy: 'genre', watched: true }).then((response) => {
+      setAgrupatedByGenre(response)
+    })
+
   }, [reload]);
 
   async function deleteMarkedMedia(id: number) {
@@ -30,6 +40,22 @@ function MyMovies() {
 
   return (
     <div>
+      <h1>Movie stats</h1>
+      <div className={styles.chartContainer}>
+        {markedMovies && markedMovies.length > 1 && (
+          <>
+            <div className={styles.chart}>
+              <ResponsiveContainer width="100%" height={400}>
+                <RadarChart data={agrupatedByGenre}>
+                  <PolarGrid color='white' />
+                  <PolarAngleAxis dataKey={'name'} stroke='white' />
+                  <Tooltip content={<AgrByCategoryTooltip />} />
+                  <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </>)}
+      </div>
       <h1>My Movies</h1>
       <h2>Watched Movies</h2>
       <div className={styles.cardContainer}>
