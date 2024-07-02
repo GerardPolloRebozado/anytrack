@@ -8,15 +8,16 @@ datasource db {
 }
 
 model user {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  name      String?
-  password  String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  setting   setting?
-  userShow  userShow[]
-  userMovie userMovie[]
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  password       String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  setting        setting?
+  userShow       userShow[]
+  userMovie      userMovie[]
+  userShowReview userShowReview[]
 }
 
 model setting {
@@ -56,18 +57,19 @@ model userMovie {
 }
 
 model show {
-  id          Int        @id @default(autoincrement())
-  tmdbId      Int        @unique
-  tmdbRating  Float?
-  title       String
-  poster      String?
-  releaseDate DateTime?
-  overview    String?
-  season      season[]
-  genre       genre[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  userShow    userShow[]
+  id             Int              @id @default(autoincrement())
+  tmdbId         Int              @unique
+  tmdbRating     Float?
+  title          String
+  poster         String?
+  releaseDate    DateTime?
+  overview       String?
+  season         season[]
+  genre          genre[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userShow       userShow[]
+  userShowReview userShowReview[]
 }
 
 model userShow {
@@ -80,10 +82,20 @@ model userShow {
   episode     episode   @relation(fields: [episodeId], references: [id])
   watchedDate DateTime?
   watched     Boolean
-  rating      Int?
-  review      String?
 
   @@unique([userId, showId, episodeId])
+}
+
+model userShowReview {
+  id     Int     @id @default(autoincrement())
+  userId String
+  user   user    @relation(fields: [userId], references: [id])
+  showId Int
+  show   show    @relation(fields: [showId], references: [id])
+  rating Int?
+  review String?
+
+  @@unique([userId, showId])
 }
 
 model season {

@@ -22,6 +22,8 @@ export type markShowType = {
 export type markMovieType = {
   watchedDate: string,
   watched: boolean,
+  rating?: number,
+  review?: string,
 }
 
 export type ButtonProps = {
@@ -53,7 +55,7 @@ export enum MediaType {
   movie = 'movie'
 }
 
-export type ReviewForm = {
+export type MediaReviewForm = {
   review?: string;
   rating: number;
   mediaId: number;

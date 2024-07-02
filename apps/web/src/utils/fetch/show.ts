@@ -37,3 +37,31 @@ export const getManyMarkedShows = async (data: { watched?: boolean, groupBy?: st
     }
   })
 }
+
+export const postShowReview = async (data: { mediaId: number, rating: number, review?: string }) => {
+  return await fetch(`/api/v1/show/review`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${Cookies.get('token')}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+}
+
+export const getManyShowReviews = async (mediaId: number) => {
+  return await fetch(`/api/v1/show/${mediaId}/review`, {
+    headers: {
+      Authorization: `Bearer ${Cookies.get('token')}`
+    }
+  });
+}
+
+export const deleteOneShowReview = async (mediaId: number) => {
+  return await fetch(`/api/v1/show/${mediaId}/review`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${Cookies.get('token')}`
+    }
+  });
+}

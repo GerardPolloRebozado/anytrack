@@ -283,5 +283,93 @@ export const getManyMarkedShows = async (req: Request, res: Response) => {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
+}
 
+export const postShowReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const showId = req.body.mediaId;
+    const rating = req.body.rating;
+    const review = req.body.review;
+    const userReview = await prisma.userShowReview.upsert({
+      where: {
+        userId_showId: {
+          userId,
+          showId
+        }
+      },
+      update: {
+        rating,
+        review,
+      },
+      create: {
+        userId,
+        showId,
+        rating,
+        review,
+      }
+    })
+    res.status(200).json(userReview);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const getManyShowReviews = async (req: Request, res: Response) => {
+  try {
+    const showId = Number(req.params.mediaId);
+    console.log(showId);
+    const reviews = await prisma.userShowReview.findMany({
+      where: {
+        showId,
+        rating: {
+          not: null
+        },
+        OR: [
+          {
+            user: {
+              setting: {
+                public: true
+              }
+            }
+          },
+          {
+            userId: res.locals.user.id
+          }
+        ]
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true
+          }
+        }
+      }
+    });
+    res.status(200).json(reviews);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const deleteOneShowReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const showId = Number(req.params.mediaId);
+    await prisma.userShowReview.delete({
+      where: {
+        userId_showId: {
+          userId,
+          showId
+        }
+      }
+    });
+    res.status(200).json(showId);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
 }

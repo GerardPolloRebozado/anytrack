@@ -40,9 +40,9 @@ export const getCredits = async (req: Request, res: Response) => {
     const mediaType = req.query.mediaType as MediaType;
     const tmdbId = Number(req.query.tmdbId);
     let response;
-    if (mediaType === MediaType.show) {
+    if (mediaType === 'show') {
       response = await getAgregatedShowCreditsService(tmdbId)
-    } else if (mediaType === MediaType.movie) {
+    } else if (mediaType === 'movie') {
       response = await getMovieCredits(tmdbId)
     }
     await Promise.all(response.cast.map(async (credit: any) => {

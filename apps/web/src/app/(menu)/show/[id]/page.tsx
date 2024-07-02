@@ -6,30 +6,52 @@ import Image from "next/image";
 import { ArrowLeft, CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import { getShow } from "@/utils/fetch/show";
+import { getManyShowReviews, getShow, postShowReview } from "@/utils/fetch/show";
 import { getSeasons } from "@/utils/fetch/tmdb";
 import { deleteUserMediaItem, getCredits, getWatchedEpisodes } from "@/utils/fetch/userMediaItem";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import { randomColor } from "@/utils/randomColor";
-import { MediaType } from "@prisma/client";
 import Tabs from "@/components/Tabs/Tabs";
 import MediaScore from "@/components/MediaScore/MediaScore";
-import { getReviews } from "@/utils/fetch/reviews";
 import Notifications from "@/components/Notifications/Notifications";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import UpsertReviewForm from "@/components/UpsertReviewForm/UpsertReviewForm";
-import { Notification, ReviewWithUser } from "libs/types/src";
+import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
+import { joiResolver } from "@hookform/resolvers/joi";
+import { updateReviewSchema } from "libs/joi/src";
+import { SubmitHandler, useForm } from "react-hook-form";
+import Input from "@/components/Input/Input";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
   const [credits, setCredits] = useState<any>();
   const [reload, setReload] = useState(false);
-  const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [error, setError] = useState('')
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([])
+  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<MediaReviewForm>({
+    resolver: joiResolver(updateReviewSchema),
+    defaultValues: {
+      mediaId: show?.localId,
+    }
+  });
+  const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
+    try {
+      const response = await postShowReview(data)
+      if (response.status === 200) {
+        addNotification({ type: 'success', message: 'Review added successfully' })
+        setReload(!reload)
+        reset()
+        setValue('mediaId', show.localId)
+      } else {
+        addNotification({ type: 'error', message: 'Error adding review' })
+      }
+    } catch (error: any) {
+      addNotification({ type: 'error', message: 'Error adding review' })
+    }
+  }
 
   function addNotification(notification: Notification) {
     setNotifications((prevNotifications) => [...prevNotifications, notification]);
@@ -39,14 +61,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
   };
 
   useEffect(() => {
-    async function fetchReviews(mediaId: number) {
-      try {
-        const response = await getReviews(mediaId);
-        setReviews(response)
-      } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
-      }
-    }
     async function fetchShow() {
       try {
         const response = await getShow(`tmdb:${params.id}`);
@@ -55,8 +69,10 @@ function ShowDetails({ params }: { params: { id: number } }) {
         const show = await response.body
         show.seasons = seasons.body;
         setShow(show);
-        if (await show.localId) {
-          await fetchReviews(await show.localId)
+        if (await show?.localId) {
+          setValue('mediaId', await show.localId)
+          const response = await getManyShowReviews(await show.localId)
+          setReviews(await response.json())
         }
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
@@ -75,13 +91,13 @@ function ShowDetails({ params }: { params: { id: number } }) {
     async function fetchCredits() {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.show });
-        setCredits(response.json())
+        setCredits(await response.json())
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
       }
     }
     fetchCredits();
-  }, [params.id, reload]);
+  }, [params.id, reload, setValue]);
   const closeModal = () => {
     setError('')
   }
@@ -176,11 +192,32 @@ function ShowDetails({ params }: { params: { id: number } }) {
                 </div>
                 <div id="Reviews" className={styles.reviewsContainer}>
                   <div className={styles.reviewList}>
-                    {reviews.length > 0 ? reviews.map((review: ReviewWithUser) => (
+                    {reviews.length > 0 ? reviews.map((review) => (
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
                   </div>
-                  {show.localId && <UpsertReviewForm mediaId={show.localId} addNotification={addNotification} setReload={() => setReload(!reload)} />}
+                  {show.localId && (
+                    <form onSubmit={handleSubmit(submitReview)}>
+                      <Input
+                        label="Rating"
+                        register={register}
+                        name="rating"
+                        type="number"
+                        placeholder="Rating"
+                        error={errors.rating}
+                      />
+                      <Input
+                        label="Review"
+                        register={register}
+                        name="review"
+                        type="text"
+                        placeholder="Type your review"
+                        error={errors.review}
+                      />
+                      <PrimaryButton type="submit">Submit</PrimaryButton>
+                      {errors.review && <Callout type="error">{errors.review.message}</Callout>}
+                      {errors.rating && <Callout type="error">{errors.rating.message}</Callout>}
+                    </form>)}
                 </div>
               </Tabs>
             </div>

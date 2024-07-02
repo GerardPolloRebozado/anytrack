@@ -18,13 +18,13 @@ export const getMovieByTerm = async (req: Request, res: Response) => {
 
 export const getMoviebyId = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-    const data = await searchMoviebyIdService(id);
+    const movieId = Number(req.params.movieId);
+    const data = await searchMoviebyIdService(movieId);
     if (data.status_code === 34) return res.status(404).json({ error: "Movie not found" });
     data.poster = `https://image.tmdb.org/t/p/original/${data.poster_path}`;
     const localId = await prisma.movie.findUnique({
       where: {
-        tmdbId: id,
+        tmdbId: movieId,
       }
     });
     if (localId) {
@@ -40,10 +40,10 @@ export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
     const watched = Boolean(req.body.watched);
-    const tmdbId = Number(req.body.tmdbId);
+    const tmdbId = Number(req.body.mediaId);
     const userId = res.locals.user.id;
     const rating = Number(req.body.rating);
-    const review = req.body.text;
+    const review = req.body.review;
 
     let movieItem = await prisma.movie.findFirst({
       where: {
@@ -96,9 +96,12 @@ export const markMovie = async (req: Request, res: Response) => {
         },
         data: {
           watched,
-          watchedDate
+          watchedDate,
+          rating,
+          review,
         }
       })
+      console.log('Updating movie', rating, review)
     }
     return res.status(200).json(userMovie);
   } catch (error) {
@@ -166,6 +169,88 @@ export const removeMarkedMovie = async (req: Request, res: Response) => {
       }
     });
     return res.status(200).json(userMediaItem);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const getReviews = async (req: Request, res: Response) => {
+  try {
+    const movieId = Number(req.params.mediaId);
+    const reviews = await prisma.userMovie.findMany({
+      where: {
+        movieId,
+        rating: {
+          not: null
+        },
+        OR: [
+          {
+            user: {
+              setting: {
+                public: true
+              }
+            }
+          },
+          {
+            userId: res.locals.user.id
+          }
+        ]
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true
+          }
+        },
+        movie: true
+      }
+    });
+    return res.status(200).json(reviews);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const updateReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const { rating, review, mediaId } = req.body;
+    const userMovie = await prisma.userMovie.update({
+      where: {
+        userId_movieId: {
+          userId,
+          movieId: mediaId,
+        }
+      },
+      data: {
+        rating,
+        review
+      }
+    });
+    return res.status(200).json(userMovie);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const deleteReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const mediaId = Number(req.params.mediaId);
+    const userMovie = await prisma.userMovie.update({
+      where: {
+        userId_movieId: {
+          userId,
+          movieId: mediaId
+        }
+      },
+      data: {
+        rating: null,
+        review: null
+      }
+    });
+    return res.status(200).json(userMovie);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

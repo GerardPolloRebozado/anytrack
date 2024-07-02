@@ -1,7 +1,7 @@
 import Joi from "joi";
-import { tlds } from "@hapi/tlds";
 export { Joi };
-
+import { tlds } from "@hapi/tlds";
+import { MediaType } from "@anytrack/type";
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
@@ -20,7 +20,7 @@ export const searchMoviesSchema = Joi.object({
 });
 
 export const searchMovieByIdSchema = Joi.object({
-  id: Joi.string().required(),
+  movieId: Joi.string().required(),
 });
 
 export const deleteMediaSchema = Joi.object({
@@ -52,15 +52,23 @@ export const markShowSchema = Joi.object({
   episode: Joi.number().optional()
 })
 
-export const markMovieSchema = Joi.object({
-  tmdbId: Joi.number().required(),
-  watchedDate: Joi.date().max("now").optional(),
-  watched: Joi.boolean().required()
-})
-
 export const markMovieSchemaForm = Joi.object({
   watchedDate: Joi.date().max("now").required(),
-  watched: Joi.boolean().required()
+  watched: Joi.boolean().required(),
+  rating: Joi.alternatives().conditional('watched', {
+    is: true,
+    then: Joi.number().min(0).max(10).precision(1).required(),
+    otherwise: Joi.number().forbidden()
+  }),
+  review: Joi.alternatives().conditional('rating', {
+    is: Joi.exist(),
+    then: Joi.string().optional(),
+    otherwise: Joi.string().forbidden()
+  })
+})
+
+export const markMovieSchema = markMovieSchemaForm.keys({
+  tmdbId: Joi.number().required()
 })
 
 export const markShowSchemaForm = Joi.object({
@@ -82,6 +90,7 @@ export const removeMarkedMovieSchema = Joi.object({
 export const getCreditsSchema = Joi.object({
   tmdbId: Joi.number().required(),
   season: Joi.number().optional(),
+  mediaType: Joi.string().valid(...Object.values(MediaType)).required()
 })
 
 export const getOneUserMediaItemSchema = Joi.object({
@@ -103,7 +112,7 @@ export const updateSettingsSchema = Joi.object({
   public: Joi.boolean().required(),
 });
 
-export const upsertReviewSchema = Joi.object({
+export const updateReviewSchema = Joi.object({
   review: Joi.string().optional(),
   rating: Joi.alternatives().try(
     Joi.number().min(0).max(9.9).precision(1),

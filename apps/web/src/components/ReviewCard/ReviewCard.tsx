@@ -1,15 +1,22 @@
+import { removeReview } from "@/utils/fetch/movies";
 import Card from "../Card/Card";
-import { ReviewWithUser } from "libs/types/src";
 import MediaScore from "../MediaScore/MediaScore";
 import styles from './ReviewCard.module.css';
 import Cookies from "js-cookie";
-import { deleteReview } from "@/utils/fetch/reviews";
+import { deleteOneShowReview } from "@/utils/fetch/show";
 
-export default function ReviewCard({ review, setReload }: { review: ReviewWithUser, setReload: () => void }) {
+export default function ReviewCard({ review, setReload }: { review: any, setReload: () => void }) {
   const fetchDeleteReview = async () => {
-    const response = await deleteReview(review.mediaId);
-    if (response.status === 200) {
-      setReload();
+    if (review.movieId) {
+      const response = await removeReview(review.movieId);
+      if (response.status === 200) {
+        setReload();
+      }
+    } else if (review.showId) {
+      const response = await deleteOneShowReview(review.showId);
+      if (response.status === 200) {
+        setReload();
+      }
     }
   }
   return (
