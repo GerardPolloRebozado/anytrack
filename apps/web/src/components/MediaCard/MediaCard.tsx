@@ -3,7 +3,7 @@ import Image from 'next/image';
 import styles from './MediaCard.module.css';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import { MediaType } from '@prisma/client';
+import { MediaType } from 'libs/types/src';
 
 export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string, title: string, poster: string, year: number, children?: React.ReactNode, mediaType: MediaType}) {
     const router = useRouter();

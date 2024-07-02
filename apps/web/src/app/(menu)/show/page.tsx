@@ -9,34 +9,35 @@ import { Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar, RadarCha
 
 import distinctColors from 'distinct-colors';
 import AgrByCategoryTooltip from '@/components/RechartsTooltip/AgrByCategoryTooltip/AgrByCategoryTooltip';
+import { getManyMarkedShows } from '@/utils/fetch/show';
 
 function MyShows() {
   const [watchedShows, setWatchedShows] = useState([])
   const [watchlistShows, setWatchlistShows] = useState([])
   const [reload, setReload] = useState(false);
-  const [agrupatedByGenres, setAgrupatedByGenres] = useState<any>();
+  const [agrupatedByGenre, setAgrupatedByGenre] = useState<any>();
   const pieColors = distinctColors({ count: watchedShows.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
 
   useEffect(() => {
     async function fetchWatchedShows() {
-      const response = await getManyUserMediaItem({
-        mediaType: MediaType.show,
-        groupBy: 'mediaItem',
+      const response = await getManyMarkedShows({
+        groupBy: 'show',
       })
-      setWatchedShows(await response.body)
+      const body = await response.json()
+      setWatchedShows(await body)
       const tempAgrupation: { id: number, name: string, runtime: number, mediaItems: any[] }[] = [];
-      await response.body.forEach((show: any) => {
-        show.mediaItem.genres.forEach((genre: any) => {
+      await body.forEach((userShow: any) => {
+        userShow.show.genre.forEach((genre: any) => {
           const category = tempAgrupation.find((category) => category.id === genre.id);
           if (category) {
-            category.runtime += show.watchTime
-            category.mediaItems.push(show.mediaItem);
+            category.runtime += userShow.watchTime
+            category.mediaItems.push(userShow.show);
           } else {
-            tempAgrupation.push({ id: genre.id, name: genre.name, runtime: show.watchTime, mediaItems: [show.mediaItem] });
+            tempAgrupation.push({ id: genre.id, name: genre.name, runtime: userShow.watchTime, mediaItems: [userShow.mediaItem] });
           }
         });
       });
-      setAgrupatedByGenres(tempAgrupation)
+      setAgrupatedByGenre(tempAgrupation)
     }
     fetchWatchedShows()
 
@@ -55,7 +56,7 @@ function MyShows() {
     <>
       <h3>Show stats</h3>
       <div className={styles.chartContainer}>
-        {watchedShows && watchedShows.length > 0 && (
+        {watchedShows && watchedShows.length > 1 && (
           <>
             <div className={styles.chart}>
               <h3>Watchtime agrupated by show</h3>
@@ -70,31 +71,33 @@ function MyShows() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className={`${styles.chart} radarChart`}>
-              <h3>Watchtime agrupated by category</h3>
-              <ResponsiveContainer width="100%" height={400}>
-                <RadarChart data={agrupatedByGenres}>
-                  <PolarGrid color='white'/>
-                  <PolarAngleAxis dataKey={'name'} stroke='white'/>
-                  <Tooltip content={<AgrByCategoryTooltip />} />
-                  <Radar name="Genres" dataKey="runtime" fill={pieColors[2].hex()} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
+            {agrupatedByGenre && agrupatedByGenre.length > 1 && (
+              <div className={`${styles.chart} radarChart`}>
+                <h3>Watchtime agrupated by category</h3>
+                <ResponsiveContainer width="100%" height={400}>
+                  <RadarChart data={agrupatedByGenre}>
+                    <PolarGrid color='white' />
+                    <PolarAngleAxis dataKey={'name'} stroke='white' />
+                    <Tooltip content={<AgrByCategoryTooltip />} />
+                    <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.random() * pieColors.length]?.hex()} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </>
         )}
       </div>
       <h1>My shows</h1>
       <h2>Watched Shows</h2>
       <div className={styles.cardContainer}>
-        {watchedShows.length > 0 && watchedShows.map((show: any) => (
-          <MediaCard key={show.mediaItem.tmdbId} id={show.mediaItem.tmdbId} title={show.mediaItem.title} poster={show.mediaItem.poster} year={show.mediaItem.year} mediaType={MediaType.show} />
+        {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
+          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.year} mediaType={MediaType.show} />
         ))}
       </div>
       <h2>Watchlist</h2>
       <div className={styles.cardContainer}>
-        {watchlistShows.length > 0 && watchlistShows.map((show: any) => (
-          <MediaCard key={show.mediaItem.tmdbId} id={show.mediaItem.tmdbId} title={show.mediaItem.title} poster={show.mediaItem.poster} year={show.mediaItem.year} mediaType={MediaType.show} />
+        {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
+          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.year} mediaType={MediaType.show} />
         ))}
       </div>
     </ >

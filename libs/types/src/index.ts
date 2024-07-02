@@ -1,4 +1,3 @@
-import { Prisma, Review, User } from '@prisma/client';
 import React from 'react';
 
 export type signupForm = {
@@ -23,6 +22,8 @@ export type markShowType = {
 export type markMovieType = {
   watchedDate: string,
   watched: boolean,
+  rating?: number,
+  review?: string,
 }
 
 export type ButtonProps = {
@@ -54,12 +55,8 @@ export enum MediaType {
   movie = 'movie'
 }
 
-export type ReviewForm = {
+export type MediaReviewForm = {
   review?: string;
   rating: number;
   mediaId: number;
 }
-
-export type ReviewWithUser = Prisma.ReviewGetPayload<{
-  include: { user: true };
-}>

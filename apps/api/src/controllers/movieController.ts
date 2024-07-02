@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
-import { Genre, MediaType } from "@prisma/client";
+import { genre } from "@prisma/client";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
   try {
@@ -18,20 +18,13 @@ export const getMovieByTerm = async (req: Request, res: Response) => {
 
 export const getMoviebyId = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-    // const movieLocal = await prisma.mediaItem.findFirst({
-    //     where: { tmdbId: id },
-    // });
-    // if (movieLocal) {
-    //     res.status(200).json(movieLocal);
-    //     return;
-    // }
-    const data = await searchMoviebyIdService(id);
+    const movieId = Number(req.params.movieId);
+    const data = await searchMoviebyIdService(movieId);
     if (data.status_code === 34) return res.status(404).json({ error: "Movie not found" });
     data.poster = `https://image.tmdb.org/t/p/original/${data.poster_path}`;
-    const localId = await prisma.mediaItem.findUnique({
+    const localId = await prisma.movie.findUnique({
       where: {
-        tmdbId: id
+        tmdbId: movieId,
       }
     });
     if (localId) {
@@ -47,65 +40,70 @@ export const markMovie = async (req: Request, res: Response) => {
   try {
     let watchedDate = req.body.watchedDate;
     const watched = Boolean(req.body.watched);
-    const tmdbId = Number(req.body.tmdbId);
+    const tmdbId = Number(req.body.mediaId);
     const userId = res.locals.user.id;
-    let mediaItem = await prisma.mediaItem.findFirst({
+    const rating = Number(req.body.rating);
+    const review = req.body.review;
+
+    let movieItem = await prisma.movie.findFirst({
       where: {
         tmdbId
       }
     });
-    if (!mediaItem) {
+    if (!movieItem) {
       const movie = await searchMoviebyIdService(tmdbId);
-      const genreData = await Promise.all(await movie.genres.map((genre: Genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
+      const genreData = await Promise.all(await movie.genres.map((genre: genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
       if (movie.status_code === 34) throw new Error("Movie not found");
-      mediaItem = await prisma.mediaItem.create({
+      movieItem = await prisma.movie.create({
         data: {
           tmdbId: movie.id,
-          mediaType: "movie",
           title: movie.title,
           overview: movie.overview,
           poster: `https://image.tmdb.org/t/p/original/${movie.poster_path}`,
           tmdbRating: movie.vote_average,
           releaseDate: new Date(movie.release_date),
           runtime: movie.runtime,
-          genres: {
+          genre: {
             connect: genreData.map((genre) => ({ name: genre.name }))
           }
         }
       });
     }
+
     if (watchedDate) watchedDate = new Date(watchedDate);
-    let userMediaItem = await prisma.userMediaItem.findFirst({
+    let userMovie = await prisma.userMovie.findFirst({
       where: {
         userId,
-        mediaId: mediaItem.id,
-        mediaItem: {
-          mediaType: MediaType.movie
-        },
+        movieId: movieItem.id,
       },
     });
 
-    if (!userMediaItem) {
-      userMediaItem = await prisma.userMediaItem.create({
+    if (!userMovie) {
+      userMovie = await prisma.userMovie.create({
         data: {
           userId,
+          movieId: movieItem.id,
           watched,
           watchedDate,
-          mediaId: mediaItem.id
+          rating,
+          review,
         }
       });
     } else {
-      userMediaItem = await prisma.userMediaItem.update({
+      userMovie = await prisma.userMovie.update({
         where: {
-          id: userMediaItem.id
+          id: userMovie.id
         },
         data: {
           watched,
-          watchedDate
+          watchedDate,
+          rating,
+          review,
         }
       })
+      console.log('Updating movie', rating, review)
     }
-    return res.status(200).json(userMediaItem);
+    return res.status(200).json(userMovie);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -116,45 +114,42 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id;
     const groupBy = req.query.groupBy as string;
-    const movies = await prisma.userMediaItem.findMany({
+    const movies = await prisma.userMovie.findMany({
       where: {
         userId,
-        mediaItem: {
-          mediaType: "movie"
-        },
       },
       include: {
-        mediaItem: {
-          select: {
-            seasons: false
-          },
+        movie: {
           include: {
-            genres: true,
+            genre: true,
           }
         },
-        episode: false
       }
     })
     if (groupBy === "month") {
-      const grouped: { month: string, totalRuntime: number, movies: any[] }[] = [];
+      const groupedMedia: { month: string, totalRuntime: number, movies: any[] }[] = [];
+
       movies.forEach((movie: any) => {
         const date = new Date(movie.watchedDate);
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
         const group = `${year}-${month}`;
-        const existingIndex = grouped.findIndex(item => item.month === group);
+        const existingIndex = groupedMedia.findIndex(item => item.month === group);
         if (existingIndex !== -1) {
-          grouped[existingIndex].totalRuntime += movie.mediaItem.runtime;
-          grouped[existingIndex].movies.push(movie);
+          groupedMedia[existingIndex].totalRuntime += movie.movie.runtime;
+          groupedMedia[existingIndex].movies.push(movie);
         } else {
-          grouped.push({ month: group, totalRuntime: movie.mediaItem.runtime, movies: [movie] });
+          groupedMedia.push({ month: group, totalRuntime: movie.movie.runtime, movies: [movie] });
         }
       });
-      res.status(200).json(grouped);
+      const statsOverview: { totalRuntime: number, mediaCount: number } = groupedMedia.reduce((acc, item) => {
+        acc.totalRuntime += item.totalRuntime;
+        acc.mediaCount += item.movies.length;
+        return acc;
+      }, { totalRuntime: 0, mediaCount: 0 });
+      res.status(200).json({ groupedMedia, statsOverview });
       return;
     }
-
-
     return res.status(200).json(movies);
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -162,15 +157,100 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
 }
 
 export const removeMarkedMovie = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  console.log(id)
+  const movieId = Number(req.params.id);
+  const userId = res.locals.user.id;
   try {
-    const userMediaItem = await prisma.userMediaItem.delete({
+    const userMediaItem = await prisma.userMovie.delete({
       where: {
-        id
+        userId_movieId: {
+          userId,
+          movieId
+        }
       }
     });
     return res.status(200).json(userMediaItem);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const getReviews = async (req: Request, res: Response) => {
+  try {
+    const movieId = Number(req.params.mediaId);
+    const reviews = await prisma.userMovie.findMany({
+      where: {
+        movieId,
+        rating: {
+          not: null
+        },
+        OR: [
+          {
+            user: {
+              setting: {
+                public: true
+              }
+            }
+          },
+          {
+            userId: res.locals.user.id
+          }
+        ]
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            id: true
+          }
+        },
+        movie: true
+      }
+    });
+    return res.status(200).json(reviews);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const updateReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const { rating, review, mediaId } = req.body;
+    const userMovie = await prisma.userMovie.update({
+      where: {
+        userId_movieId: {
+          userId,
+          movieId: mediaId,
+        }
+      },
+      data: {
+        rating,
+        review
+      }
+    });
+    return res.status(200).json(userMovie);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+export const deleteReview = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id;
+    const mediaId = Number(req.params.mediaId);
+    const userMovie = await prisma.userMovie.update({
+      where: {
+        userId_movieId: {
+          userId,
+          movieId: mediaId
+        }
+      },
+      data: {
+        rating: null,
+        review: null
+      }
+    });
+    return res.status(200).json(userMovie);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

@@ -1,5 +1,4 @@
 import Cookies from "js-cookie"
-import { headers } from "next/headers"
 
 export const triggerUpdateMovies = async () => {
   const response = await fetch('/api/v1/cron/update/movie', {

@@ -1,21 +1,19 @@
 import { CronJob } from "cron";
-import { MediaType } from "@prisma/client";
 import { searchMoviebyIdService, searchShowSeasonsService, searchShowTmdbIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
 
 export const updateMovies = new CronJob("0 0 */2 * *", async () => {
-  const movieItems = await prisma.mediaItem.findMany({
+  const movieItems = await prisma.movie.findMany({
     where: {
       updatedAt: {
         lte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
       },
-      mediaType: MediaType.movie,
     },
   });
   console.log(`Found ${movieItems.length} movies to update`);
   movieItems.forEach(async (movie) => {
     const movieTmdb = await searchMoviebyIdService(movie.tmdbId);
-    const updatedMovie = await prisma.mediaItem.update({
+    const updatedMovie = await prisma.movie.update({
       where: { id: movie.id },
       data: {
         title: movieTmdb.original_title,
@@ -24,7 +22,7 @@ export const updateMovies = new CronJob("0 0 */2 * *", async () => {
         tmdbRating: movieTmdb.vote_average,
         releaseDate: new Date(movieTmdb.release_date),
         runtime: movieTmdb.runtime,
-        genres: {
+        genre: {
           connect: movieTmdb.genres.map((genre: any) => ({ name: genre.name }))
         }
       }
@@ -34,21 +32,20 @@ export const updateMovies = new CronJob("0 0 */2 * *", async () => {
 }, null, true, "Europe/Madrid");
 
 export const updateShows = new CronJob("0 0 * * *", async () => {
-  const showItems = await prisma.mediaItem.findMany({
+  const showItems = await prisma.show.findMany({
     where: {
       updatedAt: {
         lte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 2),
       },
-      mediaType: MediaType.show,
     },
     include: {
-      season: true,
+      season: true
     }
   });
   console.log(`Found ${showItems.length} shows to update`);
   showItems.forEach(async (show) => {
     const showTmdb = await searchShowTmdbIdService(show.tmdbId);
-    const updatedShow = await prisma.mediaItem.update({
+    const updatedShow = await prisma.show.update({
       where: { id: show.id },
       data: {
         title: showTmdb.name,
@@ -56,8 +53,7 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
         poster: `https://image.tmdb.org/t/p/original/${showTmdb.poster_path}`,
         tmdbRating: showTmdb.vote_average,
         releaseDate: new Date(showTmdb.first_air_date),
-        runtime: showTmdb.runtime,
-        genres: {
+        genre: {
           connect: showTmdb.genres.map((genre: any) => ({ name: genre.name }))
         }
       }
@@ -65,8 +61,8 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
     showTmdb.seasons.forEach(async (season) => {
       const seasonDb = await prisma.season.upsert({
         where: {
-          mediaItemId_seasonNumber: {
-            mediaItemId: show.id,
+          showId_seasonNumber: {
+            showId: show.id,
             seasonNumber: season.season_number
           }
         },
@@ -82,7 +78,7 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
           poster: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
           releaseDate: new Date(season.air_date),
           overview: season.overview,
-          mediaItem: {
+          show: {
             connect: {
               id: show.id
             }
@@ -90,7 +86,7 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
         }
       });
       const seasonTmdb = await searchShowSeasonsService(show.tmdbId, season.season_number);
-      seasonTmdb.episodes.forEach(async episode =>{
+      seasonTmdb.episodes.forEach(async episode => {
         await prisma.episode.upsert({
           where: {
             seasonId_episodeNumber: {
@@ -116,7 +112,6 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
           }
         });
       });
-
     });
     console.log(`Updated show ${updatedShow.title}`);
   });
