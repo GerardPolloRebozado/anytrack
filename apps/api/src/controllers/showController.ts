@@ -483,3 +483,34 @@ export const deleteOneUserShow = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message })
   }
 }
+
+export const getManyFutureEpisode = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id
+    const futureEpisodes = await prisma.episode.findMany({
+      where: {
+        userShow: {
+          some: {
+            userId
+          }
+        },
+        releaseDate: {
+          gte: new Date()
+        }
+      },
+      include: {
+        season: {
+          include: {
+            show: true
+          }
+        }
+      },
+      orderBy: {
+        releaseDate: 'asc'
+      }
+    })
+    res.status(200).json(futureEpisodes)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}

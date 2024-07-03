@@ -88,3 +88,12 @@ export const deleteOneUserShow = async (mediaId: number, data: { season?: number
     },
   })
 }
+
+export const getManyFutureEpisode = async () => {
+  return await fetch(`api/v1/show/future`, {
+    headers: {
+      Authorization: `Bearer ${Cookies.get('token')}`,
+      'Content-Type': 'application/json'
+    },
+  })
+}

@@ -1,6 +1,6 @@
 .chartContainer {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr;
   grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
   grid-gap: 1.2em;
 }
@@ -13,31 +13,29 @@
   height: auto;
 }
 
-.overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  grid-gap: 3.5em;
-}
-
-.overview div {
+.legend {
   display: flex;
   align-items: center;
   justify-content: center;
   align-content: center;
   text-align: center;
   flex-direction: row;
-  background-color: var(--primary-dark);
-  border-radius: 5px;
 }
 
-.overview div p {
-  font-size: 1.3rem;
+.legend p {
+  font-size: 1.2rem;
 }
 
-.overview span {
+.legend span {
   margin: 0 0.5rem;
 }
 
-.overview svg {
+.legend svg {
   margin-right: 0.5rem;
+}
+
+.upcomingReleases {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
