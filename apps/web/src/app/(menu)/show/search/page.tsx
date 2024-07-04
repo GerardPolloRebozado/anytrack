@@ -1,10 +1,10 @@
 'use client'
 import SearchBar from "@/components/SearchBar/SearchBar";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import styles from './page.module.css';
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
-import { getShow, markShow } from "@/utils/fetch/show";
+import { getShow } from "@/utils/fetch/show";
 import MediaCard from "@/components/MediaCard/MediaCard";
 import Link from "next/link";
 import { MediaType } from "libs/types/src";

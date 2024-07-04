@@ -61,7 +61,7 @@ function MyMovies() {
       <div className={styles.cardContainer}>
         {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
           markedMovie.watched && (
-            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.year} mediaType={MediaType.movie}>
+            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.releaseDate} mediaType={MediaType.movie}>
               <PrimaryButton onClick={() => deleteMarkedMedia(markedMovie.id)}>Remove</PrimaryButton>
             </MovieCard>)
         ))}
@@ -70,7 +70,7 @@ function MyMovies() {
       <div className={styles.cardContainer}>
         {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
           !markedMovie.watched && (
-            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.year} mediaType={MediaType.movie}>
+            <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.releaseDate} mediaType={MediaType.movie}>
               <PrimaryButton onClick={() => deleteMarkedMedia(markedMovie.id)}>Remove</PrimaryButton>
             </MovieCard>)
         ))}

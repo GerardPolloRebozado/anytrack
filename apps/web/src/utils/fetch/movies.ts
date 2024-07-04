@@ -2,23 +2,25 @@ import Cookies from 'js-cookie';
 import buildUrl from '../buildUrl';
 import { MediaReviewForm, getMarkedMoviesType } from '@anytrack/type';
 
-async function searchMoviebyId(id: number) {
+export async function searchMoviebyId(id: number) {
   return await fetch(`/api/v1/movie/${id}`, {
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   });
 }
 
-async function searchMovies(query: string) {
+export async function searchMovies(query: string) {
   return await fetch(`/api/v1/movie/search?query=${query}`, {
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   });
 }
 
-async function markMovie(data: { tmdbId: number, watched?: boolean, watchedDate?: string, rating?: number, review?: string }) {
+export async function markMovie(data: { tmdbId: number, watched?: boolean, watchedDate?: string, rating?: number, review?: string }) {
   const response = await fetch('/api/v1/movie/mark', {
     method: 'POST',
     headers: {
@@ -33,7 +35,7 @@ async function markMovie(data: { tmdbId: number, watched?: boolean, watchedDate?
   }
 }
 
-async function removeMarkedMovie(id: number) {
+export async function removeMarkedMovie(id: number) {
   const response = await fetch(`/api/v1/movie/mark/${id}`, {
     method: 'DELETE',
     headers: {
@@ -47,17 +49,17 @@ async function removeMarkedMovie(id: number) {
   }
 }
 
-async function getMarkedMovies(data: getMarkedMoviesType) {
+export async function getMarkedMovies(data: getMarkedMoviesType) {
   const url = buildUrl('/api/v1/movie/mark', data)
   return await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   })
 }
 
-async function updateMovieReview(data: MediaReviewForm) {
+export async function updateMovieReview(data: MediaReviewForm) {
   return await fetch('/api/v1/movie/review', {
     method: 'PUT',
     headers: {
@@ -68,21 +70,30 @@ async function updateMovieReview(data: MediaReviewForm) {
   })
 }
 
-async function getReview(mediaId: number) {
+export async function getReview(mediaId: number) {
   return await fetch(`/api/v1/movie/${mediaId}/review`, {
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   })
 }
 
-async function removeReview(mediaId: number) {
+export async function removeReview(mediaId: number) {
   return await fetch(`/api/v1/movie/${mediaId}/review`, {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   })
 }
 
-export { searchMoviebyId, searchMovies, markMovie, removeMarkedMovie, getMarkedMovies, updateMovieReview, getReview, removeReview }
+export async function getManyFutureMovies() {
+  return await fetch(`/api/v1/movie/future`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
+  })
+}

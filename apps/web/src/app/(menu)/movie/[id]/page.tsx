@@ -20,6 +20,7 @@ import Input from "@/components/Input/Input";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { updateReviewSchema } from "libs/joi/src";
 import { getCredits } from "@/utils/fetch/tmdb";
+import Card from "@/components/Card/Card";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -38,15 +39,13 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
     try {
       const response = await updateMovieReview(data)
-      if (response.status === 200) {
-        addNotification({ type: 'success', message: 'Review added successfully' })
-        setReload(!reload)
-        reset()
-        setValue('mediaId', movie.localId)
-      } else {
-        addNotification({ type: 'error', message: 'Error adding review' })
-      }
+      if (!response.ok) throw new Error(await response.json())
+      addNotification({ type: 'success', message: 'Review added successfully' })
+      setReload(!reload)
+      reset()
+      setValue('mediaId', movie.localId)
     } catch (error: any) {
+      console.error(error)
       addNotification({ type: 'error', message: 'Error adding review' })
     }
   }
@@ -65,6 +64,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
     async function fetchReviews(mediaId: number) {
       try {
         const response = await getReview(mediaId)
+        if (!response.ok) throw new Error(await response.json())
         setReviews(await response.json())
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
@@ -134,20 +134,20 @@ function MovieDetails({ params }: { params: { id: number } }) {
                 <div id="Credits" className={styles.creditList}>
                   {credits && credits.length > 0 && (
                     credits.map((credit: any) => (
-                      <div key={credit.id} className={styles.creditCard}>
+                      <Card key={credit.id} className={styles.creditCard} padding={false}>
                         <Image
                           src={credit.profile_path}
                           alt={credit.name}
                           width={0}
                           height={0}
                           sizes="100vw"
-                          style={{ width: '5.7dvw', height: 'auto' }}
+                          style={{ width: '6dvw', height: 'auto' }}
                         />
                         <div className={styles.castDetails}>
                           <h5>{credit.name}</h5>
                           <p>{credit.character}</p>
                         </div>
-                      </div>
+                      </Card>
                     )))}
                 </div>
                 <div id="Reviews" className={styles.reviewsContainer}>

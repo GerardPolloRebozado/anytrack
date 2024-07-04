@@ -90,13 +90,13 @@ function MyShows() {
       <h2>Watched Shows</h2>
       <div className={styles.cardContainer}>
         {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
-          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.year} mediaType={MediaType.show} />
+          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
       </div>
       <h2>Watchlist</h2>
       <div className={styles.cardContainer}>
         {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
-          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.year} mediaType={MediaType.show} />
+          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
       </div>
     </ >
