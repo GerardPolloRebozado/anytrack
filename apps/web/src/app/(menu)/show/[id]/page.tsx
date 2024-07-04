@@ -20,6 +20,7 @@ import { joiResolver } from "@hookform/resolvers/joi";
 import { updateReviewSchema } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/components/Input/Input";
+import Card from "@/components/Card/Card";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
@@ -156,30 +157,30 @@ function ShowDetails({ params }: { params: { id: number } }) {
               <Tabs>
                 <div className={styles.listContainer} id="Seasons">
                   {show.seasons.map((season: any) => (
-                    <div className={`${styles.season}`} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
+                    <Card padding={false} className={`${styles.season}`} onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
                       <Image
                         src={season.poster_path}
                         alt={season.name}
                         width={0}
                         height={0}
                         sizes="100vw"
-                        style={{ width: '5.7dvw', height: 'auto' }} />
+                        style={{ width: '6dvw', height: 'auto' }} />
                       <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='ok' /> : setIcon(season) === 1 ? <Eye className="warning" /> : <CircleX className="error" />}</p>
                       {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
-                    </div>
+                    </Card>
                   ))}
                 </div>
-                <div className={`${styles.listContainer} ${styles.seasonList} ${styles.castList}`} id="Credits">
+                <div className={`${styles.listContainer} ${styles.castList}`} id="Credits">
                   {credits && credits?.cast && (
                     credits.cast.map((credit: any) => (
-                      <div key={credit.id} className={styles.creditCard}>
+                      <Card key={credit.id} className={styles.creditCard} padding={false}>
                         <Image
                           src={credit.profile_path}
                           alt={credit.name}
                           width={0}
                           height={0}
                           sizes="100vw"
-                          style={{ width: '5.7dvw', height: 'auto' }} />
+                          style={{ width: '6dvw', height: 'auto' }} />
                         <div className={styles.castDetails}>
                           <h5>{credit.name}</h5>
                           <p>{credit.roles.map((role: any) => {
@@ -187,7 +188,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                           })}</p>
                           <p>Episodes: {credit.total_episode_count}</p>
                         </div>
-                      </div>
+                      </Card>
                     )))}
                 </div>
                 <div id="Reviews" className={styles.reviewsContainer}>

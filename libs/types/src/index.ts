@@ -63,3 +63,11 @@ export type getMarkedMoviesType = {
   watched?: boolean;
   groupBy?: string;
 }
+
+export type groupedFutureMedia = {
+  mediaType: MediaType;
+  tmdbId: number;
+  title: string;
+  poster: string;
+  releaseDate: Date;
+}

@@ -4,16 +4,17 @@ import styles from './page.module.css';
 import MovieRuntimeTooltip from "@/components/RechartsTooltip/MovieRuntimeTooltip/MovieRuntimeTooltip";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { MediaType, Notification } from "libs/types/src";
+import { MediaType, Notification, groupedFutureMedia } from "libs/types/src";
 import { Clapperboard, Tv } from "lucide-react";
 import { getMarkedMovies } from "@/utils/fetch/movies";
-import { getManyFutureEpisode, getManyMarkedShows } from "@/utils/fetch/show";
-import MediaCard from "@/components/MediaCard/MediaCard";
+import { getManyMarkedShows } from "@/utils/fetch/show";
 import Notifications from "@/components/Notifications/Notifications";
+import FutureReleaseCard from "@/components/FutureReleaseCard/FutureReleaseCard";
+import { getManyFutureMedia } from "@/utils/fetch/media";
 
 function DashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [nextEpisodes, setNextEpisodes] = useState<any>({});
+  const [nextMedia, setNextMedia] = useState<groupedFutureMedia[]>([]);
   const [MovieHistory, setMovieHistory] = useState<any>({});
   const [ShowHistory, setShowHistory] = useState<any>([]);
   const [MovieStats, setMovieStats] = useState<any>({});
@@ -33,13 +34,16 @@ function DashboardPage() {
           watched: true,
           groupBy: 'month'
         })
+        if (!movies.ok) throw new Error(await movies.json())
         const movieBody = await movies.json()
         setMovieHistory(await movieBody.groupedMedia)
         setMovieStats(await movieBody.statsOverview)
+
         const shows = await getManyMarkedShows({
           watched: true,
           groupBy: 'month'
         })
+        if (!shows.ok) throw new Error(await shows.json())
         const showBody = await shows.json()
         setShowHistory(await showBody.groupedMedia)
         setShowStats(await showBody.statsOverview)
@@ -48,22 +52,23 @@ function DashboardPage() {
       }
     }
     fetchWatchtime()
-    async function fetchNextEpisodes() {
+    async function fetchFutureEpisodes() {
       try {
-        const response = await getManyFutureEpisode()
+        const response = await getManyFutureMedia()
+        if (!response.ok) throw new Error(await response.json())
         const nextEpisodesResponse = await response.json()
-        setNextEpisodes(nextEpisodesResponse)
+        setNextMedia(nextEpisodesResponse)
       } catch (error) {
         addNotification({ type: 'error', message: 'Failed to fetch upcoming releases' })
       }
     }
-    fetchNextEpisodes()
+    fetchFutureEpisodes()
   }, [])
 
   return (
     <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
-      <h1>Dashboard</h1>
+      <h2>Dashboard</h2>
       <div className={styles.container}>
         <div className={styles.chartContainer}>
           {MovieHistory && MovieHistory.length > 1 && (
@@ -92,17 +97,17 @@ function DashboardPage() {
             </div>)}
         </div>
         <div>
-          <h1>Upcoming releases</h1>
+          <h2>Upcoming releases</h2>
           <div className={styles.upcomingReleases}>
-            {nextEpisodes.length > 0 && (
-              nextEpisodes.map((episode: any) => (
-                <MediaCard
-                  id={episode.id}
-                  key={episode.id}
-                  title={episode.title}
-                  poster={episode.season.poster}
-                  year={episode.releaseDate}
-                  mediaType={MediaType.show} />
+            {nextMedia.length > 0 && (
+              nextMedia.map((media: groupedFutureMedia) => (
+                <FutureReleaseCard
+                  id={media.tmdbId}
+                  title={media.title}
+                  key={media.title}
+                  poster={media.poster}
+                  year={media.releaseDate}
+                  mediaType={media.mediaType} />
               )))}
           </div>
         </div>

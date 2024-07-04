@@ -268,3 +268,24 @@ export const deleteReview = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error.message });
   }
 }
+
+export const getManyFutureMovies = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user.id
+    const futureMovie = await prisma.movie.findMany({
+      where: {
+        userMovie: {
+          some: {
+            userId
+          }
+        },
+        releaseDate: {
+          gte: new Date()
+        }
+      },
+    });
+    res.status(200).json(futureMovie)
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
