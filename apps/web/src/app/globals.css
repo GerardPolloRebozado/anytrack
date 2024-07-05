@@ -143,3 +143,29 @@ a {
 .recharts-polar-angle-axis-tick-value {
   color: white!important;
 }
+
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 50dvw;
+}
+
+
+.horizontalList {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  column-gap: 1rem;
+  width: 50dvw;
+  height: 34dvh;
+}
+
+.centerThings {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}

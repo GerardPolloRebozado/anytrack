@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getAgregatedShowCreditsService, getMovieCredits, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { getAgregatedShowCreditsService, getMovieCredits, getOnePeopleService, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
 import { MediaType } from '@anytrack/type';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
@@ -13,9 +13,6 @@ export const getShowSeasons = async (req: Request, res: Response) => {
     }
     if (seasonNumber) {
       seasons = await searchShowSeasonsService(tmdbId, seasonNumber)
-      if (seasons.status_code === 34) {
-        throw new Error("Season not found");
-      }
       seasons.poster_path = `https://image.tmdb.org/t/p/original/${seasons.poster_path}`
       seasons.episodes.map((episode: any) => {
         episode.still_path = `https://image.tmdb.org/t/p/original/${episode.still_path}`
@@ -31,7 +28,8 @@ export const getShowSeasons = async (req: Request, res: Response) => {
     }
     res.status(200).json(seasons);
   } catch (error) {
-    res.status(500).json(error);
+    console.log(error);
+    res.status(500).json({ error: error.message })
   }
 }
 
@@ -45,11 +43,34 @@ export const getCredits = async (req: Request, res: Response) => {
     } else if (mediaType === 'movie') {
       response = await getMovieCredits(tmdbId)
     }
+    if (await response.status_code === 34) {
+      throw new Error(`${mediaType} not found`);
+    }
     await Promise.all(response.cast.map(async (credit: any) => {
       credit.profile_path = `https://image.tmdb.org/t/p/original${credit.profile_path}`
-    }))
-    res.status(200).json(response)
+    }));
+    res.status(200).json(response);
   } catch (error) {
-    res.status(500).json(error)
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const getOnePeople = async (req: Request, res: Response) => {
+  try {
+    const peopleId = Number(req.params.peopleId);
+    const response = await getOnePeopleService(peopleId);
+    const people = await response.json();
+    if (await people.status_code === 34) {
+      throw new Error("People not found");
+    }
+    people.profile_path = `https://image.tmdb.org/t/p/original${people.profile_path}`;
+    people.combined_credits.cast.map((media: any) => {
+      media.poster_path = `https://image.tmdb.org/t/p/original${media.poster_path}`;
+    });
+    res.status(200).json(people);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
   }
 }

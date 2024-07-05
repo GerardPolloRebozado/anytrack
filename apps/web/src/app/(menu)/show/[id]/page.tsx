@@ -3,7 +3,7 @@ import Callout from "@/components/Callout/Callout";
 import { useEffect, useState } from "react";
 import styles from './showInfo.module.css';
 import Image from "next/image";
-import { ArrowLeft, CircleCheck, CircleX, Eye } from "lucide-react";
+import { CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postShowReview } from "@/utils/fetch/show";
@@ -21,6 +21,7 @@ import { updateReviewSchema } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Input from "@/components/Input/Input";
 import Card from "@/components/Card/Card";
+import GoBack from "@/components/GoBack/GoBack";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
@@ -62,7 +63,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     async function fetchWatchedEpisodes(mediaId: number) {
-      const response = await getOneMarkedShow(mediaId, true);
+      const response = await getOneMarkedShow({ mediaId, watched: true });
       if (response.status === 200) {
         setWatchedEpisodes(await response.json())
       } else {
@@ -119,7 +120,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
   }
 
   async function deleteSeason({ tmdbId, season }: { tmdbId: number, season: number }) {
-    await deleteOneUserShow(show.localId, {season}).then(() => setReload(!reload))
+    await deleteOneUserShow(show.localId, { season }).then(() => setReload(!reload))
   }
 
   async function markSeason({ tmdbId, season }: { tmdbId: string, season: number }) {
@@ -128,7 +129,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
 
   return (
     <>
-      <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
       <Notifications notifications={notifications} setNotifications={setNotifications} />
       <>
         {error && (
@@ -148,7 +148,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                 sizes="100vw"
                 style={{ width: '15dvw', height: 'auto' }} />
             </div>
-            <div className={styles.showDetails}>
+            <div className='detailsContainer'>
               <h1 className={styles.title}>{show.title} {show.name} ({show.year})</h1>
               <div className={styles.genres}>{show.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</div>
               <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>

@@ -116,7 +116,8 @@ export const mediaIdSchema = Joi.object({
 })
 
 export const getOneMarkedShowQuerySchema = Joi.object({
-  watched: Joi.bool().optional()
+  watched: Joi.bool().optional(),
+  seasonNumber: Joi.number().optional()
 })
 
 export const seaonsAndEpisodeSchema = Joi.object({

@@ -9,8 +9,8 @@ import { Clapperboard, Tv } from "lucide-react";
 import { getMarkedMovies } from "@/utils/fetch/movies";
 import { getManyMarkedShows } from "@/utils/fetch/show";
 import Notifications from "@/components/Notifications/Notifications";
-import FutureReleaseCard from "@/components/FutureReleaseCard/FutureReleaseCard";
 import { getManyFutureMedia } from "@/utils/fetch/media";
+import MediaInfoCard from "@/components/FutureReleaseCard/MediaInfoCard";
 
 function DashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -101,7 +101,7 @@ function DashboardPage() {
           <div className={styles.upcomingReleases}>
             {nextMedia.length > 0 && (
               nextMedia.map((media: groupedFutureMedia) => (
-                <FutureReleaseCard
+                <MediaInfoCard
                   id={media.tmdbId}
                   title={media.title}
                   key={media.title}

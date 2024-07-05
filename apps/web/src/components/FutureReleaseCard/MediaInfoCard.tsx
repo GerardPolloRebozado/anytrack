@@ -5,7 +5,7 @@ import { MediaType } from 'libs/types/src';
 import Link from 'next/link';
 import Card from '../Card/Card';
 
-export default function FutureReleaseCard({ id, title, poster, year, children, mediaType }: { id: number, title: string, poster: string, year: Date | string, children?: React.ReactNode, mediaType: MediaType }) {
+export default function MediaInfoCard({ id, title, poster, year, children, mediaType }: { id: number, title: string, poster: string, year: Date | string, children?: React.ReactNode, mediaType: MediaType }) {
 
   return (
     <Card padding={false} className={styles.card}>

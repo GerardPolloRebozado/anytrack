@@ -93,3 +93,14 @@ export const getMovieCredits = async (tmdbId: number) => {
   );
   return await response.json()
 }
+
+export const getOnePeopleService = async (id: number) => {
+  return await fetch(
+    `https://api.themoviedb.org/3/person/${id}?append_to_response=combined_credits`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
