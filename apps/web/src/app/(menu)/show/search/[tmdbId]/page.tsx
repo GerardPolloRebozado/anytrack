@@ -83,16 +83,15 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (name === 'season') {
-        const season = Number(value.season)
-        setSelectedSeason(season);
+        const seasonNumber = Number(value.season)
+        setSelectedSeason(seasons.findIndex(season => season.season_number === seasonNumber));
       }
     });
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [seasons, watch]);
 
   return (
     <>
-      <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
       {show && (
         <div className={styles.container}>
           <h1>Mark show {show?.name && show.name}</h1>
@@ -114,9 +113,10 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
                 <label htmlFor="episode">Episode:</label>
                 <select id='episode' {...register('episode', { required: true })}>
                   <option value={-1}>All</option>
-                  {seasons[selectedSeason].episodes.map((episode: any) => (
-                    <option key={episode.id} value={episode.episode_number}>{episode.episode_number}-{episode.name}</option>
-                  ))}
+                  {seasons[selectedSeason].episodes.length > 0 && (
+                    seasons[selectedSeason].episodes.map((episode: any) => (
+                      <option key={episode.id} value={episode.episode_number}>{episode.episode_number}-{episode.name}</option>
+                    )))}
                 </select>
               </>)}
             <label htmlFor="watched">Watched or watchlist:</label>
