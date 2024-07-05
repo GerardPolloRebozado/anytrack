@@ -8,6 +8,7 @@ import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { ArrowDown } from "lucide-react";
 import Tabs from "@/components/Tabs/Tabs";
 import MediaCard from "@/components/MediaCard/MediaCard";
+import Card from "@/components/Card/Card";
 
 export default function PeoplePage({ params }: { params: { peopleId: number } }) {
   const [people, setPeople] = useState<any>({})
@@ -33,7 +34,7 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
 
   return (
     <>
-      {people && (
+      {Object.keys(people).length > 0 && (
         <>
           <div className={styles.infoContainer}>
             <div className={styles.posterContainer}>
@@ -55,22 +56,27 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
                 <PrimaryButton className={styles.viewMore} onClick={showMore}><ArrowDown size={32} /></PrimaryButton>
               </div>
               <Tabs>
-                <div id="Personal info" className={styles.personalInfo}>
+                <div id="Personal" className={styles.personalInfo}>
                   <p><strong>Known For:</strong> {people.known_for_department}</p>
                   <p><strong>Gender:</strong> {people.gender === 1 ? 'Female' : people.gender === 2 ? 'Male' : people.gender === 3 ? 'Non-binary' : 'Not specified'}</p>
                   <p><strong>Place of birth:</strong> {people.place_of_birth}</p>
                 </div>
-                <div id="Known for" className='detailsContainer'>
+                <div id="Known" className='detailsContainer horizontalList'>
                   {people.combined_credits && (
                     people.combined_credits.cast.map((media: any) => (
-                      <MediaCard
-                        key={media.id}
-                        id={media.id}
-                        title={media.original_title}
-                        poster={media.poster_path}
-                        year={media.release_date}
-                        mediaType={media.media_type}
-                      />
+                      <Card key={media.id + media.credit_id} padding={false} className={styles.knownFor}>
+                        <Image
+                          src={media.poster_path}
+                          alt={media.original_title || media.original_name}
+                          width={0}
+                          height={0}
+                          sizes="100vw"
+                          style={{ width: '12dvh', height: 'auto', borderRadius: '5px' }} />
+                        <div className='centerThings'>
+                          <p>{media.original_title}</p>
+                          <p>{media.character}</p>
+                        </div>
+                      </Card>
                     )))}
                 </div>
               </Tabs>

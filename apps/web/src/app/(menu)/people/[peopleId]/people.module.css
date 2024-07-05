@@ -43,3 +43,7 @@
 .birthday {
   margin-top: 0;
 }
+
+.knownFor {
+  height: 30dvh!important;
+}
