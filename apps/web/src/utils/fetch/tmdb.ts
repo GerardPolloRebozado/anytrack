@@ -5,8 +5,9 @@ export const getSeasons = async ({ tmdbId, season }: { tmdbId: number, season?: 
   const url = buildUrl('/api/v1/tmdb/show/seasons', { tmdbId, season })
   const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${Cookies.get('token')}`
-    }
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
   });
   return {
     status: response.status,
@@ -19,8 +20,17 @@ export const getCredits = async (data: { tmdbId: number, mediaType: string, seas
   return await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Berare ${Cookies.get('token')}`
+      'Authorization': `Bearer ${Cookies.get('token')}`,
     },
   });
+}
+
+export const getOnePeople = async (peopleId: number) => {
+  return await fetch(`/api/v1/tmdb/people/${peopleId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
+  })
 }
 

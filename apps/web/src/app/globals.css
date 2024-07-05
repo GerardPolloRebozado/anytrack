@@ -143,3 +143,10 @@ a {
 .recharts-polar-angle-axis-tick-value {
   color: white!important;
 }
+
+.detailsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 50dvw;
+}

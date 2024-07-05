@@ -1,5 +1,6 @@
 import styles from './layout.module.css';
 import DropDownMenu from '@/components/DropdownMenu/DropDownMenu';
+import GoBack from '@/components/GoBack/GoBack';
 import { Clapperboard, Tv } from 'lucide-react';
 import Link from 'next/link';
 
@@ -27,6 +28,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
         <Link href="/settings" className={styles.link}>Settings</Link>
       </div>
       <div className={styles.content}>
+        <GoBack />
         {children}
       </div>
     </div>

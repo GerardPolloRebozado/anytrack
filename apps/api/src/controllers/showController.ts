@@ -377,6 +377,7 @@ export const getOneMarkedShow = async (req: Request, res: Response) => {
   try {
     const userId = res.locals.user.id
     const showId = Number(req.params.mediaId)
+    const seasonNumber = Number(req.query.seasonNumber) as number | undefined;
     let watched: boolean | undefined;
     if (String(req.query.watched) === 'true') {
       watched = true
@@ -387,7 +388,15 @@ export const getOneMarkedShow = async (req: Request, res: Response) => {
       where: {
         userId,
         showId,
-        watched
+        watched,
+        // add seasonNumber to the query only if seasonNumber is defined
+        ...(seasonNumber ? {
+          episode: {
+            season: {
+              seasonNumber
+            }
+          }
+        } : {})
       },
       include: {
         episode: {
@@ -403,7 +412,8 @@ export const getOneMarkedShow = async (req: Request, res: Response) => {
       }
     })
     if (userShow.length === 0) {
-      res.status(404).json("No watched episodes found")
+      res.status(200).json("No watched episodes found")
+      return
     }
     const groupedBySeason: { season: number, episodes: any[], count: number }[] = [];
     userShow.forEach((episode) => {
@@ -422,6 +432,7 @@ export const getOneMarkedShow = async (req: Request, res: Response) => {
     })
     res.status(200).json(groupedBySeason)
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message })
   }
 }

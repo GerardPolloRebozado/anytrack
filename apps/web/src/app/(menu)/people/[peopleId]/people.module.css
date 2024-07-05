@@ -1,0 +1,45 @@
+.infoContainer {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-column-gap: 3rem;
+  margin-top: 2rem;
+  margin-left: 6rem;
+}
+
+.posterContainer img {
+  border-radius: 5px;
+}
+
+.biographyContainer {
+  display: flex;
+}
+
+.biography {
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  align-items: center;
+}
+
+.viewMore {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 1.5dvw !important;
+  width: 1.5dvw !important;
+  margin-left: 1rem !important;
+  position: relative;
+  top: 1rem;
+}
+
+.name {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.birthday {
+  margin-top: 0;
+}

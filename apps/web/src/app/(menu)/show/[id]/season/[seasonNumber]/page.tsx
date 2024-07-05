@@ -2,19 +2,16 @@
 
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute"
 import { getSeasons } from "@/utils/fetch/tmdb"
-import { ArrowLeft } from "lucide-react"
 import { useEffect, useState } from "react"
 import styles from '../../showInfo.module.css'
-import { useRouter } from "next/navigation"
 import Callout from "@/components/Callout/Callout"
+import { getOneMarkedShow } from '@/utils/fetch/show'
 import Image from "next/image"
-import { getWatchedEpisodes } from "@/utils/fetch/userMediaItem"
 
 function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }) {
   const [season, setSeason] = useState<any>(null)
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([])
   const [error, setError] = useState('')
-  const router = useRouter()
   const [title, setTitle] = useState('AnyTrack')
 
 
@@ -35,19 +32,16 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
     fetchSeason()
 
     async function fetchWatchedEpisodes() {
-      const response = await getWatchedEpisodes(params.id, params.seasonNumber)
-      if (response.status === 200) {
-        setWatchedEpisodes(response.body)
-      } else {
-        setError(response.body.error)
-      }
+      const response = await getOneMarkedShow({ mediaId: params.id, seasonNumber: params.seasonNumber })
+      if (response.status !== 200) throw new Error(JSON.stringify(response))
+      const data = await response.json()
+      setWatchedEpisodes(data)
     }
   }, [params.id, params.seasonNumber])
 
   return (
     <div className={styles.container}>
       <title>{title}</title>
-      <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
       {error && (
         <div className={styles.errorModal} onClick={() => setError('')}>
           <p className={styles.closeModal}>X</p>
@@ -61,11 +55,13 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
               <Image
                 src={season.poster_path}
                 alt={season.name}
-                width={300}
-                height={420} />
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: '15dvw', height: 'auto' }} />
             </div>
 
-            <div className={styles.showDetails}>
+            <div className='detailsContainer'>
               <h1 className={styles.name}>{season.name} ({season.air_date.slice(0, 7)})</h1>
               <p className={styles.overview}>{season.overview}</p>
               <p>Episodes:</p>
