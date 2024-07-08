@@ -9,7 +9,7 @@ import mediaRouter from "./mediaRoute"
 
 const apiRouter = Router()
 
-apiRouter.use("/users", userRouter)
+apiRouter.use("/user", userRouter)
 apiRouter.use("/movie", movieRouter)
 apiRouter.use('/show', showRouter)
 apiRouter.use('/tmdb', tmdbRouter)

@@ -128,3 +128,18 @@ export const seaonsAndEpisodeSchema = Joi.object({
   }),
   episode: Joi.number().optional()
 })
+
+export const updateUserSchema = Joi.object({
+  email: Joi.string().email({ tlds: { allow: tlds } }).optional(),
+  name: Joi.string().optional(),
+  password: Joi.string().min(6).optional(),
+})
+
+export const updateUserSchemaForm = Joi.object({
+  email: Joi.string().email({ tlds: { allow: tlds } }).optional(),
+  name: Joi.string().optional(),
+})
+
+export const changePasswordSchema = Joi.object({
+  password: Joi.string().min(6).required(),
+})

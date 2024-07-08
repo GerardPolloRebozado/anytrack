@@ -1,5 +1,18 @@
-.settingsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.2rem;
+.settingsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.settingsActions {
+  width: 20%;
+}
+
+.settingsActions button {
+  margin: 1rem 0;
+}
+
+.form {
+  width: 30%;
 }

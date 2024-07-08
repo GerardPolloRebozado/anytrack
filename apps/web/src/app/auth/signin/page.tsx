@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, } = useForm<loginForm>({
+  const { register, handleSubmit, formState: { errors } } = useForm<loginForm>({
     resolver: joiResolver(loginUserSchema)
   });
   const onSubmit: SubmitHandler<loginForm> = async (data: loginForm) => {

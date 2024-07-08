@@ -73,3 +73,13 @@ export type groupedFutureMedia = {
   poster: string;
   releaseDate: Date;
 }
+
+export type updateUserForm = {
+  email?: string;
+  name?: string;
+  password?: string;
+}
+
+export type changePassword = {
+  password: string;
+}

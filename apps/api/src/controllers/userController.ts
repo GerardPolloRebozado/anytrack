@@ -48,7 +48,40 @@ export async function userData(req: Request, res: Response) {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    delete user.password
+    delete user.createdAt
+    delete user.updatedAt
     res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function updateUser(req: Request, res: Response) {
+  try {
+    const userId = res.locals.user.id
+    const { email, name } = req.body;
+    let password = req.body.password;
+    if (password) {
+      password = await hashPassword(password)
+    }
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        email,
+        name,
+        password,
+      }
+    })
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    } else {
+      delete user.password
+    }
+    res.status(200).json(user)
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
