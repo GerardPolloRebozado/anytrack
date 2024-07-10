@@ -1,177 +1,59 @@
-:root {
-  --primary: #252525;
-  --primary-dark: rgba(0, 0, 0, 0.5);
-  --secondary: #f0f0f0;
-  --background: #25272c;
-  --accent: #00ADB5;
-  --accent1: #CC3700;
-  --accent2: #CCAC00;
-  --accent3: #00CC00;
-  --accent4: #007ACC;
-  --accent5: #CC0E78;
-  --accent6: #00A3A3;
-  --accent7: #CC4F36;
-  --accent8: #29A329;
-  --accent9: #9736A3;
-  --accent10: #CCCC00;
-  --accent11: #33B3B3;
-  --accent12: #CC5489;
-  --accent13: #66CC00;
-  --accent14: #CC00CC;
-  --accent15: #00CC66;
-  --ok: #1fda57;
-  --error: #ff0000;
-  --warning: #ffcc00;
-  --movieColor: #FF2E63;
-  --showColor: #F97300;
-  --semi-transparent: rgba(0, 0, 0, 0.7);
-  margin: 0;
-  padding: 0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-body {
-  height: 100%;
-  width: 100%;
-  background:
-    radial-gradient(ellipse at 0% 50%, rgb(5, 18, 59) 0%, rgba(9, 27, 87, 0.62) 31.6%, rgb(2 7 23 / 0) 65.97%) 0% 0% / 100% 100% no-repeat no-repeat,
-    radial-gradient(ellipse at 0% 100%, rgb(76 74 194 / 1) 0%, rgb(76 74 194 / 0.85) 4.17%, rgb(76 74 194 / 0.48) 13.89%, rgb(76 74 194 / 0.32) 20.49%, rgb(76 74 194 / 0.14) 31.25%, rgb(76 74 194 / 0) 45.49%) 0% 0% / 100% 100% no-repeat no-repeat,
-    radial-gradient(circle at 100% 50%, rgb(2 7 23 / 1) 0%, rgb(2 7 23 / 0.53) 14.24%, rgb(2 7 23 / 0) 28.13%) 0% 0% / 100% 100% no-repeat no-repeat,
-    radial-gradient(ellipse at 100% 0%, rgb(76 74 194 / 1) 0%, rgb(76 74 194 / 0.73) 8.33%, rgb(76 74 194 / 0.51) 15.28%, rgb(76 74 194 / 0.18) 37.5%, rgb(76 74 194 / 0) 54.86%) 0% 0% / 100% 100% no-repeat no-repeat,
-    linear-gradient(rgb(2 7 23 / 1), rgb(2 7 23 / 1)) 0% 0% / 100% 100% no-repeat no-repeat;
-  animation: gradient 20s linear infinite;
-  animation-fill-mode: forwards;
-  background-size: 300% 300%;
-  background-attachment: fixed;
-  color: white;
-  margin: 0;
-  padding: 0;
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 0%;
-    background-size: 300% 300%;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.3rem;
   }
 
-  25% {
-    background-position: 100% 0%;
-    background-size: 200% 200%;
-  }
-
-  50% {
-    background-position: 50% 100%;
-    background-size: 200% 400%;
-  }
-
-  75% {
-    background-position: 0% 100%;
-    background-size: 200% 200%;
-  }
-
-  100% {
-    background-position: 0% 0%;
-    background-size: 300% 300%;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
   }
 }
 
-:root * {
-  box-sizing: border-box;
-}
-
-html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.darker {
-  opacity: 0.3;
-}
-
-a {
-  text-decoration: none;
-}
-
-.ok {
-  color: var(--ok);
-}
-
-.error {
-  color: var(--error);
-}
-
-.warning {
-  color: var(--warning);
-}
-
-.chartTooltip,
-.chartTooltip * {
-  background-color: var(--primary-dark) !important;
-  color: var(--secondary) !important;
-  border-radius: 5px;
-}
-
-
-*::-webkit-scrollbar {
-  width: 0.6rem;
-}
-
-*::-webkit-scrollbar-track {
-  background: var(--primary-dark);
-  border-radius: 8px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: var(--secondary);
-  border-radius: 8px;
-}
-
-@supports not selector(::-webkit-scrollbar) {
+@layer base {
   * {
-    scrollbar-color: var(--secondary) var(--primary-dark);
+    @apply border-border;
   }
-}
-
-.customChartTooltip {
-  background-color: var(--semi-transparent);
-  color: var(--secondary);
-  border-radius: 5px;
-  padding: 0.5rem;
-  border: 1px white;
-}
-
-.recharts-polar-angle-axis-tick-value {
-  color: white!important;
-}
-
-.detailsContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 50dvw;
-}
-
-
-.horizontalList {
-  display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  column-gap: 1rem;
-  width: 50dvw;
-  height: 34dvh;
-}
-
-.centerThings {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.splitGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  body {
+    @apply bg-background text-foreground;
+  }
 }
