@@ -11,6 +11,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { getMediaRuntimeChart } from "@/utils/fetch/charts";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Image from "next/image";
+import Link from "next/link";
 
 function DashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -98,17 +99,19 @@ function DashboardPage() {
                 {nextMedia.map((media: groupedFutureMedia) => (
                   <CarouselItem key={media.title} className="basis-[250px] mx-5">
                     <Card className="w-[250px] rounded-lg h-[500px]">
-                      <CardContent className="p-0">
-                        <div className=" w-[250px] h-[375px] mb-3">
-                          <Image
-                            src={media.poster}
-                            alt={`Poster for the ${media.mediaType}`}
-                            width={250}
-                            height={375}
-                            className="p-0 rounded-lg" />
-                        </div>
-                      </CardContent>
-                      <CardFooter>{media.title} <br />{new Date(media.releaseDate).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</CardFooter>
+                      <Link href={`/${media.mediaType}/${media.tmdbId}`}>
+                        <CardContent className="p-0">
+                          <div className=" w-[250px] h-[375px] mb-3">
+                            <Image
+                              src={media.poster}
+                              alt={`Poster for the ${media.mediaType}`}
+                              width={250}
+                              height={375}
+                              className="p-0 rounded-lg" />
+                          </div>
+                        </CardContent>
+                        <CardFooter>{media.title} <br />{new Date(media.releaseDate).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</CardFooter>
+                      </Link>
                     </Card>
                   </CarouselItem>
                 ))}
