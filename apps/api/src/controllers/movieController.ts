@@ -127,16 +127,13 @@ export const getMarkedMovies = async (req: Request, res: Response) => {
       case "month": {
         const groupedMedia: { month: string, totalRuntime: number, movies: any[] }[] = [];
         movies.forEach((movie: any) => {
-          const date = new Date(movie.watchedDate);
-          const month = date.getMonth() + 1;
-          const year = date.getFullYear();
-          const group = `${year}-${month}`;
-          const existingIndex = groupedMedia.findIndex(item => item.month === group);
+          const date = movie.watchedDate?.toISOString().slice(0, 7);
+          const existingIndex = groupedMedia.findIndex(item => item.month === date);
           if (existingIndex !== -1) {
             groupedMedia[existingIndex].totalRuntime += movie.movie.runtime;
             groupedMedia[existingIndex].movies.push(movie);
           } else {
-            groupedMedia.push({ month: group, totalRuntime: movie.movie.runtime, movies: [movie] });
+            groupedMedia.push({ month: date, totalRuntime: movie.movie.runtime, movies: [movie] });
           }
         });
         const statsOverview: { totalRuntime: number, mediaCount: number } = groupedMedia.reduce((acc, item) => {

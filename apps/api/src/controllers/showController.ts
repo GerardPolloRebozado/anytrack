@@ -237,7 +237,7 @@ export const getManyMarkedShows = async (req: Request, res: Response) => {
     })
     switch (groupBy) {
       case "month": {
-        const groupedShows: { groupedMedia: { month: string, totalRuntime: number, media: any[] }[], statsOverview: { totalRuntime: number, episodeCount: number } } = {
+        const groupedShows: { groupedMedia: { month: string, totalRuntime: number, show: any[] }[], statsOverview: { totalRuntime: number, episodeCount: number } } = {
           groupedMedia: [],
           statsOverview: {
             totalRuntime: 0,
@@ -251,11 +251,11 @@ export const getManyMarkedShows = async (req: Request, res: Response) => {
             groupedShows.groupedMedia.push({
               month,
               totalRuntime: show.episode.runtime,
-              media: [show]
+              show: [show]
             });
           } else {
             groupedShows.groupedMedia[monthIndex].totalRuntime += show.episode.runtime;
-            groupedShows.groupedMedia[monthIndex].media.push(show);
+            groupedShows.groupedMedia[monthIndex].show.push(show);
           }
           groupedShows.statsOverview.totalRuntime += show.episode.runtime;
           groupedShows.statsOverview.episodeCount++;

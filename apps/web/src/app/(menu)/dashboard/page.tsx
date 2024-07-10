@@ -1,24 +1,21 @@
 'use client';
 import { useEffect, useState } from "react";
-import styles from './page.module.css';
-import MovieRuntimeTooltip from "@/components/RechartsTooltip/MovieRuntimeTooltip/MovieRuntimeTooltip";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { MediaType, Notification, groupedFutureMedia } from "libs/types/src";
+import { BarChart, Bar, XAxis, Legend } from 'recharts';
+import { MediaRuntimeChartData, Notification, groupedFutureMedia } from "libs/types/src";
 import { Clapperboard, Tv } from "lucide-react";
-import { getMarkedMovies } from "@/utils/fetch/movies";
-import { getManyMarkedShows } from "@/utils/fetch/show";
 import Notifications from "@/components/Notifications/Notifications";
 import { getManyFutureMedia } from "@/utils/fetch/media";
-import MediaInfoCard from "@/components/FutureReleaseCard/MediaInfoCard";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { getMediaRuntimeChart } from "@/utils/fetch/charts";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Image from "next/image";
 
 function DashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [nextMedia, setNextMedia] = useState<groupedFutureMedia[]>([]);
-  const [MovieHistory, setMovieHistory] = useState<any>({});
-  const [ShowHistory, setShowHistory] = useState<any>([]);
-  const [MovieStats, setMovieStats] = useState<any>({});
-  const [ShowStats, setShowStats] = useState<any>({});
+  const [mediaHistory, setMediaHistory] = useState<MediaRuntimeChartData>()
 
   function addNotification(notification: Notification) {
     setNotifications((prevNotifications) => [...prevNotifications, notification]);
@@ -28,30 +25,6 @@ function DashboardPage() {
   };
 
   useEffect(() => {
-    async function fetchWatchtime() {
-      try {
-        const movies = await getMarkedMovies({
-          watched: true,
-          groupBy: 'month'
-        })
-        if (!movies.ok) throw new Error(await movies.json())
-        const movieBody = await movies.json()
-        setMovieHistory(await movieBody.groupedMedia)
-        setMovieStats(await movieBody.statsOverview)
-
-        const shows = await getManyMarkedShows({
-          watched: true,
-          groupBy: 'month'
-        })
-        if (!shows.ok) throw new Error(await shows.json())
-        const showBody = await shows.json()
-        setShowHistory(await showBody.groupedMedia)
-        setShowStats(await showBody.statsOverview)
-      } catch (error) {
-        addNotification({ type: 'error', message: 'Failed to fetch watchtime' })
-      }
-    }
-    fetchWatchtime()
     async function fetchFutureEpisodes() {
       try {
         const response = await getManyFutureMedia()
@@ -63,53 +36,87 @@ function DashboardPage() {
       }
     }
     fetchFutureEpisodes()
+
+    async function fetchMediaHistory() {
+      try {
+        const response = await getMediaRuntimeChart('month')
+        if (!response.ok) throw new Error(await response.json())
+        const body = await response.json()
+        setMediaHistory(body)
+      } catch (error) {
+        addNotification({ type: 'error', message: 'Failed to fetch media history' })
+      }
+    }
+    fetchMediaHistory()
   }, [])
+
+
+  useEffect(() => {
+    console.log(mediaHistory)
+  }, [mediaHistory])
+
+  const monthlyWatchtimeChartConfig = {
+    show: {
+      label: 'Show',
+      color: 'var(--showColor)',
+    },
+    movie: {
+      label: 'Movie',
+      color: 'var(--movieColor)',
+    },
+  }
 
   return (
     <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
-      <h2>Dashboard</h2>
-      <div className={styles.container}>
-        <div className={styles.chartContainer}>
-          {MovieHistory && MovieHistory.length > 1 && (
-            <div className={styles.chart}>
-              <h3>Movie monthly watchtime</h3>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={MovieHistory}>
-                  <Bar type="monotone" dataKey="totalRuntime" fill={'var(--movieColor)'} />
-                  <XAxis dataKey="month" stroke={'var(--secondary)'} />
-                  <Tooltip content={<MovieRuntimeTooltip />} cursor={{ fill: 'transparent' }} />
-                  {MovieStats && <Legend content={<div className={styles.legend}><Clapperboard color={'var(--movieColor)'} /><p><strong>{MovieStats.mediaCount} movies</strong></p> <span style={{ color: 'var(--movieColor)' }}>|</span> <p><strong>{MovieStats.totalRuntime}</strong> minutes</p></div>} />}
-                </BarChart>
-              </ResponsiveContainer>
-            </div>)}
-          {ShowHistory && ShowHistory.length > 1 && (
-            <div className={styles.chart}>
-              <h3>Show monthly watchtime</h3>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={ShowHistory}>
-                  <Bar type="monotone" dataKey="totalRuntime" fill={'var(--showColor)'} />
-                  <XAxis dataKey="month" stroke={'var(--secondary)'} />
-                  <Tooltip content={<MovieRuntimeTooltip />} cursor={{ fill: 'transparent' }} />
-                  <Legend content={<div className={styles.legend}><Tv color={'var(--showColor)'} /> <p><strong>{ShowStats.episodeCount} episodes</strong></p> <span style={{ color: 'var(--showColor)' }}>|</span> <p><strong>{ShowStats.totalRuntime}</strong> minutes</p></div>} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>)}
+      <h1 className="text-4xl">Dashboard</h1>
+      <div>
+        <div className='grid sm:grid-cols-1 xl:grid-cols-2 my-4'>
+          {mediaHistory && mediaHistory.chartData.length > 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Media Monthly watchtime</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={monthlyWatchtimeChartConfig}>
+                  <BarChart data={mediaHistory.chartData}>
+                    <Bar dataKey="movie" fill={'var(--movieColor)'} />
+                    <Bar dataKey="show" fill={'var(--showColor)'} />
+                    <XAxis dataKey="date" />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+                    <Legend content={<div className="flex items-center flex-col justify-center text-lg"><div className="flex justify-center items-center w-full"><Clapperboard className="text-movie mx-1" size={22} /><p><strong>{mediaHistory.mediaStats.movieCount} movies</strong></p> <span className="text-movie mx-1">|</span> <p><strong>{mediaHistory.mediaStats.movieRuntime}</strong> minutes</p></div> <div className="flex justify-center items-center w-full"><Tv className="text-show mx-1" size={22} /><p><strong>{mediaHistory.mediaStats.episodeCount} shows</strong></p> <span className="text-show mx-1">|</span> <p><strong>{mediaHistory.mediaStats.showRuntime}</strong> minutes</p></div></div>} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>)}
         </div>
-        <div>
-          <h2>Upcoming releases</h2>
-          <div className={styles.upcomingReleases}>
-            {nextMedia.length > 0 && (
-              nextMedia.map((media: groupedFutureMedia) => (
-                <MediaInfoCard
-                  id={media.tmdbId}
-                  title={media.title}
-                  key={media.title}
-                  poster={media.poster}
-                  year={media.releaseDate}
-                  mediaType={media.mediaType} />
-              )))}
-          </div>
+        <h2 className="text-2xl mb-4">Upcoming releases</h2>
+        <div className=" flex flex-col justify-center items-center">
+          {nextMedia.length > 0 && (
+            <Carousel opts={{ loop: true, align: "start" }} className="w-[80dvw]">
+              <CarouselContent className="py-5">
+                {nextMedia.map((media: groupedFutureMedia) => (
+                  <CarouselItem key={media.title} className="basis-[250px] mx-5">
+                    <Card className="w-[250px] rounded-lg h-[500px]">
+                      <CardContent className="p-0">
+                        <div className=" w-[250px] h-[375px] mb-3">
+                          <Image
+                            src={media.poster}
+                            alt={`Poster for the ${media.mediaType}`}
+                            width={250}
+                            height={375}
+                            className="p-0 rounded-lg" />
+                        </div>
+                      </CardContent>
+                      <CardFooter>{media.title} <br />{new Date(media.releaseDate).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</CardFooter>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
         </div>
       </div >
     </>
