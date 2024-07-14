@@ -1,7 +1,6 @@
 'use client'
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { useState } from "react";
-import styles from './page.module.css';
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { getShow } from "@/utils/fetch/show";
@@ -24,10 +23,10 @@ function SearchShows() {
 
   return (
     <>
-      <div className={styles.barContainer}>
+      <div className="flex items-center justify-center mt-4">
         <SearchBar fetchData={(query: string) => fetchData(query)} />
       </div>
-      <div className={styles.cardContainer}>
+      <div className="p-8 grid w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[1fr] gap-6 overflow-hidden">
         {shows.length > 0 && shows.map((show: any) => (
           <MediaCard key={show.id} id={show.id} title={show.original_name} poster={show.poster_path} year={show.first_air_date.split('-')[0]} mediaType={MediaType.show}>
             <Link href={`/show/search/${show.id}`}>

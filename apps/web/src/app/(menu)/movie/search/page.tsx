@@ -1,7 +1,6 @@
 'use client'
 import SearchBar from "@/components/SearchBar/SearchBar";
-import { useRef, useState } from "react";
-import styles from './page.module.css';
+import { useState } from "react";
 import MovieCard from "@/components/MediaCard/MediaCard";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { searchMovies } from "@/utils/fetch/movies";
@@ -11,7 +10,6 @@ import { MediaType } from "libs/types/src";
 
 function SearchMovie() {
   const [movies, setMovies] = useState([]);
-  const watchedDateRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   async function fetchData(query: string) {
     if (!query) {
       setMovies([]);
@@ -24,10 +22,10 @@ function SearchMovie() {
 
   return (
     <>
-      <div className={styles.barContainer}>
+      <div className="flex items-center justify-center mt-4">
         <SearchBar fetchData={(query: string) => fetchData(query)} />
       </div>
-      <div className={styles.cardContainer}>
+      <div className="p-8 grid w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[1fr] gap-6 overflow-hidden">
         {movies.length > 0 && movies.map((movie: any) => (
           <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
             <Link href={`/movie/search/${movie.id}`}>

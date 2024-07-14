@@ -21,8 +21,8 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en">
-      <body className={cn("bg-background font-sans antialiased", fontSans.variable)}>
+    <html lang="en" className="h-full">
+      <body className={cn("bg-background font-sans antialiased h-full", fontSans.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
