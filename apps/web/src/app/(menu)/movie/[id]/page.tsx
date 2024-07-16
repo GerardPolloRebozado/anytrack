@@ -2,13 +2,9 @@
 import Callout from "@/components/Callout/Callout";
 import { searchMoviebyId, updateMovieReview, getReview } from "@/utils/fetch/movies";
 import { useEffect, useState } from "react";
-import styles from './page.module.css';
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
-import { randomColor } from "@/utils/randomColor";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import Tabs from "@/components/Tabs/Tabs";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
@@ -20,7 +16,9 @@ import Input from "@/components/Input/Input";
 import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { updateReviewSchema } from "libs/joi/src";
 import { getCredits } from "@/utils/fetch/tmdb";
-import Card from "@/components/Card/Card";
+import { Card } from "@/components/ui/card";
+import distinctColors from "distinct-colors";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -29,13 +27,13 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const [reload, setReload] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [reviews, setReviews] = useState<any[]>([]);
-  const router = useRouter();
   const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
     defaultValues: {
       mediaId: movie?.localId,
     }
   });
+  const colors = distinctColors({ count: movie?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
   const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
     try {
       const response = await updateMovieReview(data)
@@ -103,55 +101,66 @@ function MovieDetails({ params }: { params: { id: number } }) {
 
 
   return (
-    <div className={styles.container}>
-      <ArrowLeft className={styles.back} size={32} onClick={() => router.back()} />
+    <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
       {error && (
-        <div className={styles.errorModal} onClick={closeModal}>
-          <p className={styles.closeModal}>X</p>
+        <div className="flex flex-col justify-center items-center fixed bg-[rgba(0,0,0,0.5)] z-10 w-full h-full" onClick={closeModal}>
+          <p className="absolute p-4 text-3xl cursor-pointer">X</p>
           <Callout type="error">{error}</Callout>
         </div>
       )}
-      <div>
+      <>
         {movie && (
-          <div className={styles.grid}>
-            <div className={styles.poster}>
+          <div className="flex gap-x-12 ml-24 mt-8">
+            <div className="w-[11dvw]">
               <Image
                 src={movie.poster}
                 alt={movie.title}
                 width={0}
                 height={0}
                 sizes="100vw"
-                style={{ width: '15dvw', height: 'auto' }} />
+                objectFit="cover"
+                className="w-[11dvw] h-auto rounded-lg"
+              />
+
             </div>
-            <div className={styles.movieDetails}>
-              <h1 className={styles.title}>{movie.title} ({movie.release_date.split('-')[0]})</h1>
-              <p className={styles.genres}>{movie.genres.map((genre: any) => <Chip key={genre.id} bgColor={randomColor()}>{genre.name}</Chip>)}</p>
-              <p className={styles.runtime}> {movie.runtime} min</p>
+            <div className='flex flex-col items-start w-[50dvw]'>
+              <h1 className="text-3xl font-bold">{movie.title} ({movie.release_date.split('-')[0]})</h1>
+              <p className='text-l flex my-4'>{movie.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</p>
+              <p> {movie.runtime} min</p>
               <MediaScore score={movie.vote_average} source="tmdb" />
-              <p className={styles.overview}>{movie.overview}</p>
+              <p className="my-4">{movie.overview}</p>
               <Tabs>
-                <div id="Credits" className={styles.creditList}>
+                <div id="Credits" className="flex gap-x-2 py-4">
+
                   {credits && credits.length > 0 && (
-                    credits.map((credit: any) => (
-                      <Card key={credit.id} className={styles.creditCard} padding={false}>
-                        <Image
-                          src={credit.profile_path}
-                          alt={credit.name}
-                          width={0}
-                          height={0}
-                          sizes="100vw"
-                          style={{ width: '6dvw', height: 'auto' }}
-                        />
-                        <div className={styles.castDetails}>
-                          <h5>{credit.name}</h5>
-                          <p>{credit.character}</p>
-                        </div>
-                      </Card>
-                    )))}
+                    <Carousel opts={{ loop: true, align: "start" }} >
+                      <CarouselContent className="w-[50dvw]">
+                        {(credits.map((credit: any) => (
+                          <CarouselItem key={credit.id} className="basis-[180px] ml-4">
+                            <Card key={credit.id} className="w-[180px] h-[380px]">
+                              <Image
+                                src={credit.profile_path}
+                                alt={credit.name}
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                className="rounded-lg max-w-[180px] w-[180px] h-auto"
+                              />
+                              <div className="p-2">
+                                <p>{credit.name}</p>
+                                <p>{credit.character}</p>
+                              </div>
+                            </Card>
+                          </CarouselItem>)))}
+                      </CarouselContent>
+                      <CarouselNext />
+                      <CarouselPrevious />
+                    </Carousel>
+                  )}
                 </div>
-                <div id="Reviews" className={styles.reviewsContainer}>
-                  <div className={styles.reviewList}>
+                <div id="Reviews">
+                  <div className='grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-4 my-4'>
                     {reviews.length > 0 ? reviews.map((review) => (
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
@@ -182,8 +191,8 @@ function MovieDetails({ params }: { params: { id: number } }) {
             </div>
           </div>
         )}
-      </div>
-    </div >
+      </>
+    </ >
   );
 }
 

@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './DropDownMenu.module.css';
 import IconWrapper from '../IconWrapper/IconWrapper';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { usePathname } from 'next/navigation';
