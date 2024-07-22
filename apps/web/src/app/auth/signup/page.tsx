@@ -1,7 +1,6 @@
 'use client'
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi';
-import styles from './page.module.css';
 import { createUser } from '@/utils/fetch/users';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
