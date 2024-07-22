@@ -4,7 +4,6 @@ import { getOnePeople } from "@/utils/fetch/tmdb"
 import { useEffect, useRef, useState } from "react"
 import styles from './people.module.css';
 import Image from "next/image";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { ArrowDown } from "lucide-react";
 import Tabs from "@/components/Tabs/Tabs";
 import { Card } from "@/components/ui/card";

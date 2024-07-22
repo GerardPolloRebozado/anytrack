@@ -27,9 +27,11 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
         </DropDownMenu>
         <Link href="/settings" className='w-[70%] flex flex-row items-center justify-center m-2 p-2 hover:bg-accent rounded-lg'>Settings</Link>
       </div>
-      <div className='h-full pr-3'>
+      <div className='h-[100dvh] pr-3'>
         <GoBack />
-        {children}
+        <div className='mt-8'>
+          {children}
+        </div>
       </div>
     </div>
   );
