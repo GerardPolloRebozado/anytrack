@@ -1,12 +1,11 @@
 'use client'
-
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute"
 import { getSeasons } from "@/utils/fetch/tmdb"
 import { useEffect, useState } from "react"
-import styles from '../../showInfo.module.css'
-import Callout from "@/components/Callout/Callout"
 import { getOneMarkedShow } from '@/utils/fetch/show'
 import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }) {
   const [season, setSeason] = useState<any>(null)
@@ -40,56 +39,53 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
   }, [params.id, params.seasonNumber])
 
   return (
-    <div className={styles.container}>
+    <div>
       <title>{title}</title>
-      {error && (
-        <div className={styles.errorModal} onClick={() => setError('')}>
-          <p className={styles.closeModal}>X</p>
-          <Callout type="error">{error}</Callout>
-        </div>
-      )}
       <div>
         {season && (
-          <div className={styles.grid}>
-            <div className={styles.poster}>
+          <div className='flex gap-x-12 ml-24 mt-8'>
+            <div className="w-[11dvw]">
               <Image
                 src={season.poster_path}
                 alt={season.name}
                 width={0}
                 height={0}
                 sizes="100vw"
-                style={{ width: '15dvw', height: 'auto' }} />
+                objectFit="cover"
+                className="w-[11dvw] h-auto rounded-lg"
+              />
             </div>
-
             <div className='detailsContainer'>
-              <h1 className={styles.name}>{season.name} ({season.air_date.slice(0, 7)})</h1>
-              <p className={styles.overview}>{season.overview}</p>
-              <p>Episodes:</p>
-              <div className={styles.episodeList}>
+              <h1 className="text-4xl font-semibold">{season.name} ({season.air_date.slice(0, 7)})</h1>
+              <p className="my-4">{season.overview}</p>
+              <p className="text-2xl mb-4">Episodes:</p>
+              <ScrollArea className="w-[50dvw] h-[80dvh]">
                 {season.episodes.map((episode: any) => (
-                  <div className={styles.episodeItem} key={episode.episode_number}>
-                    <div className={styles.ImageTitle}>
+                  <Card key={episode.episode_number} className="my-4">
+                    <CardContent className="p-0 flex gap-4">
                       <Image
-                        className={styles.episodeImg}
                         src={episode.still_path}
-                        width={300}
-                        height={300}
+                        width={350}
+                        height={200}
+                        sizes="100vw"
+                        className="rounded-lg"
                         alt={`Episode ${episode.episode_number} - ${episode.name} still path`}
                       />
-                      <div>
-                        <p>{episode.episode_number}-{episode.name}</p>
-                        <p className="darker">{episode.runtime} min</p>
+                      <div className="pr-4">
+                        <p className="text-xl font-semibold">{episode.episode_number}-{episode.name}</p>
+                        <p className="font-thin">{episode.runtime} min</p>
+                        <div>{episode.overview}</div>
                       </div>
-                    </div>
-                    <div className={styles.overview}>{episode.overview}</div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
-              </div>
+              </ScrollArea>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+        )
+        }
+      </div >
+    </div >
   )
 }
 

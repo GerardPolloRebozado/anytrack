@@ -1,8 +1,13 @@
+import { ThemeProvider } from "@/components/Providers/themeProvider";
+import { Montserrat as FontSans } from "next/font/google";
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/utils/utils";
 
-const montserrat = Montserrat({ subsets: ["latin"] });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
 
 export const metadata: Metadata = {
   title: "AnyTrack",
@@ -16,9 +21,17 @@ export default function RootLayout({
 }>) {
 
   return (
-    <html lang="en">
-      <body className={montserrat.className}>
-        {children}</body>
-    </html>
+    <html lang="en" className="h-full">
+      <body className={cn("bg-background font-sans antialiased h-full", fontSans.variable)}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
+    </html >
   );
 }

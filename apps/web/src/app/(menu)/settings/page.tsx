@@ -1,7 +1,5 @@
 'use client'
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import styles from './settings.module.css'
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { triggerUpdateMovies, triggerUpdateShows } from "@/utils/fetch/cron"
 import { useEffect, useState } from "react";
 import { getUser, updateUser } from "@/utils/fetch/users";
@@ -13,8 +11,11 @@ import Cookies from "js-cookie";
 import { changePasswordSchema, updateUserSchemaForm } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { joiResolver } from "@hookform/resolvers/joi";
-import Input from "@/components/Input/Input";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import PasswordInput from "@/components/ui/passwordInput";
 
 function SettingsPage() {
   const [user, setUser] = useState({} as any)
@@ -24,10 +25,10 @@ function SettingsPage() {
   const [changePassword, setChangePassword] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const router = useRouter()
-  const { register: userRegister, handleSubmit: userHandleSubmit, formState: { errors: userErrors }, setValue: userSetValues } = useForm<updateUserForm>({
+  const editProfileForm = useForm<updateUserForm>({
     resolver: joiResolver(updateUserSchemaForm),
   });
-  const { register: passwordRegister, handleSubmit: passwordHandleSubmit, formState: { errors: passwordErrors } } = useForm<changePassword>({
+  const passwordForm = useForm<changePassword>({
     resolver: joiResolver(changePasswordSchema),
   });
 
@@ -36,17 +37,13 @@ function SettingsPage() {
   };
 
   useEffect(() => {
-    console.log(passwordErrors)
-  }, [passwordErrors])
-
-  useEffect(() => {
     async function fetchData() {
       try {
         const response = await getUser()
         const user = await response.json()
         setUser(user)
-        userSetValues('email', await user.email)
-        userSetValues('name', await user.name)
+        editProfileForm.setValue('email', await user.email)
+        editProfileForm.setValue('name', await user.name)
       } catch (error) {
         console.log(error)
         setNotifications((prevNotifications) => [...prevNotifications, { type: 'error', message: 'Error fetching user data' }]);
@@ -60,7 +57,7 @@ function SettingsPage() {
       }
     }
     fetchData();
-  }, [reload, userSetValues])
+  }, [editProfileForm, reload])
 
   async function changeSettings(data: Omit<setting, "userId">) {
     try {
@@ -110,55 +107,65 @@ function SettingsPage() {
   return (
     <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
-      <div className={styles.settingsContainer}>
-        <h2>Settings</h2>
-        <div className={styles.settingsActions}>
-          {settings?.public ? <PrimaryButton onClick={() => changeSettings({ public: false })}>Set to private</PrimaryButton> : <PrimaryButton onClick={() => changeSettings({ public: true })}>Set to public</PrimaryButton>}
-          <PrimaryButton onClick={updateMovies}>Force movie update</PrimaryButton>
-          <PrimaryButton onClick={updateShows}>Force show update</PrimaryButton>
-          <PrimaryButton onClick={() => setEditProfile(!editProfile)} className={styles.editButton}>Edit profile</PrimaryButton>
-          <PrimaryButton onClick={() => setChangePassword(!changePassword)} className={styles.editButton}>Change Password</PrimaryButton>
-          <PrimaryButton onClick={logout} >Log out</PrimaryButton>
+      <div className=' w-full flex justify-center flex-col items-center'>
+        <h2 className="text-2xl mb-2">Settings</h2>
+        <div className='w-1/6 flex flex-col gap-3'>
+          {settings?.public ? <Button onClick={() => changeSettings({ public: false })}>Set to private</Button> : <Button onClick={() => changeSettings({ public: true })}>Set to public</Button>}
+          <Button onClick={updateMovies}>Force movie update</Button>
+          <Button onClick={updateShows}>Force show update</Button>
+          <Button onClick={() => setEditProfile(!editProfile)}>Edit profile</Button>
+          <Button onClick={() => setChangePassword(!changePassword)}>Change Password</Button>
+          <Button onClick={logout} >Log out</Button>
         </div>
-        <div className={styles.form}>
+        <div className='w-1/6 mt-4 flex flex-col items-center'>
           {editProfile && (
-            <>
-              <h3>Edit profile</h3>
-              <form onSubmit={userHandleSubmit(onSubmit)}>
-                <Input
-                  label="Email"
-                  register={userRegister}
-                  name="email"
-                  type="email"
-                  placeholder="Type your email ✉️"
-                  error={userErrors.email}
-                />
-                <Input
-                  label="Name"
-                  register={userRegister}
-                  name="name"
-                  type="text"
-                  placeholder="Whats your name?"
-                  error={userErrors.name}
-                />
-                <PrimaryButton type="submit">Update</PrimaryButton>
+            <Form {...editProfileForm}>
+              <form onSubmit={editProfileForm.handleSubmit(onSubmit)} className="w-full">
+                <FormField
+                  control={editProfileForm.control}
+                  name='email'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Type your email ✉️' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                <FormField
+                  control={editProfileForm.control}
+                  name='name'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder='Type your name' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                <Button type="submit" className="w-full mt-2">Update</Button>
               </form>
-            </>)}
+            </Form>)}
           {changePassword && (
-            <>
-              <h3>Change password</h3>
-              <form onSubmit={passwordHandleSubmit(onSubmit)}>
-                <Input
-                  label="Password"
-                  register={passwordRegister}
-                  name="password"
-                  type="password"
-                  placeholder="Whats your new password? 🔒"
-                  error={passwordErrors.password}
-                />
-                <PrimaryButton type="submit">Change password</PrimaryButton>
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(onSubmit)} className="w-full">
+                <FormField
+                  control={passwordForm.control}
+                  name='password'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New password</FormLabel>
+                      <FormControl>
+                        <PasswordInput placeholder="Enter your new super secret password 🔒" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                <Button type="submit" className="w-full mt-2">Change password</Button>
               </form>
-            </>)}
+            </Form>)}
         </div>
       </div >
     </>

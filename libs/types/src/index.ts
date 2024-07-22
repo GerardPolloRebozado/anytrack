@@ -1,4 +1,5 @@
 import React from 'react';
+import { userMovie, movie, episode, userShow } from "@prisma/client"
 
 export type signupForm = {
   name: string;
@@ -83,3 +84,21 @@ export type updateUserForm = {
 export type changePassword = {
   password: string;
 }
+
+export type MediaRuntimeChartData = {
+  chartData: {
+    date: string,
+    show: number,
+    movie: number,
+  }[];
+  mediaStats: {
+    episodeCount: number;
+    movieCount: number;
+    showRuntime: number;
+    movieRuntime: number;
+  };
+}
+
+export type userMovieWithMovie = userMovie & { movie: movie }
+
+export type userShowWithEpisode = userShow & { episode: episode }

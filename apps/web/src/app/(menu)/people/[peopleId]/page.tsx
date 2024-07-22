@@ -4,11 +4,11 @@ import { getOnePeople } from "@/utils/fetch/tmdb"
 import { useEffect, useRef, useState } from "react"
 import styles from './people.module.css';
 import Image from "next/image";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { ArrowDown } from "lucide-react";
 import Tabs from "@/components/Tabs/Tabs";
-import MediaCard from "@/components/MediaCard/MediaCard";
-import Card from "@/components/Card/Card";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function PeoplePage({ params }: { params: { peopleId: number } }) {
   const [people, setPeople] = useState<any>({})
@@ -36,49 +36,58 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
     <>
       {Object.keys(people).length > 0 && (
         <>
-          <div className={styles.infoContainer}>
-            <div className={styles.posterContainer}>
+          <div className='grid grid-cols-[repeat(6,1fr)] gap-x-12 ml-24 mt-8'>
+            <div className="rounded-lg">
               <Image
                 src={people.profile_path}
                 alt={people.name}
                 width={0}
                 height={0}
                 sizes="100vw"
-                style={{ width: '15dvw', height: 'auto' }} />
+                objectFit="cover"
+                className="w-[11dvw] h-auto rounded-lg max-w-[11dvw]" />
             </div>
-            <div className="detailsContainer">
-              <p className={styles.name}>{people.name}</p>
-              <p className={styles.birthday}>{people.birthday}</p>
-              <div className={styles.biographyContainer}>
-                <p className={styles.biography} ref={biographyRef}>
-                  {people.biography}
-                </p>
-                <PrimaryButton className={styles.viewMore} onClick={showMore}><ArrowDown size={32} /></PrimaryButton>
+            <div className="flex flex-col items-start w-[50dvw]">
+              <div className="my-4">
+                <p className='text-3xl'>{people.name}</p>
+                <p className='my-2'>{people.birthday}</p>
+                <div className='flex'>
+                  <p className={styles.biography} ref={biographyRef}>
+                    {people.biography}
+                  </p>
+                  <Button onClick={showMore}><ArrowDown size={32} /></Button>
+                </div>
               </div>
               <Tabs>
-                <div id="Personal" className={styles.personalInfo}>
+                <div id="Personal" className='mt-4'>
                   <p><strong>Known For:</strong> {people.known_for_department}</p>
                   <p><strong>Gender:</strong> {people.gender === 1 ? 'Female' : people.gender === 2 ? 'Male' : people.gender === 3 ? 'Non-binary' : 'Not specified'}</p>
                   <p><strong>Place of birth:</strong> {people.place_of_birth}</p>
                 </div>
-                <div id="Known" className='detailsContainer horizontalList'>
-                  {people.combined_credits && (
-                    people.combined_credits.cast.map((media: any) => (
-                      <Card key={media.id + media.credit_id} padding={false} className={styles.knownFor}>
-                        <Image
-                          src={media.poster_path}
-                          alt={media.original_title || media.original_name}
-                          width={0}
-                          height={0}
-                          sizes="100vw"
-                          style={{ width: '12dvh', height: 'auto', borderRadius: '5px' }} />
-                        <div className='centerThings'>
-                          <p>{media.original_title}</p>
-                          <p>{media.character}</p>
-                        </div>
-                      </Card>
-                    )))}
-                </div>
+                <Carousel id="Known">
+                  <CarouselContent>
+                    {people.combined_credits && (
+                      people.combined_credits.cast.map((media: any) => (
+                        <CarouselItem key={media.id + media.credit_id} className="basis-[8dvw]">
+                          <Card>
+                            <Image
+                              src={media.poster_path}
+                              alt={media.original_title || media.original_name}
+                              width={0}
+                              height={0}
+                              sizes="100vw"
+                              style={{ width: '8dvw', height: 'auto', borderRadius: '5px' }} />
+                            <div className='flex items-center flex-col my-2'>
+                              <p>{media.original_title}</p>
+                              <p>{media.character}</p>
+                            </div>
+                          </Card>
+                        </CarouselItem>
+                      )))}
+                    <CarouselNext />
+                    <CarouselPrevious />
+                  </CarouselContent>
+                </Carousel>
               </Tabs>
             </div>
           </div>

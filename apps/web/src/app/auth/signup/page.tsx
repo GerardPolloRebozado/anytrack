@@ -1,21 +1,22 @@
 'use client'
-import Input from '@/components/Input/Input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi';
-import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
-import styles from './page.module.css';
 import { createUser } from '@/utils/fetch/users';
 import { useState } from 'react';
-import Callout from '@/components/Callout/Callout';
 import { useRouter } from 'next/navigation';
 import { signupForm } from 'libs/types/src';
 import { createUserSchema } from 'libs/joi/src';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import Callout from '@/components/Callout/Callout';
+import PasswordInput from '@/components/ui/passwordInput';
 
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, } = useForm<signupForm>({
+  const form = useForm<signupForm>({
     resolver: joiResolver(createUserSchema)
   });
 
@@ -30,44 +31,62 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {error && <Callout type="error">{error}</Callout>}
-        <Input
-          label="Name"
-          register={register}
-          name="name"
-          type="text"
-          placeholder="A cool name 🦄"
-          error={errors.name}
-        />
-        <Input
-          label="Email"
-          register={register}
-          name="email"
-          type="email"
-          placeholder="Type your email ✉️"
-          error={errors.email}
-        />
-        <Input
-          label="Password"
-          register={register}
-          name="password"
-          type="password"
-          placeholder="Super secret password 🤫"
-          error={errors.password}
-        />
-        <Input
-          label="Confirm Password"
-          register={register}
-          name="confirmPassword"
-          type="password"
-          placeholder="Repeat the same password 🔒"
-          error={errors.confirmPassword}
-        />
-        <PrimaryButton type="submit">Register</PrimaryButton>
-      </form>
+    <div className='flex justify-center items-center h-dvh flex-col'>
+      {error && <Callout type="error">{error}</Callout>}
+      <h1 className='text-2xl font-semibold tracking-tight'>Register</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='w-80'>
+          <FormField
+            control={form.control}
+            name='name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder='A cool name 🦄' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <FormField
+            control={form.control}
+            name='email'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder='Type your email ✉️' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput placeholder='Super secret password 🤫' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+                      <FormField
+            control={form.control}
+            name='confirmPassword'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm password</FormLabel>
+                <FormControl>
+                  <PasswordInput placeholder='Repeat the same password 🔒' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <Button type='submit' className='w-full mt-1'>Login</Button>
+        </form>
+      </Form>
     </div>
   );
 }

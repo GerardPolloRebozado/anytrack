@@ -1,22 +1,22 @@
 'use client'
-import Input from '@/components/Input/Input';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi';
-import PrimaryButton from '@/components/PrimaryButton/PrimaryButton';
-import styles from './page.module.css';
 import { loginUser } from '@/utils/fetch/users';
 import { useState } from 'react';
-import Callout from '@/components/Callout/Callout';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { loginUserSchema } from 'libs/joi/src';
 import { loginForm } from 'libs/types/src';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import PasswordInput from '@/components/ui/passwordInput';
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<loginForm>({
+  const form = useForm<loginForm>({
     resolver: joiResolver(loginUserSchema)
   });
   const onSubmit: SubmitHandler<loginForm> = async (data: loginForm) => {
@@ -31,28 +31,37 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {error && <Callout type="error">{error}</Callout>}
-        <Input
-          label="Email"
-          register={register}
-          name="email"
-          type="email"
-          placeholder="Type your email ✉️"
-          error={errors.email}
-        />
-        <Input
-          label="Password"
-          register={register}
-          name="password"
-          type="password"
-          placeholder="Type you secret password 🔒"
-          error={errors.password}
-        />
-        <PrimaryButton type="submit">Login</PrimaryButton>
-      </form>
+    <div className='flex justify-center items-center h-dvh flex-col'>
+      <h1 className='text-2xl font-semibold tracking-tight'>Login</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='w-80'>
+          <FormField
+            control={form.control}
+            name='email'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder='Type your email ✉️' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <FormField
+            control={form.control}
+            name='password'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <PasswordInput placeholder='Type you password 🔒' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <Button type='submit' className='w-full mt-1'>Login</Button>
+        </form>
+      </Form>
     </div>
   );
 }

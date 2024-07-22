@@ -1,22 +1,22 @@
 'use client'
 import { joiResolver } from "@hookform/resolvers/joi";
 import { useForm } from "react-hook-form";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { markMovie, searchMoviebyId } from "@/utils/fetch/movies";
 import { useEffect, useState } from "react";
-import styles from '@/styles/markMediaForm.module.css';
 import Image from "next/image";
 import { markMovieSchemaForm } from "libs/joi/src";
 import { Notification, markMovieType } from "libs/types/src";
-import Callout from "@/components/Callout/Callout";
 import Notifications from "@/components/Notifications/Notifications";
-import Input from "@/components/Input/Input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 export default function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
   const [movie, setMovie] = useState<any>({})
   const [result, setResult] = useState<boolean | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const { register, handleSubmit, formState: { errors } } = useForm<markMovieType>({
+  const form = useForm<markMovieType>({
     resolver: joiResolver(markMovieSchemaForm),
     defaultValues: {
       watchedDate: new Date().toISOString().split('T')[0],
@@ -59,28 +59,49 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
   return (
     <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
-      <div className={styles.container}>
-        <h1>{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
-        <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className={styles.poster} />
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-          <Input
-            label="Watched Date"
-            register={register}
-            name="watchedDate"
-            type="date"
-            error={errors.watchedDate}
-            placeholder="Select the date you watched the movie"
-          />
-          <select id="watched" {...register('watched', { required: true })}>
-            <option value="true">Watched</option>
-            <option value="false">Not watched</option>
-          </select>
-          <PrimaryButton type="submit">Submit</PrimaryButton>
-          {result === true && <Callout type="success" >Movie added</Callout>}
-          {result === false && <Callout type="error" >Error adding movie</Callout>}
-          {errors.watched && <Callout type="error" >{errors.watched.message}</Callout>}
-        </form>
-      </div>
+      <div className='flex flex-col items-center justify-center'>
+        <h1 className="text-3xl font-semibold">{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
+        <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className='rounded-lg my-2' />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className=' flex flex-col'>
+            <FormField
+              control={form.control}
+              name='watchedDate'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Watched Date</FormLabel>
+                  <FormControl>
+                    <Input type="date" placeholder='Select the date you watched the movie' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            <FormField
+              control={form.control}
+              name='watched'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Watched</FormLabel>
+                  <Select onValueChange={field.onChange} >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="true">Watched</SelectItem>
+                        <SelectItem value="false">Not watched</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            <Button type='submit' className="mt-2">Mark</Button>
+          </form>
+        </Form>
+      </div >
     </>
   )
 }

@@ -1,9 +1,9 @@
 import { removeReview } from "@/utils/fetch/movies";
-import Card from "../Card/Card";
 import MediaScore from "../MediaScore/MediaScore";
 import styles from './ReviewCard.module.css';
 import Cookies from "js-cookie";
 import { deleteOneShowReview } from "@/utils/fetch/show";
+import { Card } from "../ui/card";
 
 export default function ReviewCard({ review, setReload }: { review: any, setReload: () => void }) {
   const fetchDeleteReview = async () => {
@@ -20,11 +20,11 @@ export default function ReviewCard({ review, setReload }: { review: any, setRelo
     }
   }
   return (
-    <Card>
+    <Card className="p-4">
       {review.userId === Cookies.get('userId') && <button className={styles.deleteButton} onClick={fetchDeleteReview}>X</button>}
-      <div className={styles.title}>
-        <h4>{review.user.name}</h4>
-        <MediaScore score={review.rating} />
+      <div className="flex items-center align-middle">
+        <p className="mr-3">{review.user.name}</p>
+        <MediaScore score={review.rating}/>
       </div>
       <p>{review.review}</p>
     </Card>
