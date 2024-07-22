@@ -1,5 +1,4 @@
 'use client'
-import Callout from "@/components/Callout/Callout";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { CircleCheck, CircleX, Eye } from "lucide-react";

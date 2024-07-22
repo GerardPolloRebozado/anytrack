@@ -1,14 +1,13 @@
 'use client'
 import MediaCard from '@/components/MediaCard/MediaCard';
 import { useEffect, useState } from 'react'
-import styles from './page.module.css'
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
 import { MediaType } from 'libs/types/src';
 import { Cell, Legend, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts';
-
 import distinctColors from 'distinct-colors';
 import AgrByCategoryTooltip from '@/components/RechartsTooltip/AgrByCategoryTooltip/AgrByCategoryTooltip';
 import { getManyMarkedShows } from '@/utils/fetch/show';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 function MyShows() {
   const [watchedShows, setWatchedShows] = useState([])
@@ -53,47 +52,55 @@ function MyShows() {
 
   return (
     <>
-      <h3>Show stats</h3>
-      <div className={styles.chartContainer}>
+      <h1 className='text-4xl font-semibold'>My shows</h1>
+      <h1 className='text-2xl mt-4'>Stats</h1>
+      <div className='grid grid-rows-[1fr] grid-cols-[repeat(auto-fill,minmax(550px,1fr))] gap-4 my-4'>
         {watchedShows && watchedShows.length > 1 && (
           <>
-            <div className={styles.chart}>
-              <h3>Watchtime agrupated by show</h3>
-              <ResponsiveContainer width="100%" height={400}>
-                <PieChart >
-                  <Pie data={watchedShows} dataKey="watchTime" nameKey="title" fill={'var(--showColor)'} label stroke="var(--primary)">
-                    {watchedShows.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={pieColors[index].hex()} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            {agrupatedByGenre && agrupatedByGenre.length > 1 && (
-              <div className={`${styles.chart} radarChart`}>
-                <h3>Watchtime agrupated by category</h3>
+            <Card>
+              <CardHeader>
+                <CardTitle>Watchtime agrupated by show</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ResponsiveContainer width="100%" height={400}>
-                  <RadarChart data={agrupatedByGenre}>
-                    <PolarGrid color='white' />
-                    <PolarAngleAxis dataKey={'name'} stroke='white' />
-                    <Tooltip content={<AgrByCategoryTooltip />} />
-                    <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
-                  </RadarChart>
+                  <PieChart >
+                    <Pie data={watchedShows} dataKey="watchTime" nameKey="title" fill={'var(--showColor)'} label stroke="var(--primary)">
+                      {watchedShows.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={pieColors[index].hex()} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
                 </ResponsiveContainer>
-              </div>
+              </CardContent>
+            </Card>
+            {agrupatedByGenre && agrupatedByGenre.length > 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Watchtime agrupated by category</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <RadarChart data={agrupatedByGenre}>
+                      <PolarGrid color='white' />
+                      <PolarAngleAxis dataKey={'name'} stroke='white' />
+                      <Tooltip content={<AgrByCategoryTooltip />} />
+                      <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
             )}
           </>
         )}
       </div>
-      <h1>My shows</h1>
-      <h2>Watched Shows</h2>
+      <h2 className='text-2xl mb-4'>Watched Shows</h2>
       <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
         {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
       </div>
-      <h2>Watchlist</h2>
+      <h2 className='text-2xl my-4'>Watchlist</h2>
       <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
         {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
