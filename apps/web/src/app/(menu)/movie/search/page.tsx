@@ -29,7 +29,7 @@ function SearchMovie() {
         {movies.length > 0 && movies.map((movie: any) => (
           <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
             <Link href={`/movie/search/${movie.id}`}>
-              <Button className="text-white">Mark</Button>
+              <Button>Mark</Button>
             </Link>
           </MovieCard>
         ))}

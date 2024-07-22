@@ -1,14 +1,12 @@
 'use client'
 import Callout from "@/components/Callout/Callout";
 import { useEffect, useState } from "react";
-import styles from './showInfo.module.css';
 import Image from "next/image";
 import { CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postShowReview } from "@/utils/fetch/show";
 import { getCredits, getSeasons } from "@/utils/fetch/tmdb";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Chip from "@/components/Chip/Chip";
 import Tabs from "@/components/Tabs/Tabs";
 import MediaScore from "@/components/MediaScore/MediaScore";
@@ -18,10 +16,12 @@ import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { updateReviewSchema } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
-import Input from "@/components/Input/Input";
 import { Card } from "@/components/ui/card";
 import distinctColors from "distinct-colors";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
@@ -29,11 +29,10 @@ function ShowDetails({ params }: { params: { id: number } }) {
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
-  const [error, setError] = useState('')
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([])
   const colors = distinctColors({ count: show?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
-  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<MediaReviewForm>({
+  const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
     defaultValues: {
       mediaId: show?.localId,
@@ -45,8 +44,8 @@ function ShowDetails({ params }: { params: { id: number } }) {
       if (response.status === 200) {
         addNotification({ type: 'success', message: 'Review added successfully' })
         setReload(!reload)
-        reset()
-        setValue('mediaId', show.localId)
+        reviewForm.reset()
+        reviewForm.setValue('mediaId', show.localId)
       } else {
         addNotification({ type: 'error', message: 'Error adding review' })
       }
@@ -80,7 +79,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
         show.seasons = seasons.body;
         setShow(show);
         if (await show?.localId) {
-          setValue('mediaId', await show.localId)
+          reviewForm.setValue('mediaId', await show.localId)
           const response = await getManyShowReviews(await show.localId)
           setReviews(await response.json())
           fetchWatchedEpisodes(await show.localId)
@@ -100,10 +99,8 @@ function ShowDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchCredits();
-  }, [params.id, reload, setValue]);
-  const closeModal = () => {
-    setError('')
-  }
+  }, [params.id, reload, reviewForm]);
+
   function setIcon(season: any) {
     if (season.episodes.length === watchedEpisodes[season.season_number]?.count) {
       return 0
@@ -132,12 +129,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
     <>
       <Notifications notifications={notifications} setNotifications={setNotifications} />
       <>
-        {error && (
-          <div className={styles.errorModal} onClick={closeModal}>
-            <p className={styles.closeModal}>X</p>
-            <Callout type="error">{error}</Callout>
-          </div>
-        )}
         {show && (
           <div className="flex gap-x-12 ml-24 mt-8">
             <div className="w-[11dvw]">
@@ -154,7 +145,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
             <div className='flex flex-col items-start w-[50dvw]'>
               <h1 className="text-3xl font-bold">{show.title} {show.name} ({show.year})</h1>
               <div className='text-l flex my-4'>{show.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</div>
-              <p className={styles.runtime}> {show.number_of_seasons} Seasons</p>
+              <p> {show.number_of_seasons} Seasons</p>
               <MediaScore score={show?.vote_average} source="tmdb" />
               <p className="my-4">{show.overview}</p>
               <Tabs>
@@ -162,19 +153,22 @@ function ShowDetails({ params }: { params: { id: number } }) {
                   <Carousel opts={{ loop: true, align: "start" }}>
                     <CarouselContent className="w-[50dvw]">
                       {show.seasons.map((season: any) => (
-                        <CarouselItem key={season.id} className="basis-[180px] ml-4">
-                          <Card className="w-[180px] h-[380px]" onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
+                        <CarouselItem key={season.id} className="basis-[8dvw] ml-4">
+                          <Card className="w-[8dvw] h-full" onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
                             <Image
                               src={season.poster_path}
                               alt={season.name}
                               width={0}
                               height={0}
                               sizes="100vw"
-                              className="rounded-lg max-w-[180px] w-[180px] h-auto"
+                              className="rounded-lg max-w-[8dvw] w-[8dvw] h-auto"
                             />
-                            <div className="p-2">
-                              <p className={styles.seasonTitle}>Season {season.season_number} {setIcon(season) === 0 ? <CircleCheck className='text-green-500' /> : setIcon(season) === 1 ? <Eye className="text-orange-500" /> : <CircleX className="text-red-500" />}</p>
-                              {setIcon(season) === 0 && <PrimaryButton onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</PrimaryButton> || <PrimaryButton onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</PrimaryButton>}
+                            <div className="p-2 flex flex-col items-center">
+                              <div className="flex justify-center w-full gap-1 my-2">
+                                <p>Season {season.season_number}</p>
+                                {setIcon(season) === 0 ? <CircleCheck className='text-green-500' /> : setIcon(season) === 1 ? <Eye className="text-orange-500" /> : <CircleX className="text-red-500" />}
+                              </div>
+                              {setIcon(season) === 0 && <Button onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</Button> || <Button onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</Button>}
                             </div>
                           </Card>
                         </CarouselItem>
@@ -189,15 +183,15 @@ function ShowDetails({ params }: { params: { id: number } }) {
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
                         {(credits.cast.map((credit: any) => (
-                          <CarouselItem key={credit.id} className="basis-[180px] ml-4">
-                            <Card className="w-[180px] h-[380px]">
+                          <CarouselItem key={credit.id} className="basis-[8dvw] ml-4">
+                            <Card className="w-[8dvw] h-auto">
                               <Image
                                 src={credit.profile_path}
                                 alt={credit.name}
                                 width={0}
                                 height={0}
                                 sizes="100vw"
-                                className="rounded-lg max-w-[180px] w-[180px] h-auto"
+                                className="rounded-lg max-w-[8dvw] w-[8dvw] h-auto"
                               />
                               <div className="p-2">
                                 <h5>{credit.name}</h5>
@@ -220,27 +214,36 @@ function ShowDetails({ params }: { params: { id: number } }) {
                     )) : <p>No reviews found</p>}
                   </div>
                   {show.localId && (
-                    <form onSubmit={handleSubmit(submitReview)}>
-                      <Input
-                        label="Rating"
-                        register={register}
-                        name="rating"
-                        type="number"
-                        placeholder="Rating"
-                        error={errors.rating}
-                      />
-                      <Input
-                        label="Review"
-                        register={register}
-                        name="review"
-                        type="text"
-                        placeholder="Type your review"
-                        error={errors.review}
-                      />
-                      <PrimaryButton type="submit">Submit</PrimaryButton>
-                      {errors.review && <Callout type="error">{errors.review.message}</Callout>}
-                      {errors.rating && <Callout type="error">{errors.rating.message}</Callout>}
-                    </form>)}
+                    <Form {...reviewForm}>
+                      <form onSubmit={reviewForm.handleSubmit(submitReview)}>
+                        <FormField
+                          control={reviewForm.control}
+                          name="rating"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Rating</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Rating" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={reviewForm.control}
+                          name="review"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Review</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Write a review of the movie" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        <Button type="submit" className="mt-1">Submit</Button>
+                      </form>
+                    </Form>)}
                 </div>
               </Tabs>
             </div>

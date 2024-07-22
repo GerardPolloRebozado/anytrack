@@ -66,11 +66,6 @@
   align-items: center;
 }
 
-.runtime {
-  font-size: 0.8rem;
-  margin: 0.1rem;
-}
-
 .listContainer {
   display: flex;
   flex-direction: row;
@@ -165,4 +160,3 @@
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1rem;
 }
-

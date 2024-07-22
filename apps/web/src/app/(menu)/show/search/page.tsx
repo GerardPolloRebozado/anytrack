@@ -2,11 +2,11 @@
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { useState } from "react";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { getShow } from "@/utils/fetch/show";
 import MediaCard from "@/components/MediaCard/MediaCard";
 import Link from "next/link";
 import { MediaType } from "libs/types/src";
+import { Button } from "@/components/ui/button";
 
 function SearchShows() {
   const [shows, setShows] = useState([]);
@@ -30,7 +30,7 @@ function SearchShows() {
         {shows.length > 0 && shows.map((show: any) => (
           <MediaCard key={show.id} id={show.id} title={show.original_name} poster={show.poster_path} year={show.first_air_date.split('-')[0]} mediaType={MediaType.show}>
             <Link href={`/show/search/${show.id}`}>
-              <PrimaryButton>Mark</PrimaryButton>
+              <Button>Mark</Button>
             </Link>
           </MediaCard>
         ))}
