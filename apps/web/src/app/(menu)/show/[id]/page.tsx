@@ -223,7 +223,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                             <FormItem>
                               <FormLabel>Rating</FormLabel>
                               <FormControl>
-                                <Input placeholder="Rating" {...field} />
+                                <Input placeholder="Rating" type="number" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

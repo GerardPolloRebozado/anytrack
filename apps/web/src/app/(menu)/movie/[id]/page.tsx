@@ -12,13 +12,14 @@ import { MediaReviewForm, Notification } from "libs/types/src";
 import Notifications from "@/components/Notifications/Notifications";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
-import Input from "@/components/Input/Input";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { updateReviewSchema } from "libs/joi/src";
 import { getCredits } from "@/utils/fetch/tmdb";
 import { Card } from "@/components/ui/card";
 import distinctColors from "distinct-colors";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -27,7 +28,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const [reload, setReload] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [reviews, setReviews] = useState<any[]>([]);
-  const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<MediaReviewForm>({
+  const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
     defaultValues: {
       mediaId: movie?.localId,
@@ -40,8 +41,8 @@ function MovieDetails({ params }: { params: { id: number } }) {
       if (!response.ok) throw new Error(await response.json())
       addNotification({ type: 'success', message: 'Review added successfully' })
       setReload(!reload)
-      reset()
-      setValue('mediaId', movie.localId)
+      reviewForm.reset()
+      reviewForm.setValue('mediaId', movie.localId)
     } catch (error: any) {
       console.error(error)
       addNotification({ type: 'error', message: 'Error adding review' })
@@ -75,7 +76,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         setMovie(await movie)
         if (await movie.localId) {
           fetchReviews(await movie.localId)
-          setValue('mediaId', await movie?.localId)
+          reviewForm.setValue('mediaId', await movie?.localId)
         }
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
@@ -93,7 +94,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchCredits()
-  }, [params.id, reload, setValue]);
+  }, [params.id, reload, reviewForm]);
 
   const closeModal = () => {
     setError('')
@@ -138,7 +139,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                       <CarouselContent className="w-[50dvw]">
                         {(credits.map((credit: any) => (
                           <CarouselItem key={credit.id} className="basis-[8dvw] ml-4">
-                            <Card key={credit.id} className="w-[8dvw] h-auto">
+                            <Card key={credit.id} className="w-[8dvw] h-full">
                               <Image
                                 src={credit.profile_path}
                                 alt={credit.name}
@@ -166,26 +167,36 @@ function MovieDetails({ params }: { params: { id: number } }) {
                     )) : <p>No reviews found</p>}
                   </div>
                   {movie.localId && (
-                    <form onSubmit={handleSubmit(submitReview)}>
-                      <Input
-                        label="Rating"
-                        register={register}
-                        name="rating"
-                        type="number"
-                        placeholder="Rating"
-                        error={errors.rating}
-                      />
-                      <Input
-                        label="Review"
-                        register={register}
-                        name="review"
-                        type="text"
-                        placeholder="Type your review"
-                        error={errors.review}
-                      />
-                      <PrimaryButton type="submit">Submit</PrimaryButton>
-                    </form>
-                  )}
+                    <Form {...reviewForm}>
+                      <form onSubmit={reviewForm.handleSubmit(submitReview)}>
+                        <FormField
+                          control={reviewForm.control}
+                          name="rating"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Rating</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Rating" type="number" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={reviewForm.control}
+                          name="review"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Review</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Write a review of the movie" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                        <Button type="submit" className="mt-1">Submit</Button>
+                      </form>
+                    </Form>)}
                 </div>
               </Tabs>
             </div>
