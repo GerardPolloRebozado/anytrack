@@ -137,15 +137,15 @@ function MovieDetails({ params }: { params: { id: number } }) {
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
                         {(credits.map((credit: any) => (
-                          <CarouselItem key={credit.id} className="basis-[180px] ml-4">
-                            <Card key={credit.id} className="w-[180px] h-[380px]">
+                          <CarouselItem key={credit.id} className="basis-[8dvw] ml-4">
+                            <Card key={credit.id} className="w-[8dvw] h-auto">
                               <Image
                                 src={credit.profile_path}
                                 alt={credit.name}
                                 width={0}
                                 height={0}
                                 sizes="100vw"
-                                className="rounded-lg max-w-[180px] w-[180px] h-auto"
+                                className="rounded-lg max-w-[8dvw] w-[8dvw] h-auto"
                               />
                               <div className="p-2">
                                 <p>{credit.name}</p>

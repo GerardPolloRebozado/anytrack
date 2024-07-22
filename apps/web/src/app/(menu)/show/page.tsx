@@ -88,13 +88,13 @@ function MyShows() {
       </div>
       <h1>My shows</h1>
       <h2>Watched Shows</h2>
-      <div className={styles.cardContainer}>
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
         {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
       </div>
       <h2>Watchlist</h2>
-      <div className={styles.cardContainer}>
+      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
         {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}

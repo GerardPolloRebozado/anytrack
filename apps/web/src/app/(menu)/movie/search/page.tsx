@@ -4,9 +4,9 @@ import { useState } from "react";
 import MovieCard from "@/components/MediaCard/MediaCard";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { searchMovies } from "@/utils/fetch/movies";
-import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import Link from "next/link";
 import { MediaType } from "libs/types/src";
+import { Button } from "@/components/ui/button";
 
 function SearchMovie() {
   const [movies, setMovies] = useState([]);
@@ -29,7 +29,7 @@ function SearchMovie() {
         {movies.length > 0 && movies.map((movie: any) => (
           <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
             <Link href={`/movie/search/${movie.id}`}>
-              <PrimaryButton>Mark</PrimaryButton>
+              <Button className="text-white">Mark</Button>
             </Link>
           </MovieCard>
         ))}
