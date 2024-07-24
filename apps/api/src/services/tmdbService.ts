@@ -104,3 +104,26 @@ export const getOnePeopleService = async (id: number) => {
     }
   );
 }
+
+export const getMovieProviders = async (tmdbId: number) => {
+  return await fetch(
+    `https://api.themoviedb.org/3/movie/${tmdbId}/watch/providers`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+
+export const getShowProviders = async (tmdbId: number) => {
+  return await fetch(
+    `https://api.themoviedb.org/3/tv/${tmdbId}/watch/providers`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+

@@ -148,3 +148,11 @@ export const changePasswordSchema = Joi.object({
 export const getMediaRuntimeChartSchema = Joi.object({
   groupBy: Joi.string().valid("month", "year").required()
 })
+
+export const getWatchProvidersQuerySchema = Joi.object({
+  mediaType: Joi.string().valid('show', 'movie').required()
+})
+
+export const getWatchProvidersParamsSchema = Joi.object({
+  tmdbId: Joi.number().required()
+})

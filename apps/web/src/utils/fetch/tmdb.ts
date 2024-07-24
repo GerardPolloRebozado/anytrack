@@ -1,3 +1,4 @@
+import { MediaType } from "@anytrack/type";
 import buildUrl from "../buildUrl";
 import Cookies from "js-cookie";
 
@@ -34,3 +35,11 @@ export const getOnePeople = async (peopleId: number) => {
   })
 }
 
+export const getWatchProviders = async (data: { tmdbId: number, mediaType: MediaType }) => {
+  return await fetch(`/api/v1/tmdb/providers/${data.tmdbId}?mediaType=${data.mediaType}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
+  })
+}
