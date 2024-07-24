@@ -5,9 +5,8 @@ import { CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postShowReview } from "@/utils/fetch/show";
-import { getCredits, getSeasons } from "@/utils/fetch/tmdb";
+import { getCredits, getSeasons, getWatchProviders } from "@/utils/fetch/tmdb";
 import Chip from "@/components/Chip/Chip";
-import Tabs from "@/components/Tabs/Tabs";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import Notifications from "@/components/Notifications/Notifications";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
@@ -21,13 +20,18 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getName } from "country-list";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
   const [credits, setCredits] = useState<any>();
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [providers, setProviders] = useState<any>({});
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
+  const [country, setCountry] = useState<string>('');
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([])
   const colors = distinctColors({ count: show?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
@@ -98,6 +102,17 @@ function ShowDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchCredits();
+
+    async function fetchProviders() {
+      try {
+        const response = await getWatchProviders({ tmdbId: params.id, mediaType: MediaType.show })
+        const body = await response.json()
+        setProviders(await body)
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
+      }
+    }
+    fetchProviders()
   }, [params.id, reload, reviewForm]);
 
   function setIcon(season: any) {
@@ -147,8 +162,14 @@ function ShowDetails({ params }: { params: { id: number } }) {
               <p> {show.number_of_seasons} Seasons</p>
               <MediaScore score={show?.vote_average} source="tmdb" />
               <p className="my-4">{show.overview}</p>
-              <Tabs>
-                <div className="flex gap-x-2 py-4" id="Seasons">
+              <Tabs defaultValue="seasons">
+                <TabsList>
+                  <TabsTrigger value="seasons">Seasons</TabsTrigger>
+                  <TabsTrigger value="credits">Credits</TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                  <TabsTrigger value="providers">Where to watch</TabsTrigger>
+                </TabsList>
+                <TabsContent value="seasons">
                   <Carousel opts={{ loop: true, align: "start" }}>
                     <CarouselContent className="w-[50dvw]">
                       {show.seasons.map((season: any) => (
@@ -176,8 +197,8 @@ function ShowDetails({ params }: { params: { id: number } }) {
                     <CarouselNext />
                     <CarouselPrevious />
                   </Carousel>
-                </div>
-                <div id="Credits" className="flex gap-x-2 py-4">
+                </TabsContent>
+                <TabsContent value="credits">
                   {credits && credits?.cast && (
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
@@ -205,8 +226,8 @@ function ShowDetails({ params }: { params: { id: number } }) {
                       <CarouselNext />
                       <CarouselPrevious />
                     </Carousel>)}
-                </div>
-                <div id="Reviews">
+                </TabsContent>
+                <TabsContent value="reviews">
                   <div className='grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-4 my-4'>
                     {reviews.length > 0 ? reviews.map((review) => (
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
@@ -243,7 +264,47 @@ function ShowDetails({ params }: { params: { id: number } }) {
                         <Button type="submit" className="mt-1">Submit</Button>
                       </form>
                     </Form>)}
-                </div>
+                </TabsContent>
+                <TabsContent value="providers">
+                  {providers && (
+                    <Select onValueChange={(value) => setCountry(value)} defaultValue="">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Countries</SelectLabel>
+                          {Object.keys(providers).length > 0 && Object.keys(providers).map((key) => (
+                            <SelectItem key={key} value={key}>{getName(key)}</SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {country && (
+                    <div className="flex gap-4 items-center mt-4 h-full w-full flex-wrap">
+                      {Object.entries(providers[country]).map(([key, value]: [string, any]) => {
+                        if (key === 'link') { return null; }
+                        return value.map((provider: any) => {
+                          return (
+                            <Card key={provider.provider_id + provider.display_priority + key} className="flex items-center w-[400px]" onClick={provider.link}>
+                              <div className="w-full">
+                                <p className="text-xl mx-4 overflow-hidden whitespace-nowrap">{provider.provider_name} - {key[0].toUpperCase()}{key.slice(1)}</p>
+                              </div>
+                              <Image
+                                src={provider.logo_path}
+                                alt={provider.provider_name + ' logo'}
+                                width={100}
+                                height={100}
+                                objectFit="cover"
+                              />
+                            </Card>
+                          )
+                        })
+                      })}
+                    </div>
+                  )}
+                </TabsContent>
               </Tabs>
             </div>
           </div >

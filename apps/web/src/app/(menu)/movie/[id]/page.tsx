@@ -253,20 +253,6 @@ function MovieDetails({ params }: { params: { id: number } }) {
                             </Card>
                           )
                         })
-
-                        // return (
-                        //   <Card key={key} className="flex items-center" onClick={value[0].link}>
-                        //     <p className="text-xl mx-4 overflow-hidden whitespace-nowrap">{value[0].provider_name}</p>
-                        //     <p className="mr-4">{key[0].toUpperCase()}{key.slice(1)}</p>
-                        //     <Image
-                        //       src={value[0].logo_path}
-                        //       alt={value[0].provider_name + ' logo'}
-                        //       width={100}
-                        //       height={100}
-                        //       objectFit="cover"
-                        //     />
-                        //   </Card>
-                        // )
                       })}
                     </div>
                   )}
