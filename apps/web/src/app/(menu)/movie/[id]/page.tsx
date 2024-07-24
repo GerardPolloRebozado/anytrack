@@ -1,25 +1,27 @@
 'use client'
 import Callout from "@/components/Callout/Callout";
 import { searchMoviebyId, updateMovieReview, getReview } from "@/utils/fetch/movies";
+import { getName } from 'country-list';
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
-import Tabs from "@/components/Tabs/Tabs";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { MediaReviewForm, Notification } from "libs/types/src";
+import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
 import Notifications from "@/components/Notifications/Notifications";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { updateReviewSchema } from "libs/joi/src";
-import { getCredits } from "@/utils/fetch/tmdb";
-import { Card } from "@/components/ui/card";
+import { getCredits, getWatchProviders } from "@/utils/fetch/tmdb";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import distinctColors from "distinct-colors";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -28,6 +30,8 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const [reload, setReload] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [reviews, setReviews] = useState<any[]>([]);
+  const [providers, setProviders] = useState<any>({});
+  const [country, setCountry] = useState<string>('');
   const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
     defaultValues: {
@@ -94,6 +98,17 @@ function MovieDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchCredits()
+
+    async function fetchProviders() {
+      try {
+        const response = await getWatchProviders({ tmdbId: params.id, mediaType: MediaType.movie })
+        const body = await response.json()
+        setProviders(await body)
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
+      }
+    }
+    fetchProviders()
   }, [params.id, reload, reviewForm]);
 
   const closeModal = () => {
@@ -131,9 +146,13 @@ function MovieDetails({ params }: { params: { id: number } }) {
               <p> {movie.runtime} min</p>
               <MediaScore score={movie.vote_average} source="tmdb" />
               <p className="my-4">{movie.overview}</p>
-              <Tabs>
-                <div id="Credits" className="flex gap-x-2 py-4">
-
+              <Tabs defaultValue="credits">
+                <TabsList>
+                  <TabsTrigger value="credits">Credits</TabsTrigger>
+                  <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                  <TabsTrigger value="providers">Where to watch</TabsTrigger>
+                </TabsList>
+                <TabsContent value="credits" className="flex gap-x-2">
                   {credits && credits.length > 0 && (
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
@@ -159,9 +178,9 @@ function MovieDetails({ params }: { params: { id: number } }) {
                       <CarouselPrevious />
                     </Carousel>
                   )}
-                </div>
-                <div id="Reviews">
-                  <div className='grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-4 my-4'>
+                </TabsContent>
+                <TabsContent value="reviews">
+                  <div className='grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-4'>
                     {reviews.length > 0 ? reviews.map((review) => (
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
@@ -197,7 +216,61 @@ function MovieDetails({ params }: { params: { id: number } }) {
                         <Button type="submit" className="mt-1">Submit</Button>
                       </form>
                     </Form>)}
-                </div>
+                </TabsContent>
+                <TabsContent value="providers">
+                  {providers && (
+                    <Select onValueChange={(value) => setCountry(value)} defaultValue="">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Countries</SelectLabel>
+                          {Object.keys(providers).length > 0 && Object.keys(providers).map((key) => (
+                            <SelectItem key={key} value={key}>{getName(key)}</SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {country && (
+                    <div className="flex gap-4 items-center mt-4 h-full w-full flex-wrap">
+                      {Object.entries(providers[country]).map(([key, value]: [string, any]) => {
+                        if (key === 'link') { return null; }
+                        return value.map((provider: any) => {
+                          return (
+                            <Card key={provider.provider_id + provider.display_priority + key} className="flex items-center w-[400px]" onClick={provider.link}>
+                              <div className="w-full">
+                                <p className="text-xl mx-4 overflow-hidden whitespace-nowrap">{provider.provider_name} - {key[0].toUpperCase()}{key.slice(1)}</p>
+                              </div>
+                              <Image
+                                src={provider.logo_path}
+                                alt={provider.provider_name + ' logo'}
+                                width={100}
+                                height={100}
+                                objectFit="cover"
+                              />
+                            </Card>
+                          )
+                        })
+
+                        // return (
+                        //   <Card key={key} className="flex items-center" onClick={value[0].link}>
+                        //     <p className="text-xl mx-4 overflow-hidden whitespace-nowrap">{value[0].provider_name}</p>
+                        //     <p className="mr-4">{key[0].toUpperCase()}{key.slice(1)}</p>
+                        //     <Image
+                        //       src={value[0].logo_path}
+                        //       alt={value[0].provider_name + ' logo'}
+                        //       width={100}
+                        //       height={100}
+                        //       objectFit="cover"
+                        //     />
+                        //   </Card>
+                        // )
+                      })}
+                    </div>
+                  )}
+                </TabsContent>
               </Tabs>
             </div>
           </div>

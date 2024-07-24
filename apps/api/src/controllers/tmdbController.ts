@@ -96,7 +96,6 @@ export const getWatchProviders = async (req: Request, res: Response) => {
         return
     }
     Object.values(await providers.results).map((provider: any) => {
-      console.log(provider);
       if (provider.flatrate) (
         provider.flatrate.map((flatrate: any) => {
           flatrate.logo_path = `https://image.tmdb.org/t/p/original${flatrate.logo_path}`
@@ -113,7 +112,7 @@ export const getWatchProviders = async (req: Request, res: Response) => {
         })
       )
     })
-    res.status(200).json(providers)
+    res.status(200).json(providers.results)
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
