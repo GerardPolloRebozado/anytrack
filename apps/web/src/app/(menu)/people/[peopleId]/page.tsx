@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from "react"
 import styles from './people.module.css';
 import Image from "next/image";
 import { ArrowDown } from "lucide-react";
-import Tabs from "@/components/Tabs/Tabs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 
 export default function PeoplePage({ params }: { params: { peopleId: number } }) {
   const [people, setPeople] = useState<any>({})
@@ -58,36 +58,42 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
                   <Button onClick={showMore}><ArrowDown size={32} /></Button>
                 </div>
               </div>
-              <Tabs>
-                <div id="Personal" className='mt-4'>
+              <Tabs defaultValue="personal">
+                <TabsList>
+                  <Button value="personal">Personal</Button>
+                  <Button value="known">Known</Button>
+                </TabsList>
+                <TabsContent value="personal">
                   <p><strong>Known For:</strong> {people.known_for_department}</p>
                   <p><strong>Gender:</strong> {people.gender === 1 ? 'Female' : people.gender === 2 ? 'Male' : people.gender === 3 ? 'Non-binary' : 'Not specified'}</p>
                   <p><strong>Place of birth:</strong> {people.place_of_birth}</p>
-                </div>
-                <Carousel id="Known">
-                  <CarouselContent>
-                    {people.combined_credits && (
-                      people.combined_credits.cast.map((media: any) => (
-                        <CarouselItem key={media.id + media.credit_id} className="basis-[8dvw]">
-                          <Card>
-                            <Image
-                              src={media.poster_path}
-                              alt={media.original_title || media.original_name}
-                              width={0}
-                              height={0}
-                              sizes="100vw"
-                              style={{ width: '8dvw', height: 'auto', borderRadius: '5px' }} />
-                            <div className='flex items-center flex-col my-2'>
-                              <p>{media.original_title}</p>
-                              <p>{media.character}</p>
-                            </div>
-                          </Card>
-                        </CarouselItem>
-                      )))}
-                    <CarouselNext />
-                    <CarouselPrevious />
-                  </CarouselContent>
-                </Carousel>
+                </TabsContent>
+                <TabsContent value="known">
+                  <Carousel id="Known">
+                    <CarouselContent>
+                      {people.combined_credits && (
+                        people.combined_credits.cast.map((media: any) => (
+                          <CarouselItem key={media.id + media.credit_id} className="basis-[8dvw]">
+                            <Card>
+                              <Image
+                                src={media.poster_path}
+                                alt={media.original_title || media.original_name}
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                style={{ width: '8dvw', height: 'auto', borderRadius: '5px' }} />
+                              <div className='flex items-center flex-col my-2'>
+                                <p>{media.original_title}</p>
+                                <p>{media.character}</p>
+                              </div>
+                            </Card>
+                          </CarouselItem>
+                        )))}
+                      <CarouselNext />
+                      <CarouselPrevious />
+                    </CarouselContent>
+                  </Carousel>
+                </TabsContent>
               </Tabs>
             </div>
           </div>
