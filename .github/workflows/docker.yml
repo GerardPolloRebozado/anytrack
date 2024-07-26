@@ -1,9 +1,8 @@
 name: Docker image CD
 
 on:
-  push:
-    tags:
-      - '*.*.*'
+  release:
+    types: [published]
   pull_request:
     branches:
       - 'main'
@@ -21,8 +20,8 @@ jobs:
         with:
           images: gerardpollorebozado/anytrack
           tags: |
-            type=semver,pattern={{major}}
-            type=semver,pattern={{version}}
+            type=ref,event=tag
+            type=raw,value=release,enable=${{ github.event_name == 'release' }},
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
