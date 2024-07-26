@@ -63,7 +63,7 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
         <h1 className="text-3xl font-semibold">{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
         <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className='rounded-lg my-2' />
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className=' flex flex-col'>
             <FormField
               control={form.control}
               name='watchedDate'
