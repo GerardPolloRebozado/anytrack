@@ -2,14 +2,16 @@
 import { joiResolver } from "@hookform/resolvers/joi";
 import { markShowSchemaForm } from "libs/joi/src";
 import { useForm } from "react-hook-form";
+import PrimaryButton from "@/components/PrimaryButton/PrimaryButton";
 import { useEffect, useState } from "react";
 import { getSeasons } from "@/utils/fetch/tmdb";
 import { getShow, markShow } from "@/utils/fetch/show";
+import styles from '@/styles/markMediaForm.module.css';
 import Image from "next/image";
 import Callout from "@/components/Callout/Callout";
 import { markShowType } from "libs/types/src";
-import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function MarkShowForm({ params }: { params: { tmdbId: number } }) {
   const searchParams = useSearchParams();
@@ -20,6 +22,7 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
   const [error, setError] = useState('')
   const season = Number(searchParams.get('season')) || -1
   const episode = Number(searchParams.get('episode')) || -1
+  const router = useRouter();
 
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<markShowType>({
     resolver: joiResolver(markShowSchemaForm),
@@ -90,10 +93,10 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
   return (
     <>
       {show && (
-        <div className="flex flex-col items-center justify-center">
+        <div className={styles.container}>
           <h1>Mark show {show?.name && show.name}</h1>
-          <Image src={show?.poster_path} alt={show.name} width={300} height={420} className='rounded-lg my-2' />
-          <form onSubmit={handleSubmit(onSubmit)} className=' flex flex-col'>
+          <Image src={show?.poster_path} alt={show.name} width={300} height={420} className={styles.poster} />
+          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             <label htmlFor="watchedDate">Date watched:</label>
             <input type="date" id='watchedDate' {...register('watchedDate', { required: true })} />
             <label htmlFor="season">Season:</label>
@@ -121,7 +124,16 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
               <option value="true">Watched</option>
               <option value="false">Watchlist</option>
             </select>
-            <Button type="submit">Submit</Button>
+            <PrimaryButton type="submit">Submit</PrimaryButton>
+            <div className={styles.state}>
+              {result === true && <Callout type="success" >Show added</Callout>}
+              {result == false && <Callout type="error" >Error adding Show</Callout>}
+              {errors.watchedDate && <Callout type="error">{errors.watchedDate.message}</Callout>}
+              {errors.season && <Callout type="error">{errors.season.message}</Callout>}
+              {errors.episode && <Callout type="error">{errors.episode.message}</Callout>}
+              {errors.episode && <Callout type="error">{errors.episode.message}</Callout>}
+              {error !== '' && <Callout type="error">{error}</Callout>}
+            </div>
           </form>
         </div>
       )}
