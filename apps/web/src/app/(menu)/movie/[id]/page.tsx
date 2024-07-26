@@ -14,7 +14,7 @@ import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { updateReviewSchema } from "libs/joi/src";
 import { getCredits, getWatchProviders } from "@/utils/fetch/tmdb";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import distinctColors from "distinct-colors";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -92,7 +92,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: 'movie' })
         const credits = await response.json()
-        setCredits(await credits.cast)
+        setCredits(await credits)
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
       }
@@ -146,6 +146,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
               <p> {movie.runtime} min</p>
               <MediaScore score={movie.vote_average} source="tmdb" />
               <p className="my-4">{movie.overview}</p>
+              <p>Directed by: </p> <p className="text-lg font-semibold mb-4">{credits && credits.crew.filter((crew: any) => crew.job === 'Director').map((director: any) => director.name).join(', ')}</p>
               <Tabs defaultValue="credits">
                 <TabsList>
                   <TabsTrigger value="credits">Credits</TabsTrigger>
@@ -156,7 +157,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                   {credits && credits.length > 0 && (
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
-                        {(credits.map((credit: any) => (
+                        {(credits.cast.map((credit: any) => (
                           <CarouselItem key={credit.id} className="basis-[8dvw] ml-4">
                             <Card key={credit.id} className="w-[8dvw] h-full">
                               <Image
