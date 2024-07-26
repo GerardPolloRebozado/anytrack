@@ -92,7 +92,6 @@ function MovieDetails({ params }: { params: { id: number } }) {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: 'movie' })
         const credits = await response.json()
-        console.log(credits)
         setCredits(await credits)
       } catch (error: any) {
         addNotification({ type: 'error', message: error?.message })
