@@ -1,3 +1,6 @@
+import { discoverMovies, discoverShows, MediaType } from "@anytrack/type";
+import buildUrl from "../utils/buildUrl"
+
 const token = process.env.TMDB_API_KEY;
 
 export const searchMovieService = async (query: string) => {
@@ -127,3 +130,13 @@ export const getShowProviders = async (tmdbId: number) => {
   )
 }
 
+export const getDiscoverService = async (options: discoverMovies | discoverShows, mediaType: MediaType) => {
+  const url = buildUrl(`https://api.themoviedb.org/3/discover/${mediaType === MediaType.movie ? 'movie' : ''}${mediaType === MediaType.show ? 'tv' : ''}`, options)
+  return await fetch(url,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getAgregatedShowCreditsService, getMovieCredits, getMovieProviders, getOnePeopleService, getShowProviders, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
-import { MediaType } from '@anytrack/type';
+import { getAgregatedShowCreditsService, getDiscoverService, getMovieCredits, getMovieProviders, getOnePeopleService, getShowProviders, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { discoverMovies, discoverShows, MediaType } from '@anytrack/type';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
   try {
@@ -116,5 +116,18 @@ export const getWatchProviders = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
+  }
+}
+
+export const getDiscover = async (req: Request, res: Response) => {
+  try {
+    const options: discoverMovies | discoverShows = req.body
+    const mediaType = req.body?.mediaType as MediaType
+    const response = await getDiscoverService(options, mediaType)
+    const discover = await response.json()
+    res.status(200).json(discover)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error.message })
   }
 }
