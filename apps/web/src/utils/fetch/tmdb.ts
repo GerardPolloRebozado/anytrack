@@ -43,3 +43,13 @@ export const getWatchProviders = async (data: { tmdbId: number, mediaType: Media
     },
   })
 }
+
+export const getMediaVideos = async (tmdbId: number, mediaType: MediaType) => {
+  return await fetch(`/api/v1/tmdb/videos/${tmdbId}?mediaType=${mediaType}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
+  }
+  )
+}

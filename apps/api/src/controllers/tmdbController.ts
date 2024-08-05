@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getAgregatedShowCreditsService, getMovieCredits, getMovieProviders, getOnePeopleService, getShowProviders, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { getAgregatedShowCreditsService, getMovieCredits, getMovieProviders, getMovieVideosService, getOnePeopleService, getShowProviders, getShowVideosService, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
 import { MediaType } from '@anytrack/type';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
@@ -113,6 +113,24 @@ export const getWatchProviders = async (req: Request, res: Response) => {
       )
     })
     res.status(200).json(providers.results)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export const getMediaVideo = async (req: Request, res: Response) => {
+  try {
+    const mediaType: MediaType = req.query.mediaType as MediaType
+    const tmdbId = Number(req.params.tmdbId)
+    let response
+    if (mediaType === MediaType.movie) {
+      response = await getMovieVideosService(tmdbId)
+    } else if (mediaType === MediaType.show) {
+      response = await getShowVideosService(tmdbId)
+    }
+    const trailers = await response.json()
+    res.status(200).json(await trailers)
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

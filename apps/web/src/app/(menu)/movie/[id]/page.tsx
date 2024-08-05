@@ -13,7 +13,7 @@ import Notifications from "@/components/Notifications/Notifications";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { updateReviewSchema } from "libs/joi/src";
-import { getCredits, getWatchProviders } from "@/utils/fetch/tmdb";
+import { getCredits, getMediaVideos, getWatchProviders } from "@/utils/fetch/tmdb";
 import { Card } from "@/components/ui/card";
 import distinctColors from "distinct-colors";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { response } from "express";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
@@ -31,6 +32,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [reviews, setReviews] = useState<any[]>([]);
   const [providers, setProviders] = useState<any>({});
+  const [videos, setVideos] = useState<any>({})
   const [country, setCountry] = useState<string>('');
   const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
@@ -110,6 +112,17 @@ function MovieDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchProviders()
+
+    async function fetchVideos() {
+      try {
+        const response = await getMediaVideos(params.id, MediaType.movie)
+        const videos = await response.json()
+        setVideos(videos.results)
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
+      }
+    }
+    fetchVideos()
   }, [params.id, reload, reviewForm]);
 
   const closeModal = () => {
@@ -153,6 +166,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                   <TabsTrigger value="credits">Credits</TabsTrigger>
                   <TabsTrigger value="reviews">Reviews</TabsTrigger>
                   <TabsTrigger value="providers">Where to watch</TabsTrigger>
+                  <TabsTrigger value="videos">Videos</TabsTrigger>
                 </TabsList>
                 <TabsContent value="credits" className="flex gap-x-2">
                   {credits && credits.length > 0 && (
@@ -259,6 +273,23 @@ function MovieDetails({ params }: { params: { id: number } }) {
                     </div>
                   )}
                 </TabsContent>
+                <TabsContent value="videos">
+                  {videos && videos.length > 0 && (
+                    <Carousel opts={{ loop: true, align: "start" }} >
+                      <CarouselContent className="w-[50dvw]">
+                        {(videos.map((video: any) => (
+                          <CarouselItem key={video.id} className="basis-[560px]">
+                            <Card key={video.id} className="w-[560px] h-[315px]">
+                              <iframe width="560" height="315" src={`https://www.youtube.com/embed/${video.key}`} title={video.name} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="p-1"></iframe>
+                            </Card>
+                          </CarouselItem>)))}
+                      </CarouselContent>
+                      <CarouselNext />
+                      <CarouselPrevious />
+                    </Carousel>
+                  )}
+                </TabsContent>
+
               </Tabs>
             </div>
           </div>

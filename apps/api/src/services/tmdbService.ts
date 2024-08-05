@@ -127,3 +127,24 @@ export const getShowProviders = async (tmdbId: number) => {
   )
 }
 
+export const getMovieVideosService = async (tmdbId: number) => {
+  return await fetch(
+    `https://api.themoviedb.org/3/movie/${tmdbId}/videos`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+
+export const getShowVideosService = async (tmdbId: number) => {
+  return await fetch(
+    `https://api.themoviedb.org/3/tv/${tmdbId}/videos`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
