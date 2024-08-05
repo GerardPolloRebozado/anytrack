@@ -153,6 +153,10 @@ export const getWatchProvidersQuerySchema = Joi.object({
   mediaType: Joi.string().valid('show', 'movie').required()
 })
 
-export const getWatchProvidersParamsSchema = Joi.object({
+export const getByTmdbId = Joi.object({
   tmdbId: Joi.number().required()
+})
+
+export const getByMediaType = Joi.object({
+  mediaType: Joi.string().valid(MediaType.movie, MediaType.show).required()
 })
