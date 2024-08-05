@@ -5,7 +5,7 @@ import { CircleCheck, CircleX, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postShowReview } from "@/utils/fetch/show";
-import { getCredits, getSeasons, getWatchProviders } from "@/utils/fetch/tmdb";
+import { getCredits, getMediaVideos, getSeasons, getWatchProviders } from "@/utils/fetch/tmdb";
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import Notifications from "@/components/Notifications/Notifications";
@@ -30,6 +30,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [providers, setProviders] = useState<any>({});
+  const [videos, setVideos] = useState<any>({})
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [country, setCountry] = useState<string>('');
   const router = useRouter();
@@ -113,6 +114,16 @@ function ShowDetails({ params }: { params: { id: number } }) {
       }
     }
     fetchProviders()
+    async function fetchVideos() {
+      try {
+        const response = await getMediaVideos(params.id, MediaType.show)
+        const videos = await response.json()
+        setVideos(videos.results)
+      } catch (error: any) {
+        addNotification({ type: 'error', message: error?.message })
+      }
+    }
+    fetchVideos()
   }, [params.id, reload, reviewForm]);
 
   function setIcon(season: any) {
@@ -168,6 +179,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                   <TabsTrigger value="credits">Credits</TabsTrigger>
                   <TabsTrigger value="reviews">Reviews</TabsTrigger>
                   <TabsTrigger value="providers">Where to watch</TabsTrigger>
+                  <TabsTrigger value="videos">Videos</TabsTrigger>
                 </TabsList>
                 <TabsContent value="seasons">
                   <Carousel opts={{ loop: true, align: "start" }}>
@@ -303,6 +315,22 @@ function ShowDetails({ params }: { params: { id: number } }) {
                         })
                       })}
                     </div>
+                  )}
+                </TabsContent>
+                <TabsContent value="videos">
+                  {videos && videos.length > 0 && (
+                    <Carousel opts={{ loop: true, align: "start" }} >
+                      <CarouselContent className="w-[50dvw]">
+                        {(videos.map((video: any) => (
+                          <CarouselItem key={video.id} className="basis-[560px]">
+                            <Card key={video.id} className="w-[560px] h-[315px]">
+                              <iframe width="560" height="315" src={`https://www.youtube.com/embed/${video.key}`} title={video.name} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="p-1"></iframe>
+                            </Card>
+                          </CarouselItem>)))}
+                      </CarouselContent>
+                      <CarouselNext />
+                      <CarouselPrevious />
+                    </Carousel>
                   )}
                 </TabsContent>
               </Tabs>

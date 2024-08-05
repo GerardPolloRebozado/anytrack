@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCredits, getOnePeople, getShowSeasons, getWatchProviders } from "../controllers/tmdbController";
+import { getCredits, getMediaVideo, getOnePeople, getShowSeasons, getWatchProviders } from "../controllers/tmdbController";
 import joiMiddleware from "../middlewares/joiMiddleware";
 import { userMiddleware } from "../middlewares/userMiddleware";
 import { getCreditsSchema, getShowSeasonsSchema, getWatchProvidersParamsSchema, getWatchProvidersQuerySchema } from "@anytrack/joi";
@@ -10,5 +10,6 @@ tmdbRouter.get("/show/seasons", userMiddleware, joiMiddleware(getShowSeasonsSche
 tmdbRouter.get('/credits', userMiddleware, joiMiddleware(getCreditsSchema, 'query'), getCredits)
 tmdbRouter.get('/people/:peopleId', userMiddleware, getOnePeople)
 tmdbRouter.get("/providers/:tmdbId", userMiddleware, joiMiddleware(getWatchProvidersParamsSchema, 'params'), joiMiddleware(getWatchProvidersQuerySchema, 'query'), getWatchProviders)
+tmdbRouter.get("/videos/:tmdbId", userMiddleware, getMediaVideo)
 
 export default tmdbRouter;
