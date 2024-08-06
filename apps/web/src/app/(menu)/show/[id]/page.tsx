@@ -9,7 +9,7 @@ import { getCredits, getMediaVideos, getSeasons, getWatchProviders } from "@/uti
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
+import { MediaReviewForm, MediaType } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { updateReviewSchema } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -34,7 +34,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
   const [country, setCountry] = useState<string>('');
   const router = useRouter();
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const colors = distinctColors({ count: show?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
   const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
