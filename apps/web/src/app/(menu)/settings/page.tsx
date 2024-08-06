@@ -18,7 +18,6 @@ import PasswordInput from "@/components/ui/passwordInput";
 import { toast } from "@/components/ui/use-toast";
 
 function SettingsPage() {
-  const [user, setUser] = useState({} as any)
   const [settings, setSettings] = useState<setting>()
   const [reload, setReload] = useState(false)
   const [editProfile, setEditProfile] = useState(false)
@@ -36,7 +35,6 @@ function SettingsPage() {
       try {
         const response = await getUser()
         const user = await response.json()
-        setUser(user)
         editProfileForm.setValue('email', await user.email)
         editProfileForm.setValue('name', await user.name)
       } catch (error: any) {

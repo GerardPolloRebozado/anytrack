@@ -2,7 +2,6 @@
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute"
 import { getSeasons } from "@/utils/fetch/tmdb"
 import { useEffect, useState } from "react"
-import { getOneMarkedShow } from '@/utils/fetch/show'
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -10,7 +9,6 @@ import { toast } from "@/components/ui/use-toast"
 
 function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }) {
   const [season, setSeason] = useState<any>(null)
-  const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([])
   const [title, setTitle] = useState('AnyTrack')
 
 
@@ -24,7 +22,6 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
         if (response.status === 200) {
           setSeason(response.body)
           setTitle(`AnyTrack ${response.body.name}`)
-          fetchWatchedEpisodes()
         } else {
           toast({ title: 'Failed to fetch season', description: `Failed to fetch season`, variant: "destructive" })
         }
@@ -33,17 +30,6 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
       }
     }
     fetchSeason()
-
-    async function fetchWatchedEpisodes() {
-      try {
-        const response = await getOneMarkedShow({ mediaId: params.id, seasonNumber: params.seasonNumber })
-        if (response.status !== 200) throw new Error(JSON.stringify(response))
-        const data = await response.json()
-        setWatchedEpisodes(data)
-      } catch (error: any) {
-        toast({ title: 'Failed to fetch watched episodes', description: error?.message, variant: "destructive" })
-      }
-    }
   }, [params.id, params.seasonNumber])
 
   return (
