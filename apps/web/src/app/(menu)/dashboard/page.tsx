@@ -2,9 +2,8 @@
 import { useEffect, useState } from "react";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { BarChart, Bar, XAxis, Legend } from 'recharts';
-import { MediaRuntimeChartData, Notification, groupedFutureMedia } from "libs/types/src";
+import { MediaRuntimeChartData, groupedFutureMedia } from "libs/types/src";
 import { Clapperboard, Tv } from "lucide-react";
-import Notifications from "@/components/Notifications/Notifications";
 import { getManyFutureMedia } from "@/utils/fetch/media";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,18 +11,11 @@ import { getMediaRuntimeChart } from "@/utils/fetch/charts";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "@/components/ui/use-toast";
 
 function DashboardPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const [nextMedia, setNextMedia] = useState<groupedFutureMedia[]>([]);
   const [mediaHistory, setMediaHistory] = useState<MediaRuntimeChartData>()
-
-  function addNotification(notification: Notification) {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
-    setTimeout(() => {
-      setNotifications((prevNotifications) => prevNotifications.slice(1))
-    }, 5000)
-  };
 
   useEffect(() => {
     async function fetchFutureEpisodes() {
@@ -32,8 +24,8 @@ function DashboardPage() {
         if (!response.ok) throw new Error(await response.json())
         const nextEpisodesResponse = await response.json()
         setNextMedia(nextEpisodesResponse)
-      } catch (error) {
-        addNotification({ type: 'error', message: 'Failed to fetch upcoming releases' })
+      } catch (error: any) {
+        toast({ title: 'Failed to fetch future episodes', description: error.message, variant: "destructive" })
       }
     }
     fetchFutureEpisodes()
@@ -44,8 +36,8 @@ function DashboardPage() {
         if (!response.ok) throw new Error(await response.json())
         const body = await response.json()
         setMediaHistory(body)
-      } catch (error) {
-        addNotification({ type: 'error', message: 'Failed to fetch media history' })
+      } catch (error: any) {
+        toast({ title: 'Failed to fetch media history', description: error.message, variant: "destructive" })
       }
     }
     fetchMediaHistory()
@@ -69,7 +61,6 @@ function DashboardPage() {
 
   return (
     <>
-      <Notifications notifications={notifications} setNotifications={setNotifications} />
       <h1 className="text-4xl">Dashboard</h1>
       <div>
         <div className='grid sm:grid-cols-1 xl:grid-cols-2 my-4'>

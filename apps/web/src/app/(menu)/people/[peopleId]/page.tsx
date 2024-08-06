@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
 
 export default function PeoplePage({ params }: { params: { peopleId: number } }) {
   const [people, setPeople] = useState<any>({})
@@ -22,7 +23,7 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
         const responsePeople = await response.json()
         setPeople(responsePeople)
       } catch (error: any) {
-        console.log(error)
+        toast({ title: 'Failed to fetch people', description: error?.message, variant: "destructive" })
       }
     }
     fetchPeople()

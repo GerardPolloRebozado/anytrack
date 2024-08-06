@@ -40,11 +40,6 @@ export type InfoProps = {
   onClick?: () => void;
 };
 
-export type Notification = {
-  type: 'error' | 'warning' | 'info' | 'success';
-  message: string;
-};
-
 export enum state {
   watched = 'watched',
   watchlist = 'watchlist',

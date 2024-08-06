@@ -3,6 +3,7 @@ import { Montserrat as FontSans } from "next/font/google";
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/utils/utils";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <Toaster />
           {children}
         </ThemeProvider>
       </body>

@@ -8,8 +8,7 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
-import Notifications from "@/components/Notifications/Notifications";
+import { MediaReviewForm, MediaType } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { updateReviewSchema } from "libs/joi/src";
@@ -22,14 +21,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { response } from "express";
+import { toast } from "@/components/ui/use-toast";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<any>();
   const [error, setError] = useState('');
   const [credits, setCredits] = useState<any>();
   const [reload, setReload] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const [reviews, setReviews] = useState<any[]>([]);
   const [providers, setProviders] = useState<any>({});
   const [videos, setVideos] = useState<any>({})
@@ -45,23 +43,14 @@ function MovieDetails({ params }: { params: { id: number } }) {
     try {
       const response = await updateMovieReview(data)
       if (!response.ok) throw new Error(await response.json())
-      addNotification({ type: 'success', message: 'Review added successfully' })
+      toast({ title: 'Review added successfully' })
       setReload(!reload)
       reviewForm.reset()
       reviewForm.setValue('mediaId', movie.localId)
     } catch (error: any) {
-      console.error(error)
-      addNotification({ type: 'error', message: 'Error adding review' })
+      toast({ title: 'Error adding review', description: error.message, variant: 'destructive' })
     }
   }
-
-
-  function addNotification(notification: Notification) {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
-    setTimeout(() => {
-      setNotifications((prevNotifications) => prevNotifications.slice(1))
-    }, 5000)
-  };
 
 
 
@@ -72,7 +61,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         if (!response.ok) throw new Error(await response.json())
         setReviews(await response.json())
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch reviews', description: error.message, variant: 'destructive' })
       }
     }
     async function fetchMovie() {
@@ -85,7 +74,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
           reviewForm.setValue('mediaId', await movie?.localId)
         }
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch movie', description: error.message, variant: 'destructive' })
       }
     }
     fetchMovie();
@@ -97,7 +86,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         console.log(credits)
         setCredits(await credits)
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch credits', description: error.message, variant: 'destructive' })
       }
     }
     fetchCredits()
@@ -108,7 +97,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         const body = await response.json()
         setProviders(await body)
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch providers', description: error.message, variant: 'destructive' })
       }
     }
     fetchProviders()
@@ -119,7 +108,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         const videos = await response.json()
         setVideos(videos.results)
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch videos', description: error.message, variant: 'destructive' })
       }
     }
     fetchVideos()
@@ -132,7 +121,6 @@ function MovieDetails({ params }: { params: { id: number } }) {
 
   return (
     <>
-      <Notifications notifications={notifications} setNotifications={setNotifications} />
       {error && (
         <div className="flex flex-col justify-center items-center fixed bg-[rgba(0,0,0,0.5)] z-10 w-full h-full" onClick={closeModal}>
           <p className="absolute p-4 text-3xl cursor-pointer">X</p>

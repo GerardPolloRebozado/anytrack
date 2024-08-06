@@ -5,17 +5,17 @@ import { markMovie, searchMoviebyId } from "@/utils/fetch/movies";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { markMovieSchemaForm } from "libs/joi/src";
-import { Notification, markMovieType } from "libs/types/src";
-import Notifications from "@/components/Notifications/Notifications";
+import { markMovieType } from "libs/types/src";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 
-export default function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
+
+function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
   const [movie, setMovie] = useState<any>({})
-  const [result, setResult] = useState<boolean | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const form = useForm<markMovieType>({
     resolver: joiResolver(markMovieSchemaForm),
     defaultValues: {
@@ -29,18 +29,11 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
         const response = await searchMoviebyId(params.tmdbId)
         setMovie(await response.json())
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Failed to fetch movie', description: error?.message, variant: "destructive" })
       }
     }
     fetchMovie()
   }, [params.tmdbId])
-
-  function addNotification(notification: Notification) {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
-    setTimeout(() => {
-      setNotifications((prevNotifications) => prevNotifications.slice(1))
-    }, 5000)
-  };
 
   const onSubmit = async (data: markMovieType) => {
     const response = await markMovie({
@@ -49,16 +42,15 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
       watchedDate: data.watchedDate,
     })
     if (response.status === 200) {
-      setResult(true)
+      toast({ title: 'Movie marked', description: 'Movie marked successfully' })
     } else {
-      setResult(false)
+      toast({ title: 'Failed to mark movie', description: 'Failed to mark movie', variant: "destructive" })
     }
   }
 
 
   return (
     <>
-      <Notifications notifications={notifications} setNotifications={setNotifications} />
       <div className='flex flex-col items-center justify-center'>
         <h1 className="text-3xl font-semibold">{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
         <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className='rounded-lg my-2' />
@@ -105,3 +97,5 @@ export default function MarkMovieForm({ params }: { params: { tmdbId: number } }
     </>
   )
 }
+
+export default withProtectedRoute(MarkMovieForm)

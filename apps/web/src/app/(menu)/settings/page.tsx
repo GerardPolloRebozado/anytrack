@@ -3,7 +3,6 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { triggerUpdateMovies, triggerUpdateShows } from "@/utils/fetch/cron"
 import { useEffect, useState } from "react";
 import { getUser, updateUser } from "@/utils/fetch/users";
-import Notifications from "@/components/Notifications/Notifications";
 import { changePassword, Notification, updateUserForm } from "libs/types/src";
 import { setting } from "@prisma/client";
 import { getSettings, updateSettings } from "@/utils/fetch/settings";
@@ -16,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import PasswordInput from "@/components/ui/passwordInput";
+import { toast } from "@/components/ui/use-toast";
 
 function SettingsPage() {
   const [user, setUser] = useState({} as any)
@@ -23,7 +23,6 @@ function SettingsPage() {
   const [reload, setReload] = useState(false)
   const [editProfile, setEditProfile] = useState(false)
   const [changePassword, setChangePassword] = useState(false)
-  const [notifications, setNotifications] = useState<Notification[]>([])
   const router = useRouter()
   const editProfileForm = useForm<updateUserForm>({
     resolver: joiResolver(updateUserSchemaForm),
@@ -31,10 +30,6 @@ function SettingsPage() {
   const passwordForm = useForm<changePassword>({
     resolver: joiResolver(changePasswordSchema),
   });
-
-  function addNotification(notification: Notification) {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -44,16 +39,16 @@ function SettingsPage() {
         setUser(user)
         editProfileForm.setValue('email', await user.email)
         editProfileForm.setValue('name', await user.name)
-      } catch (error) {
+      } catch (error: any) {
         console.log(error)
-        setNotifications((prevNotifications) => [...prevNotifications, { type: 'error', message: 'Error fetching user data' }]);
+        toast({ title: 'Failed to fetch user', description: error?.message, variant: "destructive" })
       }
       try {
         const settings = await getSettings()
         setSettings(settings.body)
-      } catch (error) {
+      } catch (error: any) {
         console.log(error)
-        setNotifications((prevNotifications) => [...prevNotifications, { type: 'error', message: 'Error fetching settings' }]);
+        toast({ title: 'Failed to fetch settings', description: error?.message, variant: "destructive" })
       }
     }
     fetchData();
@@ -61,30 +56,36 @@ function SettingsPage() {
 
   async function changeSettings(data: Omit<setting, "userId">) {
     try {
-      await updateSettings(data)
-      setReload(!reload)
-    } catch (error) {
+      const respose = await updateSettings(data)
+      if (respose.status === 200) {
+        setReload(!reload)
+      }
+    } catch (error: any) {
       console.log(error)
-      addNotification({ type: 'error', message: 'Error updating settings' })
+      toast({ title: 'Failed to update settings', description: error?.message, variant: "destructive" })
     }
   }
 
 
   async function updateMovies() {
-    const response = await triggerUpdateMovies();
-    if (response.status !== 200) {
-      addNotification({ type: 'error', message: 'Error updating Movies' })
-    } else {
-      addNotification({ type: 'success', message: 'Succefully updated Movies' })
+    try {
+      const response = await triggerUpdateMovies()
+      if (response.status === 200) {
+        toast({ title: 'Movies updated', description: 'Movies updated successfully' })
+      }
+    } catch (error: any) {
+      toast({ title: 'Failed to update movies', description: error?.message, variant: "destructive" })
     }
   }
 
   async function updateShows() {
-    const response = await triggerUpdateShows()
-    if (response.status !== 200) {
-      addNotification({ type: 'error', message: 'Error updating Shows' })
-    } else {
-      addNotification({ type: 'success', message: 'Succefully updated Shows' })
+    try {
+      const response = await triggerUpdateShows()
+      if (response.status === 200) {
+        toast({ title: 'Shows updated', description: 'Shows updated successfully' })
+      }
+    } catch (error: any) {
+      toast({ title: 'Failed to update shows', description: error?.message, variant: "destructive" })
     }
   }
 
@@ -95,18 +96,20 @@ function SettingsPage() {
   }
 
   const onSubmit: SubmitHandler<updateUserForm> = async (data: updateUserForm) => {
-    const response = await updateUser(data)
-    if (response.status !== 200) {
-      addNotification({ type: 'error', message: 'Error updating profile' })
-    } else {
-      addNotification({ type: 'success', message: 'Updated profile' })
+    try {
+      const response = await updateUser(data)
+      if (response.status === 200) {
+        toast({ title: 'User updated', description: 'User updated successfully' })
+        setReload(!reload)
+      }
+    } catch (error: any) {
+      toast({ title: 'Failed to update user', description: error?.message, variant: "destructive" })
       setReload(!reload)
     }
   }
 
   return (
     <>
-      <Notifications notifications={notifications} setNotifications={setNotifications} />
       <div className=' w-full flex justify-center flex-col items-center'>
         <h2 className="text-2xl mb-2">Settings</h2>
         <div className='w-1/6 flex flex-col gap-3'>
