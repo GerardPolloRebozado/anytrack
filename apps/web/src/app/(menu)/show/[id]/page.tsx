@@ -8,7 +8,6 @@ import { deleteOneUserShow, getManyShowReviews, getOneMarkedShow, getShow, postS
 import { getCredits, getMediaVideos, getSeasons, getWatchProviders } from "@/utils/fetch/tmdb";
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
-import Notifications from "@/components/Notifications/Notifications";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
 import { MediaReviewForm, MediaType, Notification } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
@@ -23,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getName } from "country-list";
+import { toast } from "@/components/ui/use-toast";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<any>();
@@ -46,24 +46,17 @@ function ShowDetails({ params }: { params: { id: number } }) {
     try {
       const response = await postShowReview(data)
       if (response.status === 200) {
-        addNotification({ type: 'success', message: 'Review added successfully' })
+        toast({ title: 'Review added successfully' })
         setReload(!reload)
         reviewForm.reset()
         reviewForm.setValue('mediaId', show.localId)
       } else {
-        addNotification({ type: 'error', message: 'Error adding review' })
+        toast({ title: 'Failed to update settings', description: 'Failed to update settings', variant: "destructive" })
       }
     } catch (error: any) {
-      addNotification({ type: 'error', message: 'Error adding review' })
+      toast({ title: 'Failed to update settings', description: 'Failed to update settings', variant: "destructive" })
     }
   }
-
-  function addNotification(notification: Notification) {
-    setNotifications((prevNotifications) => [...prevNotifications, notification]);
-    setTimeout(() => {
-      setNotifications((prevNotifications) => prevNotifications.slice(1))
-    }, 5000)
-  };
 
   useEffect(() => {
     async function fetchWatchedEpisodes(mediaId: number) {
@@ -71,7 +64,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
       if (response.status === 200) {
         setWatchedEpisodes(await response.json())
       } else {
-        addNotification({ type: 'error', message: 'Error fetching watched episodes' })
+        toast({ title: 'Error fetching watched episodes', variant: 'destructive' })
       }
     }
     async function fetchShow() {
@@ -89,7 +82,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
           fetchWatchedEpisodes(await show.localId)
         }
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Error fetching show', variant: 'destructive' })
       }
     }
     fetchShow();
@@ -99,7 +92,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
         const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.show });
         setCredits(await response.json())
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Error fetching credits', variant: 'destructive' })
       }
     }
     fetchCredits();
@@ -110,7 +103,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
         const body = await response.json()
         setProviders(await body)
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Error fetching providers', variant: 'destructive' })
       }
     }
     fetchProviders()
@@ -120,7 +113,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
         const videos = await response.json()
         setVideos(videos.results)
       } catch (error: any) {
-        addNotification({ type: 'error', message: error?.message })
+        toast({ title: 'Error fetching videos', variant: 'destructive' })
       }
     }
     fetchVideos()
@@ -152,7 +145,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
 
   return (
     <>
-      <Notifications notifications={notifications} setNotifications={setNotifications} />
       <>
         {show && (
           <div className="flex gap-x-12 ml-24 mt-8">

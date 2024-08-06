@@ -9,14 +9,15 @@ import Image from "next/image";
 import { markShowType } from "libs/types/src";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 
-export default function MarkShowForm({ params }: { params: { tmdbId: number } }) {
+function MarkShowForm({ params }: { params: { tmdbId: number } }) {
   const searchParams = useSearchParams();
   const [seasons, setSeasons] = useState<any[]>([]);
   const [show, setShow] = useState<any>(null)
   const [selectedSeason, setSelectedSeason] = useState(-1);
   const [result, setResult] = useState<boolean | null>(null);
-  const [error, setError] = useState('')
   const season = Number(searchParams.get('season')) || -1
   const episode = Number(searchParams.get('episode')) || -1
 
@@ -61,7 +62,7 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
         setValue('season', season)
         setValue('episode', episode)
       } else {
-        setError(await response.body.error)
+        toast({ title: 'Error fetching seasons' })
       }
     }
     fetchSeasons();
@@ -69,6 +70,8 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
       const response = await getShow('tmdb:' + params.tmdbId);
       if (response.status === 200) {
         setShow(await response.body);
+      } else {
+        toast({ title: 'Error fetching show' })
       }
     }
     fetchShow();
@@ -127,3 +130,5 @@ export default function MarkShowForm({ params }: { params: { tmdbId: number } })
     </>
   )
 }
+
+export default withProtectedRoute(MarkShowForm);

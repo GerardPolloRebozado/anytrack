@@ -9,6 +9,7 @@ import AgrByCategoryTooltip from '@/components/RechartsTooltip/AgrByCategoryTool
 import distinctColors from 'distinct-colors';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
 
 function MyMovies() {
   const [markedMovies, setMarkedMovies] = useState([])
@@ -18,7 +19,11 @@ function MyMovies() {
 
   useEffect(() => {
     async function fetchMovies(data: getMarkedMoviesType) {
-      return (await getMarkedMovies(data)).json()
+      try {
+        return (await getMarkedMovies(data)).json()
+      } catch (error: any) {
+        toast({ title: 'Failed to fetch movies', description: error?.message, variant: "destructive" })
+      }
     }
     fetchMovies({}).then((response) => {
       setMarkedMovies(response)
@@ -26,7 +31,6 @@ function MyMovies() {
     fetchMovies({ groupBy: 'genre', watched: true }).then((response) => {
       setAgrupatedByGenre(response)
     })
-
   }, [reload]);
 
   async function deleteMarkedMedia(id: number) {
@@ -35,6 +39,7 @@ function MyMovies() {
       setReload(!reload)
     } catch (error: any) {
       console.log(error)
+      toast({ title: 'Failed to delete movie', description: error?.message, variant: "destructive" })
     }
   }
 

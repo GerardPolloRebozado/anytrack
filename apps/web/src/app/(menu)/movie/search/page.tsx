@@ -7,17 +7,22 @@ import { searchMovies } from "@/utils/fetch/movies";
 import Link from "next/link";
 import { MediaType } from "libs/types/src";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 
 function SearchMovie() {
   const [movies, setMovies] = useState([]);
   async function fetchData(query: string) {
-    if (!query) {
-      setMovies([]);
-      return;
+    try {
+      if (!query) {
+        setMovies([]);
+        return;
+      }
+      const response = await searchMovies(query)
+      const body = await response.json();
+      if (await body.results) setMovies(await body.results);
+    } catch (error: any) {
+      toast({ title: 'Failed to fetch movies', description: error?.message, variant: "destructive" })
     }
-    const response = await searchMovies(query)
-    const body = await response.json();
-    if (await body.results) setMovies(await body.results);
   }
 
   return (

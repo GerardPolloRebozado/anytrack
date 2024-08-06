@@ -6,35 +6,43 @@ import { getOneMarkedShow } from '@/utils/fetch/show'
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { toast } from "@/components/ui/use-toast"
 
 function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }) {
   const [season, setSeason] = useState<any>(null)
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([])
-  const [error, setError] = useState('')
   const [title, setTitle] = useState('AnyTrack')
 
 
   useEffect(() => {
     async function fetchSeason() {
-      const response = await getSeasons({
-        tmdbId: params.id,
-        season: params.seasonNumber
-      })
-      if (response.status === 200) {
-        setSeason(response.body)
-        setTitle(`AnyTrack ${response.body.name}`)
-        fetchWatchedEpisodes()
-      } else {
-        setError(response.body.error)
+      try {
+        const response = await getSeasons({
+          tmdbId: params.id,
+          season: params.seasonNumber
+        })
+        if (response.status === 200) {
+          setSeason(response.body)
+          setTitle(`AnyTrack ${response.body.name}`)
+          fetchWatchedEpisodes()
+        } else {
+          toast({ title: 'Failed to fetch season', description: `Failed to fetch season`, variant: "destructive" })
+        }
+      } catch (error: any) {
+        toast({ title: 'Failed to fetch season', description: error?.message, variant: "destructive" })
       }
     }
     fetchSeason()
 
     async function fetchWatchedEpisodes() {
-      const response = await getOneMarkedShow({ mediaId: params.id, seasonNumber: params.seasonNumber })
-      if (response.status !== 200) throw new Error(JSON.stringify(response))
-      const data = await response.json()
-      setWatchedEpisodes(data)
+      try {
+        const response = await getOneMarkedShow({ mediaId: params.id, seasonNumber: params.seasonNumber })
+        if (response.status !== 200) throw new Error(JSON.stringify(response))
+        const data = await response.json()
+        setWatchedEpisodes(data)
+      } catch (error: any) {
+        toast({ title: 'Failed to fetch watched episodes', description: error?.message, variant: "destructive" })
+      }
     }
   }, [params.id, params.seasonNumber])
 
