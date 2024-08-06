@@ -3,7 +3,7 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { triggerUpdateMovies, triggerUpdateShows } from "@/utils/fetch/cron"
 import { useEffect, useState } from "react";
 import { getUser, updateUser } from "@/utils/fetch/users";
-import { changePassword, Notification, updateUserForm } from "libs/types/src";
+import { changePassword, updateUserForm } from "libs/types/src";
 import { setting } from "@prisma/client";
 import { getSettings, updateSettings } from "@/utils/fetch/settings";
 import Cookies from "js-cookie";
