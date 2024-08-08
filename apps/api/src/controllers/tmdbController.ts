@@ -1,31 +1,32 @@
 import { Request, Response } from 'express';
-import { getAgregatedShowCreditsService, getMovieCredits, getMovieProviders, getMovieVideosService, getOnePeopleService, getShowProviders, getShowVideosService, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
+import { getAgregatedShowCreditsService, getMovieCredits, getMovieProvidersService, getMovieVideosService, getOnePeopleService, getShowProvidersService, getShowVideosService, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
 import { MediaType } from '@anytrack/type';
+import { Cast, VideosResponse } from 'moviedb-promise';
 
 export const getShowSeasons = async (req: Request, res: Response) => {
   try {
     const tmdbId = Number(req.query.tmdbId);
     const seasonNumber: number | undefined = req.query.season as unknown as number | undefined;
-    const show = await searchShowTmdbIdService(tmdbId);
+    const show = await searchShowTmdbIdService({ id: tmdbId });
     let seasons: any
-    if (!show || show.status_code === 34) {
+    if (!show) {
       throw new Error("Show not found");
     }
     if (seasonNumber) {
-      seasons = await searchShowSeasonsService(tmdbId, seasonNumber)
-      seasons.poster_path = `https://image.tmdb.org/t/p/original/${seasons.poster_path}`
+      seasons = await searchShowSeasonsService({ id: tmdbId, season_number: seasonNumber })
+      seasons.poster_path = `https://image.tmdb.org/t/p/original${seasons.poster_path}`;
       seasons.episodes.map((episode: any) => {
-        episode.still_path = `https://image.tmdb.org/t/p/original/${episode.still_path}`
-      })
-      if (seasons.status_code === 34) {
-        throw new Error("Show or season not found");
-      } null
+        episode.still_path = `https://image.tmdb.org/t/p/original${episode.still_path}`;
+      });
     } else {
       seasons = await Promise.all(show.seasons.map(async (season: any) => {
-        return await searchShowSeasonsService(tmdbId, season.season_number);
+        return await searchShowSeasonsService({ id: tmdbId, season_number: season.season_number });
       }));
-      seasons.map((season: any) => season.poster_path = `https://image.tmdb.org/t/p/original/${season.poster_path}`)
+      seasons.map((season: any) => {
+        season.poster_path = `https://image.tmdb.org/t/p/original${season.poster_path}`;
+      });
     }
+
     res.status(200).json(seasons);
   } catch (error) {
     console.log(error);
@@ -39,16 +40,13 @@ export const getCredits = async (req: Request, res: Response) => {
     const tmdbId = Number(req.query.tmdbId);
     let response;
     if (mediaType === 'show') {
-      response = await getAgregatedShowCreditsService(tmdbId)
+      response = await getAgregatedShowCreditsService({ id: tmdbId })
     } else if (mediaType === 'movie') {
-      response = await getMovieCredits(tmdbId)
+      response = await getMovieCredits({ id: tmdbId })
     }
-    if (await response.status_code === 34) {
-      throw new Error(`${mediaType} not found`);
-    }
-    await Promise.all(response.cast.map(async (credit: any) => {
-      credit.profile_path = `https://image.tmdb.org/t/p/original${credit.profile_path}`
-    }));
+    response.cast.map((cast: Cast) => {
+      cast.profile_path = `https://image.tmdb.org/t/p/original${cast.profile_path}`
+    })
     res.status(200).json(response);
   } catch (error) {
     console.log(error);
@@ -59,15 +57,7 @@ export const getCredits = async (req: Request, res: Response) => {
 export const getOnePeople = async (req: Request, res: Response) => {
   try {
     const peopleId = Number(req.params.peopleId);
-    const response = await getOnePeopleService(peopleId);
-    const people = await response.json();
-    if (await people.status_code === 34) {
-      throw new Error("People not found");
-    }
-    people.profile_path = `https://image.tmdb.org/t/p/original${people.profile_path}`;
-    people.combined_credits.cast.map((media: any) => {
-      media.poster_path = `https://image.tmdb.org/t/p/original${media.poster_path}`;
-    });
+    const people = await getOnePeopleService({ id: peopleId, append_to_response: 'combined_credits' });
     res.status(200).json(people);
   } catch (error) {
     console.log(error);
@@ -82,13 +72,11 @@ export const getWatchProviders = async (req: Request, res: Response) => {
     let providers
     switch (mediaType) {
       case MediaType.movie: {
-        const responseMovie = await getMovieProviders(tmdbId)
-        providers = await responseMovie.json()
+        providers = await getMovieProvidersService({ id: tmdbId })
         break;
       }
       case MediaType.show: {
-        const responseShow = await getShowProviders(tmdbId)
-        providers = await responseShow.json()
+        providers = await getShowProvidersService({ id: tmdbId })
         break;
       }
       default:
@@ -123,14 +111,13 @@ export const getMediaVideo = async (req: Request, res: Response) => {
   try {
     const mediaType: MediaType = req.query.mediaType as MediaType
     const tmdbId = Number(req.params.tmdbId)
-    let response
+    let trailers: VideosResponse
     if (mediaType === MediaType.movie) {
-      response = await getMovieVideosService(tmdbId)
+      trailers = await getMovieVideosService({ id: tmdbId })
     } else if (mediaType === MediaType.show) {
-      response = await getShowVideosService(tmdbId)
+      trailers = await getShowVideosService({ id: tmdbId })
     }
-    const trailers = await response.json()
-    res.status(200).json(await trailers)
+    res.status(200).json(trailers)
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });

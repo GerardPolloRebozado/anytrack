@@ -23,10 +23,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getName } from "country-list";
 import { toast } from "@/components/ui/use-toast";
+import { AggregateCreditsResponse, ShowResponse, TvSeasonResponse } from "moviedb-promise";
 
 function ShowDetails({ params }: { params: { id: number } }) {
-  const [show, setShow] = useState<any>();
-  const [credits, setCredits] = useState<any>();
+  const [show, setShow] = useState<ShowResponse>();
+  const [seasons, setSeasons] = useState<TvSeasonResponse[]>([]);
+  const [localId, setLocalId] = useState<number>(-1);
+  const [credits, setCredits] = useState<AggregateCreditsResponse>();
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [providers, setProviders] = useState<any>({});
@@ -38,7 +41,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
   const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
     defaultValues: {
-      mediaId: show?.localId,
+      mediaId: localId,
     }
   });
   const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
@@ -48,7 +51,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
         toast({ title: 'Review added successfully' })
         setReload(!reload)
         reviewForm.reset()
-        reviewForm.setValue('mediaId', show.localId)
+        reviewForm.setValue('mediaId', localId)
       } else {
         toast({ title: 'Failed to update settings', description: 'Failed to update settings', variant: "destructive" })
       }
@@ -69,18 +72,20 @@ function ShowDetails({ params }: { params: { id: number } }) {
     async function fetchShow() {
       try {
         const response = await getShow(`tmdb:${params.id}`);
-        response.body.year = response.body.first_air_date.split('-')[0];
-        const seasons = await getSeasons({ tmdbId: params.id });
-        const show = await response.body
-        show.seasons = seasons.body;
-        setShow(show);
-        if (await show?.localId) {
-          reviewForm.setValue('mediaId', await show.localId)
-          const response = await getManyShowReviews(await show.localId)
+        const body = await response.json();
+        const responseSeasons = await getSeasons({ tmdbId: params.id });
+        const seasons = await responseSeasons.json();
+        setSeasons(seasons);
+        setShow(body.show);
+        if (await body?.localId) {
+          setLocalId(await body.localId)
+          reviewForm.setValue('mediaId', await body.localId)
+          const response = await getManyShowReviews(await body.localId)
           setReviews(await response.json())
-          fetchWatchedEpisodes(await show.localId)
+          fetchWatchedEpisodes(await body.localId)
         }
       } catch (error: any) {
+        console.log(error);
         toast({ title: 'Error fetching show', variant: 'destructive' })
       }
     }
@@ -89,7 +94,8 @@ function ShowDetails({ params }: { params: { id: number } }) {
     async function fetchCredits() {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: MediaType.show });
-        setCredits(await response.json())
+        const credits: AggregateCreditsResponse = await response.json();
+        setCredits(credits);
       } catch (error: any) {
         toast({ title: 'Error fetching credits', variant: 'destructive' })
       }
@@ -129,16 +135,16 @@ function ShowDetails({ params }: { params: { id: number } }) {
     return 2
   }
 
-  function openSeason(e: any, tmdbId: string, seasonNumber: number) {
+  function openSeason(e: any, tmdbId: number, seasonNumber: number) {
     if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
     router.push(`/show/${tmdbId}/season/${seasonNumber}`)
   }
 
   async function deleteSeason({ tmdbId, season }: { tmdbId: number, season: number }) {
-    await deleteOneUserShow(show.localId, { season }).then(() => setReload(!reload))
+    await deleteOneUserShow(localId, { season }).then(() => setReload(!reload))
   }
 
-  async function markSeason({ tmdbId, season }: { tmdbId: string, season: number }) {
+  async function markSeason({ tmdbId, season }: { tmdbId: number, season: number }) {
     router.push(`/show/search/${tmdbId}?season=${season}`)
   }
 
@@ -149,20 +155,19 @@ function ShowDetails({ params }: { params: { id: number } }) {
           <div className="flex gap-x-12 ml-24 mt-8">
             <div className="w-[11dvw]">
               <Image
-                src={show.poster_path}
-                alt={show.name}
+                src={show.poster_path || ''}
+                alt={show.name || 'Show poster'}
                 width={0}
                 height={0}
                 sizes="100vw"
-                objectFit="cover"
                 className="w-[11dvw] h-auto rounded-lg"
               />
             </div>
             <div className='flex flex-col items-start w-[50dvw]'>
-              <h1 className="text-3xl font-bold">{show.title} {show.name} ({show.year})</h1>
-              <div className='text-l flex my-4'>{show.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</div>
+              <h1 className="text-3xl font-bold">{show.name} ({show.first_air_date?.split('-')[0] ?? ''})</h1>
+              {show.genres && <div className='text-l flex my-4'>{show.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</div>}
               <p> {show.number_of_seasons} Seasons</p>
-              <MediaScore score={show?.vote_average} source="tmdb" />
+              <MediaScore score={show?.vote_average || 0} source="tmdb" />
               <p className="my-4">{show.overview}</p>
               <Tabs defaultValue="seasons">
                 <TabsList>
@@ -175,9 +180,9 @@ function ShowDetails({ params }: { params: { id: number } }) {
                 <TabsContent value="seasons">
                   <Carousel opts={{ loop: true, align: "start" }}>
                     <CarouselContent className="w-[50dvw]">
-                      {show.seasons.map((season: any) => (
+                      {seasons?.map((season: any) => (
                         <CarouselItem key={season.id} className="basis-[8dvw] ml-4">
-                          <Card className="w-[8dvw] h-full" onClick={() => openSeason(event, show.id, season.season_number)} key={season.id}>
+                          <Card className="w-[8dvw] h-full" onClick={() => openSeason(event, show.id || localId, season.season_number)} key={season.id}>
                             <Image
                               src={season.poster_path}
                               alt={season.name}
@@ -191,7 +196,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                                 <p>Season {season.season_number}</p>
                                 {setIcon(season) === 0 ? <CircleCheck className='text-green-500' /> : setIcon(season) === 1 ? <Eye className="text-orange-500" /> : <CircleX className="text-red-500" />}
                               </div>
-                              {setIcon(season) === 0 && <Button onClick={() => deleteSeason({ tmdbId: show.id, season: season.season_number })}>Delete</Button> || <Button onClick={() => markSeason({ tmdbId: show.id, season: season.season_number })}>Mark</Button>}
+                              {setIcon(season) === 0 && <Button onClick={() => deleteSeason({ tmdbId: show.id || localId, season: season.season_number })}>Delete</Button> || <Button onClick={() => markSeason({ tmdbId: show.id || localId, season: season.season_number })}>Mark</Button>}
                             </div>
                           </Card>
                         </CarouselItem>
@@ -236,7 +241,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
                   </div>
-                  {show.localId && (
+                  {localId > 0 && (
                     <Form {...reviewForm}>
                       <form onSubmit={reviewForm.handleSubmit(submitReview)}>
                         <FormField
@@ -299,7 +304,6 @@ function ShowDetails({ params }: { params: { id: number } }) {
                                 alt={provider.provider_name + ' logo'}
                                 width={100}
                                 height={100}
-                                objectFit="cover"
                               />
                             </Card>
                           )

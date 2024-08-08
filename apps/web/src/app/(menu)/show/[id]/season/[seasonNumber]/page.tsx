@@ -19,13 +19,11 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
           tmdbId: params.id,
           season: params.seasonNumber
         })
-        if (response.status === 200) {
-          setSeason(response.body)
-          setTitle(`AnyTrack ${response.body.name}`)
-        } else {
-          toast({ title: 'Failed to fetch season', description: `Failed to fetch season`, variant: "destructive" })
-        }
+        const body = await response.json()
+        setSeason(body)
+        setTitle(`AnyTrack ${body.name}`)
       } catch (error: any) {
+        console.log(error)
         toast({ title: 'Failed to fetch season', description: error?.message, variant: "destructive" })
       }
     }
@@ -62,7 +60,7 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
                         width={350}
                         height={200}
                         sizes="100vw"
-                        className="rounded-lg"
+                        className="rounded-lg h-auto w-auto"
                         alt={`Episode ${episode.episode_number} - ${episode.name} still path`}
                       />
                       <div className="pr-4">

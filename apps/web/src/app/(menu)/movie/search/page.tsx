@@ -32,7 +32,7 @@ function SearchMovie() {
       </div>
       <div className="p-8 grid w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[1fr] gap-6 overflow-hidden">
         {movies.length > 0 && movies.map((movie: any) => (
-          <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
+          <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster_path} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
             <Link href={`/movie/search/${movie.id}`}>
               <Button>Mark</Button>
             </Link>

@@ -2,20 +2,16 @@ import Cookies from 'js-cookie';
 import buildUrl from '../buildUrl';
 
 export const getShow = async (query: string) => {
-  const response = await fetch(`/api/v1/show?term=${query}`, {
+  return await fetch(`/api/v1/show?term=${query}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Cookies.get('token')}`,
     },
   });
-  return {
-    status: response.status,
-    body: await response.json()
-  }
 }
 
 export const markShow = async (data: { tmdbId: number, watched: boolean, watchedDate?: string, season?: number, episode?: number }) => {
-  const response = await fetch(`/api/v1/show/mark`, {
+  return await fetch(`/api/v1/show/mark`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -23,10 +19,6 @@ export const markShow = async (data: { tmdbId: number, watched: boolean, watched
     },
     body: JSON.stringify(data)
   });
-  return {
-    status: response.status,
-    body: await response.json()
-  }
 }
 
 export const getManyMarkedShows = async (data: { watched?: boolean, groupBy?: string }) => {

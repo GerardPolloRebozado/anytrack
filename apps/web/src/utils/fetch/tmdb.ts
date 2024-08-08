@@ -4,16 +4,12 @@ import Cookies from "js-cookie";
 
 export const getSeasons = async ({ tmdbId, season }: { tmdbId: number, season?: number }) => {
   const url = buildUrl('/api/v1/tmdb/show/seasons', { tmdbId, season })
-  const response = await fetch(url, {
+  return await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Cookies.get('token')}`,
     },
   });
-  return {
-    status: response.status,
-    body: await response.json()
-  }
 }
 
 export const getCredits = async (data: { tmdbId: number, mediaType: string, season?: number }) => {
