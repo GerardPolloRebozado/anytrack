@@ -110,17 +110,23 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
                 ))
               )}
             </select>
-            {selectedSeason !== -1 && seasons[selectedSeason].episodes && (
-              <>
-                <label htmlFor="episode">Episode:</label>
-                <select id='episode' {...register('episode', { required: true })}>
-                  <option value={-1}>All</option>
-                  {seasons[selectedSeason].episodes.length > 0 && (
-                    seasons[selectedSeason].episodes.map((episode: any) => (
-                      <option key={episode.id} value={episode.episode_number}>{episode.episode_number}-{episode.name}</option>
-                    )))}
-                </select>
-              </>)}
+            {seasons.length > 0 &&
+              selectedSeason >= 0 &&
+              selectedSeason < seasons.length &&
+              (seasons[selectedSeason]?.episodes?.length ?? 0) > 0 && (
+                <>
+                  <label htmlFor="episode">Episode:</label>
+                  <select id='episode' {...register('episode', { required: true })}>
+                    <option value={-1}>All</option>
+                    {seasons[selectedSeason]?.episodes?.map((episode: any) => (
+                      <option key={episode.id} value={episode.episode_number}>
+                        {episode.episode_number}-{episode.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+
             <label htmlFor="watched">Watched or watchlist:</label>
             <select id="watched" {...register('watched', { required: true })}>
               <option value="true">Watched</option>
