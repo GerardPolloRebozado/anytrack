@@ -8,18 +8,22 @@ import Link from "next/link";
 import { MediaType } from "libs/types/src";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { MovieResultsResponse } from "moviedb-promise";
 
 function SearchMovie() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState<MovieResultsResponse>();
   async function fetchData(query: string) {
     try {
       if (!query) {
-        setMovies([]);
         return;
       }
       const response = await searchMovies(query)
       const body = await response.json();
-      if (await body.results) setMovies(await body.results);
+      if (await body.results) {
+        console.log(body);
+        setMovies(await body);
+      }
+
     } catch (error: any) {
       toast({ title: 'Failed to fetch movies', description: error?.message, variant: "destructive" })
     }
@@ -31,13 +35,16 @@ function SearchMovie() {
         <SearchBar fetchData={(query: string) => fetchData(query)} />
       </div>
       <div className="p-8 grid w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] auto-rows-[1fr] gap-6 overflow-hidden">
-        {movies.length > 0 && movies.map((movie: any) => (
-          <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster_path} year={movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
-            <Link href={`/movie/search/${movie.id}`}>
-              <Button>Mark</Button>
-            </Link>
-          </MovieCard>
-        ))}
+        {movies?.results && movies.results.length > 0 && movies.results.map((movie) => {
+          if (!movie.title || !movie.id) return null;
+          return (
+            <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster_path || ''} year={movie.release_date && movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
+              <Link href={`/movie/search/${movie.id}`}>
+                <Button>Mark</Button>
+              </Link>
+            </MovieCard>
+          );
+        })}
       </div>
     </>
   );

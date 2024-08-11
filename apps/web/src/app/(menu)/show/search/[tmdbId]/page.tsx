@@ -11,11 +11,11 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
-import { ShowResponse } from "moviedb-promise";
+import { ShowResponse, TvSeasonResponse } from "moviedb-promise";
 
 function MarkShowForm({ params }: { params: { tmdbId: number } }) {
   const searchParams = useSearchParams();
-  const [seasons, setSeasons] = useState<any[]>([]);
+  const [seasons, setSeasons] = useState<TvSeasonResponse[]>([]);
   const [show, setShow] = useState<ShowResponse>();
   const [selectedSeason, setSelectedSeason] = useState(-1);
   const season = Number(searchParams.get('season')) || -1
@@ -110,7 +110,7 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
                 ))
               )}
             </select>
-            {selectedSeason !== -1 && (
+            {selectedSeason !== -1 && seasons[selectedSeason].episodes && (
               <>
                 <label htmlFor="episode">Episode:</label>
                 <select id='episode' {...register('episode', { required: true })}>

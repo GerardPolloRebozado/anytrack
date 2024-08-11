@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { MediaType } from 'libs/types/src';
 
-export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string, title: string, poster: string, year: string, children?: React.ReactNode, mediaType: MediaType }) {
+export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string | number, title: string, poster: string, year: string | undefined, children?: React.ReactNode, mediaType: MediaType }) {
   const router = useRouter();
 
   const handleClick = async (e: any) => {
@@ -25,7 +25,7 @@ export default function MediaCard({ id, title, poster, year, children, mediaType
       </div>
       <div className={styles.details}>
         <h2 className={styles.title}>{title}</h2>
-        <p className={styles.year}>{new Date(year).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</p>
+        {year && <p className={styles.year}>{new Date(year).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</p>}
         <div className={styles.actions}>
           {children}
         </div>

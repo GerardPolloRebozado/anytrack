@@ -1,5 +1,6 @@
 import React from 'react';
 import { userMovie, movie, episode, userShow } from "@prisma/client"
+import { WatchProviderCountry, WatchProviderResponse } from "moviedb-promise"
 
 export type signupForm = {
   name: string;
@@ -97,3 +98,9 @@ export type MediaRuntimeChartData = {
 export type userMovieWithMovie = userMovie & { movie: movie }
 
 export type userShowWithEpisode = userShow & { episode: episode }
+
+export interface WatchProviderResponseList extends WatchProviderResponse {
+  results: {
+    [key: string]: WatchProviderCountry;
+  };
+}

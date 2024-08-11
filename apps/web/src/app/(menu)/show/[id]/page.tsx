@@ -9,7 +9,7 @@ import { getCredits, getMediaVideos, getSeasons, getWatchProviders } from "@/uti
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { MediaReviewForm, MediaType } from "libs/types/src";
+import { MediaReviewForm, MediaType, WatchProviderResponseList } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { updateReviewSchema } from "libs/joi/src";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getName } from "country-list";
 import { toast } from "@/components/ui/use-toast";
-import { AggregateCreditsResponse, ShowResponse, TvSeasonResponse } from "moviedb-promise";
+import { AggregateCreditsResponse, ShowResponse, TvSeasonResponse, Video, WatchProviderCountry } from "moviedb-promise";
 
 function ShowDetails({ params }: { params: { id: number } }) {
   const [show, setShow] = useState<ShowResponse>();
@@ -32,10 +32,10 @@ function ShowDetails({ params }: { params: { id: number } }) {
   const [credits, setCredits] = useState<AggregateCreditsResponse>();
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [providers, setProviders] = useState<any>({});
-  const [videos, setVideos] = useState<any>({})
+  const [providers, setProviders] = useState<WatchProviderResponseList['results']>({});
+  const [videos, setVideos] = useState<Video[]>()
   const [watchedEpisodes, setWatchedEpisodes] = useState<any[]>([]);
-  const [country, setCountry] = useState<string>('');
+  const [country, setCountry] = useState('');
   const router = useRouter();
   const colors = distinctColors({ count: show?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
   const reviewForm = useForm<MediaReviewForm>({
@@ -289,7 +289,7 @@ function ShowDetails({ params }: { params: { id: number } }) {
                       </SelectContent>
                     </Select>
                   )}
-                  {country && (
+                  {country && providers?.results && providers.results[country as keyof WatchProviderCountry] && (
                     <div className="flex gap-4 items-center mt-4 h-full w-full flex-wrap">
                       {Object.entries(providers[country]).map(([key, value]: [string, any]) => {
                         if (key === 'link') { return null; }
