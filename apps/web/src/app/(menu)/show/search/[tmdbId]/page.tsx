@@ -11,17 +11,17 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
+import { ShowResponse, TvSeasonResponse } from "moviedb-promise";
 
 function MarkShowForm({ params }: { params: { tmdbId: number } }) {
   const searchParams = useSearchParams();
-  const [seasons, setSeasons] = useState<any[]>([]);
-  const [show, setShow] = useState<any>(null)
+  const [seasons, setSeasons] = useState<TvSeasonResponse[]>([]);
+  const [show, setShow] = useState<ShowResponse>();
   const [selectedSeason, setSelectedSeason] = useState(-1);
-  const [result, setResult] = useState<boolean | null>(null);
   const season = Number(searchParams.get('season')) || -1
   const episode = Number(searchParams.get('episode')) || -1
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<markShowType>({
+  const { register, handleSubmit, watch, setValue } = useForm<markShowType>({
     resolver: joiResolver(markShowSchemaForm),
     defaultValues: {
       season,
@@ -46,31 +46,34 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
       season: season,
       episode: episode
     })
-    console.log(await response)
-    if (response.status === 200) {
-      setResult(true)
+    if (response.ok) {
+      toast({ title: 'Show marked succesfully' })
     } else {
-      setResult(false)
+      toast({ title: 'Error marking show' })
     }
   }
 
   useEffect(() => {
     async function fetchSeasons() {
-      const response = await getSeasons({ tmdbId: params.tmdbId });
-      if (response.status === 200) {
-        setSeasons(response.body);
+      try {
+        const response = await getSeasons({ tmdbId: params.tmdbId });
+        const body = response.json();
+        setSeasons(await body);
         setValue('season', season)
         setValue('episode', episode)
-      } else {
+      } catch (error: any) {
+        console.error(error);
         toast({ title: 'Error fetching seasons' })
       }
     }
     fetchSeasons();
     async function fetchShow() {
-      const response = await getShow('tmdb:' + params.tmdbId);
-      if (response.status === 200) {
-        setShow(await response.body);
-      } else {
+      try {
+        const response = await getShow('tmdb:' + params.tmdbId);
+        const body = await response.json();
+        setShow(await body.show);
+      } catch (error: any) {
+        console.error(error);
         toast({ title: 'Error fetching show' })
       }
     }
@@ -80,7 +83,7 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
 
 
   useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
+    const subscription = watch((value, { name }) => {
       if (name === 'season') {
         const seasonNumber = Number(value.season)
         setSelectedSeason(seasons.findIndex(season => season.season_number === seasonNumber));
@@ -94,7 +97,7 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
       {show && (
         <div className="flex flex-col items-center justify-center">
           <h1>Mark show {show?.name && show.name}</h1>
-          <Image src={show?.poster_path} alt={show.name} width={300} height={420} className='rounded-lg my-2' />
+          <Image src={show.poster_path || ''} alt={show.name || ''} width={300} height={420} className='rounded-lg my-2' />
           <form onSubmit={handleSubmit(onSubmit)} className=' flex flex-col'>
             <label htmlFor="watchedDate">Date watched:</label>
             <input type="date" id='watchedDate' {...register('watchedDate', { required: true })} />
@@ -107,17 +110,23 @@ function MarkShowForm({ params }: { params: { tmdbId: number } }) {
                 ))
               )}
             </select>
-            {selectedSeason !== -1 && (
-              <>
-                <label htmlFor="episode">Episode:</label>
-                <select id='episode' {...register('episode', { required: true })}>
-                  <option value={-1}>All</option>
-                  {seasons[selectedSeason].episodes.length > 0 && (
-                    seasons[selectedSeason].episodes.map((episode: any) => (
-                      <option key={episode.id} value={episode.episode_number}>{episode.episode_number}-{episode.name}</option>
-                    )))}
-                </select>
-              </>)}
+            {seasons.length > 0 &&
+              selectedSeason >= 0 &&
+              selectedSeason < seasons.length &&
+              (seasons[selectedSeason]?.episodes?.length ?? 0) > 0 && (
+                <>
+                  <label htmlFor="episode">Episode:</label>
+                  <select id='episode' {...register('episode', { required: true })}>
+                    <option value={-1}>All</option>
+                    {seasons[selectedSeason]?.episodes?.map((episode: any) => (
+                      <option key={episode.id} value={episode.episode_number}>
+                        {episode.episode_number}-{episode.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
+
             <label htmlFor="watched">Watched or watchlist:</label>
             <select id="watched" {...register('watched', { required: true })}>
               <option value="true">Watched</option>

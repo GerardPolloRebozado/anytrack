@@ -12,7 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 function MyShows() {
   const [watchedShows, setWatchedShows] = useState([])
   const [watchlistShows, setWatchlistShows] = useState([])
-  const [reload, setReload] = useState(false);
   const [agrupatedByGenre, setAgrupatedByGenre] = useState<any>();
   const pieColors = distinctColors({ count: watchedShows.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
 
@@ -48,7 +47,7 @@ function MyShows() {
       setWatchlistShows(await response.json())
     }
     fetchWatchlistShows()
-  }, [reload]);
+  }, []);
 
   return (
     <>

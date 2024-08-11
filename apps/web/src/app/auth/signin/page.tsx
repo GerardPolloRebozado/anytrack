@@ -2,7 +2,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { joiResolver } from '@hookform/resolvers/joi';
 import { loginUser } from '@/utils/fetch/users';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { loginUserSchema } from 'libs/joi/src';
@@ -11,9 +10,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import PasswordInput from '@/components/ui/passwordInput';
+import { toast } from '@/components/ui/use-toast';
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<loginForm>({
@@ -22,7 +21,7 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<loginForm> = async (data: loginForm) => {
     const response = await loginUser(data);
     if (response.status !== 200) {
-      setError(await response.body.error);
+      toast({ title: 'Error', description: JSON.stringify(response.body.error), variant: 'destructive' });
     } else {
       Cookies.set('token', response.body.token, { expires: 30 });
       Cookies.set('userId', response.body.userId, { expires: 30 });

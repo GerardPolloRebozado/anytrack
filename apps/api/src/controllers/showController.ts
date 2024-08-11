@@ -5,21 +5,22 @@ import prisma from "../services/prisma";
 export const searchShow = async (req: Request, res: Response) => {
   try {
     const term = req.query.term as string;
-    let data: any = {};
     if (term.startsWith("tmdb:")) {
-      data = await searchShowTmdbIdService(Number(term.split(":")[1]));
-      const localId = await prisma.show.findUnique({
+      const data = await searchShowTmdbIdService({ id: Number(term.split(":")[1]) });
+      data.poster_path = `https://image.tmdb.org/t/p/original${data.poster_path}`;
+      const show = await prisma.show.findUnique({
         where: {
           tmdbId: await data.id
         }
       });
-      if (localId) {
-        data.localId = localId.id;
-      }
+      res.status(200).json({ show: data, localId: show?.id });
     } else {
-      data = await searchShowService(term);
+      const data = await searchShowService({ query: term });
+      data.results.forEach((show: any) => {
+        show.poster_path = `https://image.tmdb.org/t/p/original${show.poster_path}`;
+      });
+      res.status(200).json({ show: data });
     }
-    res.status(200).json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error.message });
@@ -42,14 +43,13 @@ export const markShow = async (req: Request, res: Response) => {
     });
 
     if (!show) {
-      const tmdbShow = await searchShowTmdbIdService(tmdbId);
-      if (tmdbShow.status_code === 34) throw new Error("Show not found");
+      const tmdbShow = await searchShowTmdbIdService({ id: tmdbId });
       show = await prisma.show.create({
         data: {
           tmdbId: tmdbShow.id,
           title: tmdbShow.name,
           overview: tmdbShow.overview,
-          poster: `https://image.tmdb.org/t/p/original/${tmdbShow.poster_path}`,
+          poster: `https://image.tmdb.org/t/p/original${tmdbShow.poster_path}`,
           tmdbRating: tmdbShow.vote_average,
           releaseDate: new Date(tmdbShow.first_air_date),
           genre: {
@@ -62,7 +62,7 @@ export const markShow = async (req: Request, res: Response) => {
         }
       });
       const seasonsTmdb = await Promise.all(tmdbShow.seasons.map(async (season: any) => {
-        return await searchShowSeasonsService(tmdbId, season.season_number);
+        return await searchShowSeasonsService({ id: tmdbId, season_number: season.season_number });
       }));
 
       const seasonPromises = seasonsTmdb.map(async (season: any) => {
@@ -70,7 +70,7 @@ export const markShow = async (req: Request, res: Response) => {
           data: {
             seasonNumber: season.season_number,
             title: season.name,
-            poster: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
+            poster: `https://image.tmdb.org/t/p/original${season.poster_path}`,
             releaseDate: new Date(season.air_date),
             overview: season.overview,
             show: {

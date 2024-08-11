@@ -2,16 +2,18 @@ import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
 import { genre } from "@prisma/client";
+import { SearchMovieRequest } from "moviedb-promise";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
   try {
-    const query = req.query.query as string;
+    const query = req.query as unknown as SearchMovieRequest;
     const data = await searchMovieService(query);
     data.results.forEach((movie: any) => {
-      movie.poster = `https://image.tmdb.org/t/p/original/${movie.poster_path}`;
+      movie.poster_path = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
     });
     res.status(200).json(data);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -19,19 +21,16 @@ export const getMovieByTerm = async (req: Request, res: Response) => {
 export const getMoviebyId = async (req: Request, res: Response) => {
   try {
     const movieId = Number(req.params.movieId);
-    const data = await searchMoviebyIdService(movieId);
-    if (data.status_code === 34) return res.status(404).json({ error: "Movie not found" });
-    data.poster = `https://image.tmdb.org/t/p/original/${data.poster_path}`;
-    const localId = await prisma.movie.findUnique({
+    const data = await searchMoviebyIdService({ id: movieId });
+    data.poster_path = `https://image.tmdb.org/t/p/original${data.poster_path}`;
+    const localMovie = await prisma.movie.findUnique({
       where: {
         tmdbId: movieId,
       }
     });
-    if (localId) {
-      data.localId = localId.id;
-    }
-    res.status(200).json(data);
+    res.status(200).json({ movie: data, localId: localMovie?.id });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -49,15 +48,14 @@ export const markMovie = async (req: Request, res: Response) => {
       }
     });
     if (!movieItem) {
-      const movie = await searchMoviebyIdService(tmdbId);
+      const movie = await searchMoviebyIdService({ id: tmdbId });
       const genreData = await Promise.all(await movie.genres.map((genre: genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
-      if (movie.status_code === 34) throw new Error("Movie not found");
       movieItem = await prisma.movie.create({
         data: {
           tmdbId: movie.id,
           title: movie.title,
           overview: movie.overview,
-          poster: `https://image.tmdb.org/t/p/original/${movie.poster_path}`,
+          poster: `https://image.tmdb.org/t/p/original${movie.poster_path}`,
           tmdbRating: movie.vote_average,
           releaseDate: new Date(movie.release_date),
           runtime: movie.runtime,

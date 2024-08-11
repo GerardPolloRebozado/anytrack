@@ -22,21 +22,20 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
+import { CreditsResponse, MovieResponse, VideosResponse } from "moviedb-promise";
 
 function MovieDetails({ params }: { params: { id: number } }) {
-  const [movie, setMovie] = useState<any>();
+  const [movie, setMovie] = useState<MovieResponse>();
+  const [localId, setLocalId] = useState<number>(-1);
   const [error, setError] = useState('');
-  const [credits, setCredits] = useState<any>();
+  const [credits, setCredits] = useState<CreditsResponse>();
   const [reload, setReload] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [providers, setProviders] = useState<any>({});
-  const [videos, setVideos] = useState<any>({})
+  const [videos, setVideos] = useState<VideosResponse>({})
   const [country, setCountry] = useState<string>('');
   const reviewForm = useForm<MediaReviewForm>({
     resolver: joiResolver(updateReviewSchema),
-    defaultValues: {
-      mediaId: movie?.localId,
-    }
   });
   const colors = distinctColors({ count: movie?.genres?.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
   const submitReview: SubmitHandler<MediaReviewForm> = async (data: MediaReviewForm) => {
@@ -46,7 +45,9 @@ function MovieDetails({ params }: { params: { id: number } }) {
       toast({ title: 'Review added successfully' })
       setReload(!reload)
       reviewForm.reset()
-      reviewForm.setValue('mediaId', movie.localId)
+      if (localId > 0) {
+        reviewForm.setValue('mediaId', localId)
+      }
     } catch (error: any) {
       toast({ title: 'Error adding review', description: error.message, variant: 'destructive' })
     }
@@ -67,11 +68,12 @@ function MovieDetails({ params }: { params: { id: number } }) {
     async function fetchMovie() {
       try {
         const response = await searchMoviebyId(params.id);
-        const movie = await response.json();
-        setMovie(await movie)
-        if (await movie.localId) {
-          fetchReviews(await movie.localId)
-          reviewForm.setValue('mediaId', await movie?.localId)
+        const body = await response.json();
+        setMovie(await body.movie);
+        if (await body.localId) {
+          fetchReviews(await body.localId)
+          setLocalId(await body.localId)
+          reviewForm.setValue('mediaId', await body.localId)
         }
       } catch (error: any) {
         toast({ title: 'Failed to fetch movie', description: error.message, variant: 'destructive' })
@@ -83,9 +85,9 @@ function MovieDetails({ params }: { params: { id: number } }) {
       try {
         const response = await getCredits({ tmdbId: params.id, mediaType: 'movie' })
         const credits = await response.json()
-        console.log(credits)
         setCredits(await credits)
       } catch (error: any) {
+        console.log(error)
         toast({ title: 'Failed to fetch credits', description: error.message, variant: 'destructive' })
       }
     }
@@ -97,6 +99,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
         const body = await response.json()
         setProviders(await body)
       } catch (error: any) {
+        console.log(error)
         toast({ title: 'Failed to fetch providers', description: error.message, variant: 'destructive' })
       }
     }
@@ -106,8 +109,9 @@ function MovieDetails({ params }: { params: { id: number } }) {
       try {
         const response = await getMediaVideos(params.id, MediaType.movie)
         const videos = await response.json()
-        setVideos(videos.results)
+        setVideos(videos)
       } catch (error: any) {
+        console.log(error)
         toast({ title: 'Failed to fetch videos', description: error.message, variant: 'destructive' })
       }
     }
@@ -132,8 +136,8 @@ function MovieDetails({ params }: { params: { id: number } }) {
           <div className="flex gap-x-12 ml-24 mt-8">
             <div className="w-[11dvw]">
               <Image
-                src={movie.poster}
-                alt={movie.title}
+                src={movie.poster_path || ''}
+                alt={movie.title || 'Movie poster'}
                 width={0}
                 height={0}
                 sizes="100vw"
@@ -143,12 +147,14 @@ function MovieDetails({ params }: { params: { id: number } }) {
 
             </div>
             <div className='flex flex-col items-start w-[50dvw]'>
-              <h1 className="text-3xl font-bold">{movie.title} ({movie.release_date.split('-')[0]})</h1>
-              <p className='text-l flex my-4'>{movie.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</p>
+              <h1 className="text-3xl font-bold">{movie.title} ({movie.release_date && movie.release_date.split('-')[0]})</h1>
+              {movie.genres && (
+                <p className='text-l flex my-4'>{movie.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</p>
+              )}
               <p> {movie.runtime} min</p>
-              <MediaScore score={movie.vote_average} source="tmdb" />
+              <MediaScore score={movie.vote_average || 0} source="tmdb" />
               <p className="my-4">{movie.overview}</p>
-              <p>Directed by: </p> <p className="text-lg font-semibold mb-4">{credits && credits.crew.filter((crew: any) => crew.job === 'Director').map((director: any) => director.name).join(', ')}</p>
+              <p>Directed by: </p> <p className="text-lg font-semibold mb-4">{credits && credits.crew?.filter((crew: any) => crew.job === 'Director').map((director: any) => director.name).join(', ')}</p>
               <Tabs defaultValue="credits">
                 <TabsList>
                   <TabsTrigger value="credits">Credits</TabsTrigger>
@@ -157,7 +163,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                   <TabsTrigger value="videos">Videos</TabsTrigger>
                 </TabsList>
                 <TabsContent value="credits" className="flex gap-x-2">
-                  {credits && credits.length > 0 && (
+                  {credits && credits.cast && credits.cast.length > 0 && (
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
                         {(credits.cast.map((credit: any) => (
@@ -189,7 +195,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                       <ReviewCard key={review.id} review={review} setReload={() => setReload(!reload)} />
                     )) : <p>No reviews found</p>}
                   </div>
-                  {movie.localId && (
+                  {localId && (
                     <Form {...reviewForm}>
                       <form onSubmit={reviewForm.handleSubmit(submitReview)}>
                         <FormField
@@ -262,10 +268,10 @@ function MovieDetails({ params }: { params: { id: number } }) {
                   )}
                 </TabsContent>
                 <TabsContent value="videos">
-                  {videos && videos.length > 0 && (
+                  {videos && videos.results && videos.results.length > 0 && (
                     <Carousel opts={{ loop: true, align: "start" }} >
                       <CarouselContent className="w-[50dvw]">
-                        {(videos.map((video: any) => (
+                        {(videos.results.map((video: any) => (
                           <CarouselItem key={video.id} className="basis-[560px]">
                             <Card key={video.id} className="w-[560px] h-[315px]">
                               <iframe width="560" height="315" src={`https://www.youtube.com/embed/${video.key}`} title={video.name} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen className="p-1"></iframe>

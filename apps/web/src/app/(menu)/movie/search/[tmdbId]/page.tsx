@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
+import { MovieResult } from "moviedb-promise";
 
 
 function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
-  const [movie, setMovie] = useState<any>({})
+  const [movie, setMovie] = useState<MovieResult>();
   const form = useForm<markMovieType>({
     resolver: joiResolver(markMovieSchemaForm),
     defaultValues: {
@@ -27,7 +28,8 @@ function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
     async function fetchMovie() {
       try {
         const response = await searchMoviebyId(params.tmdbId)
-        setMovie(await response.json())
+        const body = await response.json()
+        setMovie(body.movie)
       } catch (error: any) {
         toast({ title: 'Failed to fetch movie', description: error?.message, variant: "destructive" })
       }
@@ -42,7 +44,7 @@ function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
       watchedDate: data.watchedDate,
     })
     if (response.status === 200) {
-      toast({ title: 'Movie marked', description: 'Movie marked successfully' })
+      toast({ title: 'Movie marked successfully' })
     } else {
       toast({ title: 'Failed to mark movie', description: 'Failed to mark movie', variant: "destructive" })
     }
@@ -53,7 +55,7 @@ function MarkMovieForm({ params }: { params: { tmdbId: number } }) {
     <>
       <div className='flex flex-col items-center justify-center'>
         <h1 className="text-3xl font-semibold">{movie?.title} - {movie?.release_date?.slice(0, 4)}</h1>
-        <Image src={movie.poster_path} alt={movie.title} width={300} height={420} className='rounded-lg my-2' />
+        <Image src={movie?.poster_path ?? ''} alt={movie?.title ?? ''} width={300} height={420} className='rounded-lg my-2' />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col'>
             <FormField

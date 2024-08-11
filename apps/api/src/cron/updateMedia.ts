@@ -12,13 +12,13 @@ export const updateMovies = new CronJob("0 0 */2 * *", async () => {
   });
   console.log(`Found ${movieItems.length} movies to update`);
   movieItems.forEach(async (movie) => {
-    const movieTmdb = await searchMoviebyIdService(movie.tmdbId);
+    const movieTmdb = await searchMoviebyIdService({ id: movie.tmdbId });
     const updatedMovie = await prisma.movie.update({
       where: { id: movie.id },
       data: {
         title: movieTmdb.original_title,
         overview: movieTmdb.overview,
-        poster: `https://image.tmdb.org/t/p/original/${movieTmdb.poster_path}`,
+        poster: `https://image.tmdb.org/t/p/original${movieTmdb.poster_path}`,
         tmdbRating: movieTmdb.vote_average,
         releaseDate: new Date(movieTmdb.release_date),
         runtime: movieTmdb.runtime,
@@ -44,13 +44,13 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
   });
   console.log(`Found ${showItems.length} shows to update`);
   showItems.forEach(async (show) => {
-    const showTmdb = await searchShowTmdbIdService(show.tmdbId);
+    const showTmdb = await searchShowTmdbIdService({ id: show.tmdbId });
     const updatedShow = await prisma.show.update({
       where: { id: show.id },
       data: {
         title: showTmdb.name,
         overview: showTmdb.overview,
-        poster: `https://image.tmdb.org/t/p/original/${showTmdb.poster_path}`,
+        poster: `https://image.tmdb.org/t/p/original${showTmdb.poster_path}`,
         tmdbRating: showTmdb.vote_average,
         releaseDate: new Date(showTmdb.first_air_date),
         genre: {
@@ -68,14 +68,14 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
         },
         update: {
           title: season.name,
-          poster: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
+          poster: `https://image.tmdb.org/t/p/original${season.poster_path}`,
           releaseDate: new Date(season.air_date),
           overview: season.overview,
         },
         create: {
           seasonNumber: season.season_number,
           title: season.name,
-          poster: `https://image.tmdb.org/t/p/original/${season.poster_path}`,
+          poster: `https://image.tmdb.org/t/p/original${season.poster_path}`,
           releaseDate: new Date(season.air_date),
           overview: season.overview,
           show: {
@@ -85,7 +85,7 @@ export const updateShows = new CronJob("0 0 * * *", async () => {
           }
         }
       });
-      const seasonTmdb = await searchShowSeasonsService(show.tmdbId, season.season_number);
+      const seasonTmdb = await searchShowSeasonsService({ id: show.tmdbId, season_number: season.season_number });
       seasonTmdb.episodes.forEach(async episode => {
         await prisma.episode.upsert({
           where: {
