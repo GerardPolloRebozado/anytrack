@@ -37,7 +37,7 @@ model movie {
   overview        String?
   runtime         Int?
   genreId         Int[]
-  genre           genre[]
+  genre           movieGenre[]
   userMovie       userMovie[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -77,7 +77,7 @@ model show {
   releaseDate    DateTime?
   overview       String?
   season         season[]
-  genre          genre[]
+  genre          movieGenre[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   userShow       userShow[]
@@ -142,11 +142,36 @@ model episode {
   @@unique([seasonId, episodeNumber])
 }
 
-model genre {
+model movieGenre {
   id    Int     @id @default(autoincrement())
   name  String  @unique
   movie movie[]
   show  show[]
+}
+
+model game {
+  id                 Int         @id @default(autoincrement())
+  totalRating        Float?
+  totalRatingCount   Int?
+  first_release_date DateTime?
+  category           String
+  genres             gameGenre[]
+  name               String
+  parentGameId       Int?
+  status             String
+  parentGame         game?       @relation("parentGame", fields: [parentGameId], references: [id])
+  game               game[]      @relation("parentGame")
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+
+}
+
+model gameGenre {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  url  String
+  game game[]
 }
 
 enum status {

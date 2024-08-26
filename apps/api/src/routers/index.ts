@@ -7,6 +7,7 @@ import cronRouter from "./cronRouter"
 import settingRouter from "./settingRouter"
 import mediaRouter from "./mediaRoute"
 import chartRouter from "./chartRouter"
+import igdbRouter from "./igdbRouter"
 
 const apiRouter = Router()
 
@@ -18,5 +19,6 @@ apiRouter.use('/media', mediaRouter)
 apiRouter.use('/cron', cronRouter)
 apiRouter.use("/setting", settingRouter)
 apiRouter.use('/chart', chartRouter)
+apiRouter.use('/igdb', igdbRouter)
 
 export default apiRouter;
