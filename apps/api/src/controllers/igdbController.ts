@@ -1,29 +1,29 @@
 import { Request, Response } from "express";
-import { getGameByIdService, getManyGenreService } from "../services/igdbService";
+import { getVGameByIdService, getManyVGameGenreService, getVGameGenreByIdService } from "../services/igdbService";
 
-export const getGameById = async (req: Request, res: Response) => {
+export const getVGameById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const game = await getGameByIdService(Number(id));
+    const game = await getVGameByIdService(Number(id));
     res.json(await game);
   } catch (error) {
     console.log(error);
   }
 }
 
-export const getGenreById = async (req: Request, res: Response) => {
+export const getVGameGenreById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const genre = await getGameByIdService(Number(id));
+    const genre = await getVGameGenreByIdService(Number(id));
     res.json(await genre);
   } catch (error) {
     console.log(error);
   }
 }
 
-export const getManyGenre = async (req: Request, res: Response) => {
+export const getVGameManyGenre = async (req: Request, res: Response) => {
   try {
-    const manyGenre = await getManyGenreService();
+    const manyGenre = await getManyVGameGenreService();
     res.json(await manyGenre);
   } catch (error) {
     console.log(error);

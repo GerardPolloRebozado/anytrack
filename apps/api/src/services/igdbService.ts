@@ -39,19 +39,19 @@ const checkExpiration = async () => {
 }
 
 
-export const getGameByIdService = async (id: number) => {
+export const getVGameByIdService = async (id: number) => {
   await checkExpiration();
   const game = await igdb().fields(['name', 'cover', 'summary', 'platforms', 'genres', 'release_dates', 'screenshots', 'videos', 'websites']).where(`id = ${id}`).request('/games');
   return game.data;
 }
 
-export const getManyGenreService = async () => {
+export const getManyVGameGenreService = async () => {
   await checkExpiration();
   const genre = await igdb().fields(['id', 'name']).request('/genres');
   return genre.data;
 }
 
-export const getGenreByIdService = async (id: number) => {
+export const getVGameGenreByIdService = async (id: number) => {
   await checkExpiration();
   const genre = await igdb().fields(['id', 'name']).where(`id = ${id}`).request('/genres');
   return genre.data;
