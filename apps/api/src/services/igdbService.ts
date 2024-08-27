@@ -1,4 +1,6 @@
 import igdb from "igdb-api-node";
+import { Game } from "igdb-api-types";
+import prisma from "./prisma";
 
 const bearerToken = {
   token: null,
@@ -41,8 +43,9 @@ const checkExpiration = async () => {
 
 export const getVGameByIdService = async (id: number) => {
   await checkExpiration();
-  const game = await igdb().fields(['name', 'cover', 'summary', 'platforms', 'genres', 'release_dates', 'screenshots', 'videos', 'websites']).where(`id = ${id}`).request('/games');
-  return game.data;
+  const res = await igdb().fields(['name', 'cover', 'summary', 'platforms', 'genres', 'release_dates']).where(`id = ${id}`).request('/games');
+  const game: Game = await res.data[0];
+  return game
 }
 
 export const getManyVGameGenreService = async () => {
@@ -52,7 +55,28 @@ export const getManyVGameGenreService = async () => {
 }
 
 export const getVGameGenreByIdService = async (id: number) => {
+  const genreDb = await prisma.gameGenre.findUnique({
+    where: {
+      id,
+    }
+  });
+  if (genreDb) {
+    return genreDb;
+  }
   await checkExpiration();
   const genre = await igdb().fields(['id', 'name']).where(`id = ${id}`).request('/genres');
-  return genre.data;
+  const newGenreDb = await prisma.gameGenre.create({
+    data: {
+      id: genre.data[0].id,
+      name: genre.data[0].name,
+    }
+  });
+  return newGenreDb;
+}
+
+export const getVGameCoverService = async (id: number) => {
+  await checkExpiration();
+  const cover = await igdb().fields(['image_id']).where(`id = ${id}`).request('/covers');
+  const url = `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${await cover.data[0].image_id}.jpg`
+  return url;
 }

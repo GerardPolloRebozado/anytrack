@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { CreditsResponse, MovieResponse, VideosResponse } from "moviedb-promise";
+import { MediaInfoContainer } from "@/components/mediaInfo";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<MovieResponse>();
@@ -131,9 +132,9 @@ function MovieDetails({ params }: { params: { id: number } }) {
           <Callout type="error">{error}</Callout>
         </div>
       )}
-      <>
+      <MediaInfoContainer>
         {movie && (
-          <div className="flex gap-x-12 ml-24 mt-8">
+          <>
             <div className="w-[11dvw]">
               <Image
                 src={movie.poster_path || ''}
@@ -286,10 +287,10 @@ function MovieDetails({ params }: { params: { id: number } }) {
 
               </Tabs>
             </div>
-          </div>
+          </>
         )}
-      </>
-    </ >
+      </MediaInfoContainer>
+    </>
   );
 }
 

@@ -170,7 +170,6 @@ model game {
 model gameGenre {
   id   Int    @id @default(autoincrement())
   name String @unique
-  url  String
   game game[]
 }
 
