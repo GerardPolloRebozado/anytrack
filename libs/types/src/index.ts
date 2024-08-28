@@ -211,3 +211,5 @@ export const gameStatusConverter = (status: number | string) => {
     }
   }
 }
+
+export type tag = { id: number, name: string }

@@ -43,7 +43,7 @@ const checkExpiration = async () => {
 
 export const getVGameByIdService = async (id: number) => {
   await checkExpiration();
-  const res = await igdb().fields(['name', 'cover', 'summary', 'platforms', 'genres', 'release_dates']).where(`id = ${id}`).request('/games');
+  const res = await igdb().fields(['name', 'cover', 'summary', 'genres', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at']).where(`id = ${id}`).request('/games');
   const game: Game = await res.data[0];
   return game
 }

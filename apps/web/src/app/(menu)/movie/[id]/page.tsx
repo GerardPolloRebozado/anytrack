@@ -8,7 +8,7 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import Chip from "@/components/Chip/Chip";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import ReviewCard from "@/components/ReviewCard/ReviewCard";
-import { MediaReviewForm, MediaType } from "libs/types/src";
+import { MediaReviewForm, MediaType, tag } from "libs/types/src";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { updateReviewSchema } from "libs/joi/src";
@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { CreditsResponse, MovieResponse, VideosResponse } from "moviedb-promise";
-import { MediaInfoContainer } from "@/components/mediaInfo";
+import { MediaInfoContainer, MediaInfoData, MediaInfoImage, MediaInfoTags, MediaInfoTitle, Overview } from "@/components/mediaInfo";
 
 function MovieDetails({ params }: { params: { id: number } }) {
   const [movie, setMovie] = useState<MovieResponse>();
@@ -135,27 +135,14 @@ function MovieDetails({ params }: { params: { id: number } }) {
       <MediaInfoContainer>
         {movie && (
           <>
-            <div className="w-[11dvw]">
-              <Image
-                src={movie.poster_path || ''}
-                alt={movie.title || 'Movie poster'}
-                width={0}
-                height={0}
-                sizes="100vw"
-                objectFit="cover"
-                className="w-[11dvw] h-auto rounded-lg"
-              />
-
-            </div>
-            <div className='flex flex-col items-start w-[50dvw]'>
-              <h1 className="text-3xl font-bold">{movie.title} ({movie.release_date && movie.release_date.split('-')[0]})</h1>
-              {movie.genres && (
-                <p className='text-l flex my-4'>{movie.genres.map((genre: any, index: number) => <Chip key={genre.id} bgColor={colors[index].hex()}>{genre.name}</Chip>)}</p>
-              )}
+            {movie.poster_path && <MediaInfoImage path={movie.poster_path} alt={` ${movie.title} Movie poster`} />}
+            <MediaInfoData>
+              <MediaInfoTitle>{movie.title} ({movie.release_date && movie.release_date.split('-')[0]})</MediaInfoTitle>
+              {movie.genres && <MediaInfoTags tags={movie.genres as tag[]} />}
               <p> {movie.runtime} min</p>
-              <MediaScore score={movie.vote_average || 0} source="tmdb" />
-              <p className="my-4">{movie.overview}</p>
-              <p>Directed by: </p> <p className="text-lg font-semibold mb-4">{credits && credits.crew?.filter((crew: any) => crew.job === 'Director').map((director: any) => director.name).join(', ')}</p>
+              {movie.vote_average && <MediaScore score={movie.vote_average} source="tmdb" />}
+              <Overview>{movie.overview}</Overview>
+              <p>Directed by: </p> <p className="text-lg font-medium mb-4">{credits && credits.crew?.filter((crew: any) => crew.job === 'Director').map((director: any) => director.name).join(', ')}</p>
               <Tabs defaultValue="credits">
                 <TabsList>
                   <TabsTrigger value="credits">Credits</TabsTrigger>
@@ -286,7 +273,7 @@ function MovieDetails({ params }: { params: { id: number } }) {
                 </TabsContent>
 
               </Tabs>
-            </div>
+            </MediaInfoData>
           </>
         )}
       </MediaInfoContainer>

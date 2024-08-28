@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Chip from "./Chip/Chip"
 import distinctColors from "distinct-colors"
+import { tag } from "@anytrack/type"
 
 export function MediaInfoContainer({ children }: { children: React.ReactNode }) {
   return (
@@ -43,12 +44,18 @@ export function MediaInfoTitle({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function MediaInfoTags({ tags }: { tags: { id: number, name: string }[] }) {
+export function MediaInfoTags({ tags }: { tags: tag[] }) {
   const colors = distinctColors({ count: tags.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
   return (
     <p className='text-l flex my-4'>{tags.map((tag: { id: number, name: string }, index: number) => (
       <Chip key={tag.id} bgColor={colors[index].hex()}>{tag.name}</Chip>
     ))}
     </p>
+  )
+}
+
+export function Overview({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="my-4">{children}</p>
   )
 }
