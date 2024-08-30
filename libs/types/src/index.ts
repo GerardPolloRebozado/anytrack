@@ -52,7 +52,7 @@ export enum state {
 export enum MediaType {
   show = 'show',
   movie = 'movie',
-  game = 'game'
+  game = 'game',
 }
 
 export type MediaReviewForm = {

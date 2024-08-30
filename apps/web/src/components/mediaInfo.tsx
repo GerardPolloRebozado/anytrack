@@ -61,9 +61,9 @@ export function Overview({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function MediaCardVertical({ children, id, mediaType, cover, name }: { children?: React.ReactNode, id: number, mediaType: MediaType, cover?: string | undefined, name: string }) {
+export function MediaInfoCard({ children, cover, name }: { children?: React.ReactNode, cover?: string | undefined, name: string}) {
   return (
-    <Card key={id} className="h-[23dvh] w-[8dvw]">
+    <Card className="h-full w-full">
       {cover && (
         <Image
           src={cover}
@@ -71,30 +71,9 @@ export function MediaCardVertical({ children, id, mediaType, cover, name }: { ch
           width={0}
           height={0}
           sizes="100vw"
-          className="rounded-lg w-[8dvw] h-[16dvh]"
+          className="rounded-lg w-full h-4/6"
         />)}
       <div className="p-2">
-        {children}
-      </div>
-    </Card>
-  )
-}
-
-
-export function MediaCardHorizontal({ children, id, mediaType, cover, name }: { children?: React.ReactNode, id: number, mediaType: MediaType, cover?: string | undefined, name: string }) {
-  return (
-    <Card key={id} className="h-[23dvh] w-full">
-      {cover && (
-        <Image
-          src={cover}
-          alt={name}
-          width={0}
-          height={0}
-          sizes="100vw"
-          className="rounded-lg h-[16dvh] w-[20dvw]"
-          style={{ objectFit: 'cover' }}
-        />)}
-      <div className="p-2 h-[5dvh]">
         {children}
       </div>
     </Card>
