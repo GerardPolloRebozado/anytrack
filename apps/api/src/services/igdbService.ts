@@ -1,5 +1,5 @@
 import igdb from "igdb-api-node";
-import { Game } from "igdb-api-types";
+import { Cover, Game } from "igdb-api-types";
 import prisma from "./prisma";
 
 const bearerToken = {
@@ -43,7 +43,7 @@ const checkExpiration = async () => {
 
 export const getVGameByIdService = async (id: number) => {
   await checkExpiration();
-  const res = await igdb().fields(['name', 'cover', 'summary', 'genres', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at']).where(`id = ${id}`).request('/games');
+  const res = await igdb().fields(['name', 'cover', 'summary', 'genres', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at', 'involved_companies', 'expansions', 'dlcs']).where(`id = ${id}`).request('/games');
   const game: Game = await res.data[0];
   return game
 }
@@ -76,7 +76,20 @@ export const getVGameGenreByIdService = async (id: number) => {
 
 export const getVGameCoverService = async (id: number) => {
   await checkExpiration();
-  const cover = await igdb().fields(['image_id']).where(`id = ${id}`).request('/covers');
-  const url = `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${await cover.data[0].image_id}.jpg`
-  return url;
+  const res = await igdb().fields(['image_id']).where(`id = ${id}`).request('/covers');
+  const cover = res.data[0] as Cover
+  cover.url = `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${await cover.image_id}.jpg`
+  return cover
+}
+
+export const getGameById = async (id: number) => {
+  await checkExpiration()
+  const gamesQuery = igdb().query('games', 'games-expanded')
+    .fields(['name', 'cover.image_id', 'cover.height', 'cover.width', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at', 'involved_companies', 'expansions', 'dlcs',
+      'dlcs.name', 'dlcs.cover.image_id', 'dlcs.cover.height', 'dlcs.cover.width', 'dlcs.summary', 'dlcs.first_release_date', 'dlcs.total_rating', 'dlcs.total_rating_count', 'dlcs.category', 'dlcs.parent_game', 'dlcs.status', 'dlcs.updated_at', 'dlcs.involved_companies', 'dlcs.expansions', 'dlcs.dlcs'
+
+    ])
+    .where(`id = ${id}`);
+  const res = await igdb().multi([gamesQuery]).request('/multiquery');
+  return await res.data[0].result[0];
 }

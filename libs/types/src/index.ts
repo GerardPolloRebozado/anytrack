@@ -1,6 +1,8 @@
 import React from 'react';
 import { userMovie, movie, episode, userShow } from "@prisma/client"
 import { WatchProviderCountry, WatchProviderResponse } from "moviedb-promise"
+import { Game } from "igdb-api-types";
+import { gameGenre } from "@prisma/client";
 
 export type signupForm = {
   name: string;
@@ -49,7 +51,8 @@ export enum state {
 
 export enum MediaType {
   show = 'show',
-  movie = 'movie'
+  movie = 'movie',
+  game = 'game'
 }
 
 export type MediaReviewForm = {
@@ -213,3 +216,5 @@ export const gameStatusConverter = (status: number | string) => {
 }
 
 export type tag = { id: number, name: string }
+
+export type VGameExpanded = Game & { genreDb?: gameGenre[], dlcsExpanded?: Game[] }

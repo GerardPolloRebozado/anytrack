@@ -1,7 +1,8 @@
 import Image from "next/image"
 import Chip from "./Chip/Chip"
 import distinctColors from "distinct-colors"
-import { tag } from "@anytrack/type"
+import { MediaType, tag } from "@anytrack/type"
+import { Card } from "./ui/card"
 
 export function MediaInfoContainer({ children }: { children: React.ReactNode }) {
   return (
@@ -57,5 +58,45 @@ export function MediaInfoTags({ tags }: { tags: tag[] }) {
 export function Overview({ children }: { children: React.ReactNode }) {
   return (
     <p className="my-4">{children}</p>
+  )
+}
+
+export function MediaCardVertical({ children, id, mediaType, cover, name }: { children?: React.ReactNode, id: number, mediaType: MediaType, cover?: string | undefined, name: string }) {
+  return (
+    <Card key={id} className="h-[23dvh] w-[8dvw]">
+      {cover && (
+        <Image
+          src={cover}
+          alt={name}
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="rounded-lg w-[8dvw] h-[16dvh]"
+        />)}
+      <div className="p-2">
+        {children}
+      </div>
+    </Card>
+  )
+}
+
+
+export function MediaCardHorizontal({ children, id, mediaType, cover, name }: { children?: React.ReactNode, id: number, mediaType: MediaType, cover?: string | undefined, name: string }) {
+  return (
+    <Card key={id} className="h-[23dvh] w-full">
+      {cover && (
+        <Image
+          src={cover}
+          alt={name}
+          width={0}
+          height={0}
+          sizes="100vw"
+          className="rounded-lg h-[16dvh] w-[20dvw]"
+          style={{ objectFit: 'cover' }}
+        />)}
+      <div className="p-2 h-[5dvh]">
+        {children}
+      </div>
+    </Card>
   )
 }
