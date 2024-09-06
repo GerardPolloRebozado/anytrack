@@ -7,7 +7,7 @@ import { MediaType } from 'libs/types/src';
 
 export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string | number, title: string, poster: string, year: string | undefined, children?: React.ReactNode, mediaType: MediaType }) {
   const router = useRouter();
-
+  console.log(year)
   const handleClick = async (e: any) => {
     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
       router.push(`/${mediaType}/${id}`);
@@ -25,7 +25,8 @@ export default function MediaCard({ id, title, poster, year, children, mediaType
       </div>
       <div className={styles.details}>
         <h2 className={styles.title}>{title}</h2>
-        {year && <p className={styles.year}>{new Date(year).toLocaleDateString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric' })}</p>}
+        {year && (
+          <p className={styles.year}>{year}</p>)}
         <div className={styles.actions}>
           {children}
         </div>

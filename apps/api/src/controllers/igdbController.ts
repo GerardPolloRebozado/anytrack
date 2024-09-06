@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { getManyVGameGenreService, getVGameGenreByIdService, getGameById } from "../services/igdbService";
+import { getManyVGameGenreService, getVGameGenreByIdService, getVGameByIdService, getVGameByNameService } from "../services/igdbService";
 
 export const getVGameById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const game = await getGameById(Number(id));
+    const game = await getVGameByIdService(Number(id));
     res.json(game);
   } catch (error) {
     console.log(error);
@@ -30,5 +30,16 @@ export const getVGameManyGenre = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: error });
+  }
+}
+
+export const getVGameByName = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.params;
+    const manyGames = await getVGameByNameService(name)
+    res.status(200).json(await manyGames)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error: error })
   }
 }

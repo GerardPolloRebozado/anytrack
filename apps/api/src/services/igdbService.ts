@@ -1,5 +1,5 @@
 import igdb from "igdb-api-node";
-import { Cover, Game } from "igdb-api-types";
+import { Cover } from "igdb-api-types";
 import prisma from "./prisma";
 
 const bearerToken = {
@@ -40,14 +40,6 @@ const checkExpiration = async () => {
   }
 }
 
-
-export const getVGameByIdService = async (id: number) => {
-  await checkExpiration();
-  const res = await igdb().fields(['name', 'cover', 'summary', 'genres', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at', 'involved_companies', 'expansions', 'dlcs']).where(`id = ${id}`).request('/games');
-  const game: Game = await res.data[0];
-  return game
-}
-
 export const getManyVGameGenreService = async () => {
   await checkExpiration();
   const genre = await igdb().fields(['id', 'name']).request('/genres');
@@ -82,7 +74,7 @@ export const getVGameCoverService = async (id: number) => {
   return cover
 }
 
-export const getGameById = async (id: number) => {
+export const getVGameByIdService = async (id: number) => {
   await checkExpiration()
   const gamesQuery = igdb().query('games', 'games-expanded')
     .fields(['name', 'cover.image_id', 'cover.height', 'cover.width', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at',
@@ -95,4 +87,11 @@ export const getGameById = async (id: number) => {
     .where(`id = ${id}`);
   const res = await igdb().multi([gamesQuery]).request('/multiquery');
   return await res.data[0].result[0];
+}
+
+export const getVGameByNameService = async (search: string) => {
+  await checkExpiration()
+  const res = await igdb().search(search).fields(['name', 'cover.image_id','first_release_date']).request('/games');
+  const manyGames = await res.data
+  return await manyGames
 }

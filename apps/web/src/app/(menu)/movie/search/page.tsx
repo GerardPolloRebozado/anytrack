@@ -1,7 +1,7 @@
 'use client'
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { useState } from "react";
-import MovieCard from "@/components/MediaCard/MediaCard";
+import MediaCard from "@/components/MediaCard/MediaCard";
 import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { searchMovies } from "@/utils/fetch/movies";
 import Link from "next/link";
@@ -38,11 +38,11 @@ function SearchMovie() {
         {movies?.results && movies.results.length > 0 && movies.results.map((movie) => {
           if (!movie.title || !movie.id) return null;
           return (
-            <MovieCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster_path || ''} year={movie.release_date && movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
+            <MediaCard key={movie.id} id={movie.id} title={movie.title} poster={movie.poster_path || ''} year={movie.release_date && movie.release_date.split('-')[0]} mediaType={MediaType.movie}>
               <Link href={`/movie/search/${movie.id}`}>
                 <Button>Mark</Button>
               </Link>
-            </MovieCard>
+            </MediaCard>
           );
         })}
       </div>

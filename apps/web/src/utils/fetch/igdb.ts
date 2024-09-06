@@ -8,3 +8,12 @@ export const getVGameById = async (id: number) => {
     },
   })
 }
+
+export const getVGameByName = async (name: string) => {
+  return await fetch(`/api/v1/igdb/game/search/${name}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${Cookies.get('token')}`,
+    },
+  })
+}

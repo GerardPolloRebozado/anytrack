@@ -1,6 +1,6 @@
 import DropDownMenu from '@/components/DropdownMenu/DropDownMenu';
 import GoBack from '@/components/GoBack/GoBack';
-import { Clapperboard, Tv } from 'lucide-react';
+import { Clapperboard, Gamepad2, Tv } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -23,6 +23,14 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
           </Link>
           <Link href="/show">
             <p>My Shows</p>
+          </Link>
+        </DropDownMenu>
+        <DropDownMenu text='Games' icon={<Gamepad2 color='var(--gameColor)' />} menuKey='dropdownShows'>
+          <Link href="/game/search">
+            <p>Search Games</p>
+          </Link>
+          <Link href="/game">
+            <p>My Games</p>
           </Link>
         </DropDownMenu>
         <Link href="/settings" className='w-[70%] flex flex-row items-center justify-center m-2 p-2 hover:bg-accent rounded-lg'>Settings</Link>

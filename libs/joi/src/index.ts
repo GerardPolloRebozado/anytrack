@@ -2,7 +2,6 @@ import Joi from "joi";
 export { Joi };
 import { tlds } from "@hapi/tlds";
 import { MediaType } from "@anytrack/type";
-import { group } from "console";
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
