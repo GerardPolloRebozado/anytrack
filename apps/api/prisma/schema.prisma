@@ -19,6 +19,7 @@ model user {
   userMovie       userMovie[]
   userShowReview  userShowReview[]
   userMovieReview userMovieReview[]
+  userGame        userGame[]
 }
 
 model setting {
@@ -150,27 +151,36 @@ model movieGenre {
 }
 
 model game {
-  id                 Int         @id @default(autoincrement())
-  totalRating        Float?
-  totalRatingCount   Int?
-  first_release_date DateTime?
-  category           String
-  genres             gameGenre[]
-  name               String
-  parentGameId       Int?
-  status             String
-  parentGame         game?       @relation("parentGame", fields: [parentGameId], references: [id])
-  game               game[]      @relation("parentGame")
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-
-
+  id               Int         @id
+  name             String
+  status           String
+  genres           gameGenre[]
+  category         String
+  totalRating      Float?
+  totalRatingCount Int?
+  firstReleaseDate DateTime?
+  parentGameId     Int?
+  parentGame       game?       @relation("parentGame", fields: [parentGameId], references: [id])
+  game             game[]      @relation("parentGame")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  userGame         userGame[]
 }
 
 model gameGenre {
   id   Int    @id @default(autoincrement())
   name String @unique
   game game[]
+}
+
+model userGame {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        user      @relation(fields: [userId], references: [id])
+  gameId      Int
+  game        game      @relation(fields: [gameId], references: [id])
+  startedTime DateTime?
+  finalTime   DateTime?
 }
 
 enum status {

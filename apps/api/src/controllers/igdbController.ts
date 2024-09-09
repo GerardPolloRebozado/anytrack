@@ -4,7 +4,8 @@ import { getManyVGameGenreService, getVGameGenreByIdService, getVGameByIdService
 export const getVGameById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const game = await getVGameByIdService(Number(id));
+    const lessData = Boolean(req.query.lessData)
+    const game = await getVGameByIdService(Number(id), lessData);
     res.json(game);
   } catch (error) {
     console.log(error);

@@ -74,24 +74,34 @@ export const getVGameCoverService = async (id: number) => {
   return cover
 }
 
-export const getVGameByIdService = async (id: number) => {
+export const getVGameByIdService = async (id: number, lessData = false) => {
   await checkExpiration()
-  const gamesQuery = igdb().query('games', 'games-expanded')
-    .fields(['name', 'cover.image_id', 'cover.height', 'cover.width', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at',
-      'dlcs.name', 'dlcs.cover.image_id', 'dlcs.cover.height', 'dlcs.cover.width', 'dlcs.summary', 'dlcs.first_release_date', 'dlcs.total_rating', 'dlcs.total_rating_count', 'dlcs.category', 'dlcs.parent_game', 'dlcs.status', 'dlcs.updated_at', 'dlcs.involved_companies', 'dlcs.expansions', 'dlcs.dlcs',
-      'involved_companies.company', 'involved_companies.developer', 'involved_companies.porting', 'involved_companies.publisher', 'involved_companies.supporting',
-      'involved_companies.company.name', 'involved_companies.company.logo.image_id', 'involved_companies.company.logo.height', 'involved_companies.company.logo.width',
-      'expansions.name', 'expansions.cover.image_id', 'expansions.cover.height', 'expansions.cover.width', 'expansions.summary', 'expansions.first_release_date', 'expansions.total_rating', 'expansions.total_rating_count', 'expansions.category', 'expansions.parent_game', 'expansions.status', 'expansions.updated_at', 'expansions.involved_companies', 'expansions.dlcs', 'expansions.expansions',
-
-    ])
-    .where(`id = ${id}`);
+  let gamesQuery
+  switch (lessData) {
+    case false: {
+      gamesQuery = igdb().query('games', 'games-expanded')
+        .fields(['name', 'cover.image_id', 'cover.height', 'cover.width', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'updated_at',
+          'dlcs.name', 'dlcs.cover.image_id', 'dlcs.cover.height', 'dlcs.cover.width', 'dlcs.summary', 'dlcs.first_release_date', 'dlcs.total_rating', 'dlcs.total_rating_count', 'dlcs.category', 'dlcs.parent_game', 'dlcs.status', 'dlcs.updated_at', 'dlcs.involved_companies', 'dlcs.expansions', 'dlcs.dlcs',
+          'involved_companies.company', 'involved_companies.developer', 'involved_companies.porting', 'involved_companies.publisher', 'involved_companies.supporting',
+          'involved_companies.company.name', 'involved_companies.company.logo.image_id', 'involved_companies.company.logo.height', 'involved_companies.company.logo.width',
+          'expansions.name', 'expansions.cover.image_id', 'expansions.cover.height', 'expansions.cover.width', 'expansions.summary', 'expansions.first_release_date', 'expansions.total_rating', 'expansions.total_rating_count', 'expansions.category', 'expansions.parent_game', 'expansions.status', 'expansions.updated_at', 'expansions.involved_companies', 'expansions.dlcs', 'expansions.expansions',
+        ])
+        .where(`id = ${id}`);
+      break;
+    }
+    case true: {
+      gamesQuery = igdb().query('games', 'games-expanded')
+        .fields(['name', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status']).where(`id = ${id}`);
+      break;
+    }
+  }
   const res = await igdb().multi([gamesQuery]).request('/multiquery');
   return await res.data[0].result[0];
 }
 
 export const getVGameByNameService = async (search: string) => {
   await checkExpiration()
-  const res = await igdb().search(search).fields(['name', 'cover.image_id','first_release_date']).request('/games');
+  const res = await igdb().search(search).fields(['name', 'cover.image_id', 'first_release_date']).request('/games');
   const manyGames = await res.data
   return await manyGames
 }

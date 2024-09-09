@@ -38,7 +38,7 @@ function SearchGame() {
                     if (!game.name || !game.id) return null;
                     return (
                         <MediaCard key={game.id} id={game.id} title={game.name} poster={`https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${(game.cover as Cover)?.image_id}.jpg` || ''} year={String(game.first_release_date && new Date(game.first_release_date * 1000).toLocaleDateString())} mediaType={MediaType.game}>
-                            <Link href={`/movie/search/${game.id}`}>
+                            <Link href={`/game/search/${game.id}`}>
                                 <Button>Mark</Button>
                             </Link>
                         </MediaCard>

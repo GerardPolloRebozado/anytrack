@@ -52,7 +52,7 @@ export enum state {
 export enum MediaType {
   show = 'show',
   movie = 'movie',
-  game = 'game',
+  vgame = 'vgame',
 }
 
 export type MediaReviewForm = {
@@ -150,25 +150,6 @@ export enum gameAgeRating {
   ACB_RC = 39
 }
 
-
-export enum gameCategory {
-  main_game = 0,
-  dlc_addon = 1,
-  expansion = 2,
-  bundle = 3,
-  standalone_expansion = 4,
-  mod = 5,
-  episode = 6,
-  season = 7,
-  remake = 8,
-  remaster = 9,
-  expanded_game = 10,
-  port = 11,
-  fork = 12,
-  pack = 13,
-  update = 14,
-}
-
 export const gameStatusConverter = (status: number | string) => {
   if (typeof status === 'string') {
     switch (status) {
@@ -215,6 +196,86 @@ export const gameStatusConverter = (status: number | string) => {
   }
 }
 
+export const gameCategoryConverter = (category: number | string) => {
+  if (typeof category === 'string') {
+    switch (category) {
+      case 'main_game':
+        return 0;
+      case 'dlc_addon':
+        return 1;
+      case 'expansion':
+        return 2;
+      case 'bundle':
+        return 3;
+      case 'standalone_expansion':
+        return 4;
+      case 'mod':
+        return 5;
+      case 'episode':
+        return 6;
+      case 'season':
+        return 7;
+      case 'remake':
+        return 8;
+      case 'remaster':
+        return 9;
+      case 'expanded_game':
+        return 10;
+      case 'port':
+        return 11;
+      case 'fork':
+        return 12;
+      case 'pack':
+        return 13;
+      case 'update':
+        return 14;
+      default:
+        return 0;
+    }
+  } else {
+    switch (category) {
+      case 0:
+        return 'main_game';
+      case 1:
+        return 'dlc_addon';
+      case 2:
+        return 'expansion';
+      case 3:
+        return 'bundle';
+      case 4:
+        return 'standalone_expansion';
+      case 5:
+        return 'mod';
+      case 6:
+        return 'episode';
+      case 7:
+        return 'season';
+      case 8:
+        return 'remake';
+      case 9:
+        return 'remaster';
+      case 10:
+        return 'expanded_game';
+      case 11:
+        return 'port';
+      case 12:
+        return 'fork';
+      case 13:
+        return 'pack';
+      case 14:
+        return 'update';
+      default:
+        return 'main_game';
+    }
+  }
+}
+
 export type tag = { id: number, name: string }
 
 export type VGameExpanded = Game & { genreDb?: gameGenre[], dlcsExpanded?: Game[] }
+
+export type markVGameType = {
+  id: number
+  startedTime?: Date,
+  finishedTime?: Date,
+}

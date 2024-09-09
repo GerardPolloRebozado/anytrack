@@ -8,6 +8,7 @@ import settingRouter from "./settingRouter"
 import mediaRouter from "./mediaRoute"
 import chartRouter from "./chartRouter"
 import igdbRouter from "./igdbRouter"
+import vGameRouter from "./gameRouter"
 
 const apiRouter = Router()
 
@@ -20,5 +21,6 @@ apiRouter.use('/cron', cronRouter)
 apiRouter.use("/setting", settingRouter)
 apiRouter.use('/chart', chartRouter)
 apiRouter.use('/igdb', igdbRouter)
+apiRouter.use('/vgame', vGameRouter)
 
 export default apiRouter;
