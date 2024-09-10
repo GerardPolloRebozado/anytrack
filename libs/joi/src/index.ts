@@ -165,5 +165,5 @@ export const markVGameSchemaForm = Joi.object({
     is: Joi.exist(),
     then: Joi.required()
   }),
-  finalTime: Joi.date().max("now").optional,
+  finishedTime: Joi.date().max("now").optional(),
 })

@@ -6,16 +6,17 @@ import { gameCategoryConverter, gameStatusConverter } from "@anytrack/type";
 
 export const markVGame = async (req: Request, res: Response) => {
     try {
-        const { gameId, startedTime, finalTime } = req.body
+        const { startedTime, finishedTime } = req.body
+        const id = Number(req.body.id)
         const userId = res.locals.user.id
         const gameDb = await prisma.game.findUnique({
             where: {
-                id: gameId
+                id,
             }
         })
 
         if (!gameDb) {
-            const igdbGame: Game = await getVGameByIdService(gameId, true)
+            const igdbGame: Game = await getVGameByIdService(id, true)
             if (!igdbGame) {
                 return res.status(404).json({ message: "Game not found" })
             }
@@ -71,9 +72,9 @@ export const markVGame = async (req: Request, res: Response) => {
         const markedGame = await prisma.userGame.create({
             data: {
                 userId,
-                gameId,
+                gameId: id,
                 startedTime,
-                finalTime,
+                finishedTime,
             }
         })
         res.status(200).json(markedGame)

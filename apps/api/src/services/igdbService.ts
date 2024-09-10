@@ -91,7 +91,7 @@ export const getVGameByIdService = async (id: number, lessData = false) => {
     }
     case true: {
       gamesQuery = igdb().query('games', 'games-expanded')
-        .fields(['name', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status']).where(`id = ${id}`);
+        .fields(['name', 'summary', 'genres.id', 'genres.name', 'first_release_date', 'total_rating', 'total_rating_count', 'category', 'parent_game', 'status', 'cover.image_id', 'cover.height', 'cover.width']).where(`id = ${id}`);
       break;
     }
   }

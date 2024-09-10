@@ -275,7 +275,6 @@ export type tag = { id: number, name: string }
 export type VGameExpanded = Game & { genreDb?: gameGenre[], dlcsExpanded?: Game[] }
 
 export type markVGameType = {
-  id: number
   startedTime?: Date,
   finishedTime?: Date,
 }

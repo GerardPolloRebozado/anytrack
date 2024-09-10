@@ -180,7 +180,7 @@ model userGame {
   gameId      Int
   game        game      @relation(fields: [gameId], references: [id])
   startedTime DateTime?
-  finalTime   DateTime?
+  finishedTime   DateTime?
 }
 
 enum status {
