@@ -74,7 +74,7 @@ export const getVGameCoverService = async (id: number) => {
   return cover
 }
 
-export const getVGameByIdService = async (id: number, lessData = false) => {
+export const getVGameByIdService = async (id: number, lessData) => {
   await checkExpiration()
   let gamesQuery
   switch (lessData) {

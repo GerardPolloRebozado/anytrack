@@ -20,7 +20,6 @@ function SearchMovie() {
       const response = await searchMovies(query)
       const body = await response.json();
       if (await body.results) {
-        console.log(body);
         setMovies(await body);
       }
 

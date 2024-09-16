@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { getManyVGameGenreService, getVGameGenreByIdService, getVGameByIdService, getVGameByNameService } from "../services/igdbService";
+import { parseBoolean } from "@anytrack/utils";
 
 export const getVGameById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const lessData = Boolean(req.query.lessData)
+    const lessData = parseBoolean(String(req.query.lessData));
     const game = await getVGameByIdService(Number(id), lessData);
     res.json(game);
   } catch (error) {

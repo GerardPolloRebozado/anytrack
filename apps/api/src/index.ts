@@ -14,7 +14,6 @@ updateShows.start()
 updateMovies.fireOnTick()
 updateShows.fireOnTick()
 app.use('/api/v1', apiRouter)
-
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`)
 })

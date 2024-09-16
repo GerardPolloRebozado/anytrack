@@ -246,7 +246,6 @@ function MovieDetails({ params }: { params: { id: number } }) {
                                 alt={provider.provider_name + ' logo'}
                                 width={100}
                                 height={100}
-                                objectFit="cover"
                               />
                             </Card>
                           )

@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Chip from "./Chip/Chip"
 import distinctColors from "distinct-colors"
-import { MediaType, tag } from "@anytrack/type"
+import { MediaType, tag } from '@anytrack/types'
 import { Card } from "./ui/card"
 
 export function MediaInfoContainer({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,6 @@ export function MediaInfoImage({ path, alt }: { path: string, alt: string }) {
           width={0}
           height={0}
           sizes="100vw"
-          objectFit="cover"
           className="w-[11dvw] h-auto rounded-lg"
         />
       </div>
@@ -61,7 +60,7 @@ export function Overview({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function MediaInfoCard({ children, cover, name }: { children?: React.ReactNode, cover?: string | undefined, name: string}) {
+export function MediaInfoCard({ children, cover, name }: { children?: React.ReactNode, cover?: string | undefined, name: string }) {
   return (
     <Card className="h-full w-full">
       {cover && (

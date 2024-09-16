@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getAgregatedShowCreditsService, getMovieCredits, getMovieProvidersService, getMovieVideosService, getOnePeopleService, getShowProvidersService, getShowVideosService, searchShowSeasonsService, searchShowTmdbIdService } from '../services/tmdbService';
-import { MediaType } from '@anytrack/type';
+import { MediaType } from '@anytrack/types';
 import { Cast, VideosResponse } from 'moviedb-promise';
 
 export const getShowSeasons = async (req: Request, res: Response) => {

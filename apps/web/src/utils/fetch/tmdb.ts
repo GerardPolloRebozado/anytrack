@@ -1,4 +1,4 @@
-import { MediaType } from "@anytrack/type";
+import { MediaType } from '@anytrack/types';
 import buildUrl from "../buildUrl";
 import Cookies from "js-cookie";
 

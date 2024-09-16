@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { MediaInfoCard, MediaInfoContainer, MediaInfoData, MediaInfoImage, MediaInfoTags, MediaInfoTitle, Overview } from "@/components/mediaInfo";
 import MediaScore from "@/components/MediaScore/MediaScore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { VGameExpanded } from "@anytrack/type";
+import { VGameExpanded } from '@anytrack/types';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Link from "next/link";
 

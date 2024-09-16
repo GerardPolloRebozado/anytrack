@@ -13,10 +13,12 @@ import withProtectedRoute from "@/components/Hocs/withProtectedRoute";
 import { Game } from "igdb-api-types";
 import { getVGameById } from "@/utils/fetch/igdb";
 import { markVGame } from "@/utils/fetch/game";
+import { useRouter } from "next/navigation";
 
 
 function MarkGameForm({ params }: { params: { id: number } }) {
     const [vGame, setVGame] = useState<Game>();
+    const router = useRouter()
     const form = useForm<markVGameType>({
         resolver: joiResolver(markVGameSchemaForm)
     })
@@ -38,6 +40,11 @@ function MarkGameForm({ params }: { params: { id: number } }) {
         const response = await markVGame(params.id, data)
         if (response.status === 200) {
             toast({ title: 'Game marked successfully' })
+            setTimeout(() => {
+                router.push('/game')
+            }, 1000)
+        } else if (response.status === 409) {
+            toast({ title: 'Game already marked', description: 'This game is already added to your pending games', variant: "destructive" })
         } else {
             toast({ title: 'Failed to mark game', description: 'Failed to mark game', variant: "destructive" })
         }
@@ -81,6 +88,7 @@ function MarkGameForm({ params }: { params: { id: number } }) {
                                 </FormItem>
                             )} />
                         <Button type='submit' className="mt-2">Mark</Button>
+                        <Button type="button" onClick={() => onSubmit({})} className="mt-2">Add to pending games</Button>
                     </form>
                 </Form>
             </div >

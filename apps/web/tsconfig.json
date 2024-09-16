@@ -15,7 +15,7 @@
       "@/*": [
         "apps/web/src/*"
       ],
-      "@anytrack/type": ["libs/types/src/index"],
+      "@anytrack/types": ["libs/types/src/index"],
     },
     "plugins": [
       {

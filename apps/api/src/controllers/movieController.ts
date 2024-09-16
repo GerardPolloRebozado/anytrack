@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
-import { movieGenre } from "@prisma/client";
+import { movieGenre } from "@anytrack/types";
 import { SearchMovieRequest } from "moviedb-promise";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {

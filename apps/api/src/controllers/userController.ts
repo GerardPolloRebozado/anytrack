@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { comparePasswords, hashPassword } from "../services/bcryptService";
 import jwt from 'jsonwebtoken';
-import { user } from "@prisma/client";
+import { user } from "@anytrack/types";
 import prisma from "../services/prisma";
 
 export async function signup(req: Request, res: Response) {

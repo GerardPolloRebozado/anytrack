@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { MediaType } from 'libs/types/src';
 
-export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string | number, title: string, poster: string, year: string | undefined, children?: React.ReactNode, mediaType: MediaType }) {
+export default function MediaCard({ id, title, poster, year, children, mediaType }: { id: string | number, title: string, poster?: string, year: string | undefined, children?: React.ReactNode, mediaType: MediaType }) {
   const router = useRouter();
   console.log(year)
   const handleClick = async (e: any) => {
@@ -15,14 +15,16 @@ export default function MediaCard({ id, title, poster, year, children, mediaType
   }
   return (
     <div className={styles.card} onClick={handleClick}>
-      <div className={styles.posterContainer}>
-        <Image
-          src={poster}
-          alt={title}
-          width={300}
-          height={450}
-          className={styles.poster} />
-      </div>
+      {poster && (
+        <div className={styles.posterContainer}>
+          <Image
+            src={poster}
+            alt={title}
+            width={300}
+            height={450}
+            className={styles.poster} />
+        </div>
+      )}
       <div className={styles.details}>
         <h2 className={styles.title}>{title}</h2>
         {year && (

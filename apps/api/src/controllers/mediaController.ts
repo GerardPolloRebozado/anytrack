@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../services/prisma";
-import { MediaType, groupedFutureMedia } from "@anytrack/type";
+import { MediaType, groupedFutureMedia } from "@anytrack/types";
 
 export const getManyFutureMedia = async (req: Request, res: Response) => {
   try {

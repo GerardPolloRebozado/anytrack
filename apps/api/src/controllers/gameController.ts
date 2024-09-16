@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../services/prisma";
 import { getVGameByIdService } from "../services/igdbService";
 import { Game } from "igdb-api-types";
-import { gameCategoryConverter, gameStatusConverter } from "@anytrack/type";
+import { gameCategoryConverter, gameStatusConverter, markedGameResponse } from '@anytrack/types';
 
 export const markVGame = async (req: Request, res: Response) => {
     try {
@@ -43,9 +43,10 @@ export const markVGame = async (req: Request, res: Response) => {
                                 }))
                             },
                             category: gameCategoryConverter(parentIgdbGame.category).toString(),
+                            coverId: typeof parentIgdbGame.cover === 'object' && parentIgdbGame.cover.image_id ? parentIgdbGame.cover.image_id : undefined,
                             totalRating: parentIgdbGame.total_rating,
                             totalRatingCount: parentIgdbGame.total_rating_count,
-                            firstReleaseDate: new Date(parentIgdbGame.first_release_date),
+                            firstReleaseDate: new Date(parentIgdbGame.first_release_date * 1000),
                         }
                     })
                 }
@@ -62,10 +63,34 @@ export const markVGame = async (req: Request, res: Response) => {
                         }))
                     },
                     category: gameCategoryConverter(igdbGame.category).toString(),
+                    coverId: typeof igdbGame.cover === 'object' && igdbGame.cover.image_id ? igdbGame.cover.image_id : undefined,
                     totalRating: igdbGame.total_rating,
                     totalRatingCount: igdbGame.total_rating_count,
-                    firstReleaseDate: new Date(igdbGame.first_release_date),
+                    firstReleaseDate: new Date(igdbGame.first_release_date * 1000),
                     parentGame: typeof igdbGame.parent_game === 'number' ? { connect: { id: igdbGame.parent_game } } : undefined
+                }
+            })
+        }
+        if (!startedTime && !finishedTime) {
+            const checkMarkedGame = await prisma.userGame.findFirst({
+                where: {
+                    userId,
+                    gameId: id,
+                    startedTime: null,
+                    finishedTime: null
+                }
+            })
+            if (checkMarkedGame) {
+                res.status(409).json({ message: "Game already marked as pending" })
+                return
+            }
+        } else {
+            await prisma.userGame.deleteMany({
+                where: {
+                    userId,
+                    gameId: id,
+                    startedTime: null,
+                    finishedTime: null
                 }
             })
         }
@@ -82,4 +107,39 @@ export const markVGame = async (req: Request, res: Response) => {
         res.status(500).json({ message: "An unexpected error occurred while marking the game.", error: error.message || error });
     }
 
+}
+
+export const getMarkedVGames = async (req: Request, res: Response) => {
+    try {
+        const userId = res.locals.user.id
+        const markedGames = new Map<number, markedGameResponse>();
+        const markedGamesDb = await prisma.userGame.findMany({
+            where: {
+                userId,
+            },
+        })
+        if (!markedGamesDb) {
+            res.status(404).json({ message: "No marked games found" })
+            return
+        }
+        for (const markedGame of markedGamesDb) {
+            if (!markedGames.has(markedGame.gameId)) {
+                const game = await prisma.game.findUnique({
+                    where: {
+                        id: markedGame.gameId
+                    }
+                })
+                game.firstReleaseDate = new Date(game.firstReleaseDate)
+                markedGames.set(markedGame.gameId, { game, playHistory: [], playTime: 0 });
+            }
+            if (markedGame.finishedTime && markedGame.startedTime) {
+                markedGames.get(markedGame.gameId).playHistory.push(markedGame)
+                markedGames.get(markedGame.gameId).playTime += (markedGame.finishedTime.getTime() - markedGame.startedTime.getTime())
+            }
+        }
+        res.status(200).json(Array.from(markedGames.values()))
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: "An unexpected error occurred while marking the game.", error: error.message || error });
+    }
 }
