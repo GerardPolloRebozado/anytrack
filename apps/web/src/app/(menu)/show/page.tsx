@@ -53,7 +53,7 @@ function MyShows() {
     <>
       <h1 className='text-4xl font-semibold'>My shows</h1>
       <h1 className='text-2xl mt-4'>Stats</h1>
-      <div className='grid grid-rows-[1fr] grid-cols-[repeat(auto-fill,minmax(550px,1fr))] gap-4 my-4'>
+      <div className='flex gap-4 my-4'>
         {watchedShows && watchedShows.length > 1 && (
           <>
             <Card>
@@ -94,13 +94,13 @@ function MyShows() {
         )}
       </div>
       <h2 className='text-2xl mb-4'>Watched Shows</h2>
-      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+      <div className='flex h-[35dvh] gap-4'>
         {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
       </div>
       <h2 className='text-2xl my-4'>Watchlist</h2>
-      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+      <div className='flex h-[35dvh] gap-4'>
         {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
           <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
         ))}
