@@ -33,9 +33,11 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE_TAG=ghcr.io/${{ github.repository }}:${{ github.event.pull_request.number }}
+          REPO_NAME=${{ github.repository }}
+          REPO_NAME=${REPO_NAME,,} # Convert repository name to lowercase
+          IMAGE_TAG=ghcr.io/${REPO_NAME}:${{ github.event.pull_request.number }}
           if [ "${{ github.event_name }}" == "release" ]; then
-            IMAGE_TAG=ghcr.io/${{ github.repository }}:latest
+            IMAGE_TAG=ghcr.io/${REPO_NAME}:latest
           fi
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
