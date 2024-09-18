@@ -66,7 +66,7 @@ function MyMovies() {
           </>)}
       </div>
       <h2 className='text-xl my-4'>Watched Movies</h2>
-      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+      <div className='flex h-[35dvh] gap-4'>
         {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
           markedMovie.watched && (
             <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.releaseDate} mediaType={MediaType.movie}>
@@ -75,7 +75,7 @@ function MyMovies() {
         ))}
       </div>
       <h2 className='text-xl my-4'>Watchlist</h2>
-      <div className='grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4'>
+      <div className='flex h-[35dvh] gap-4'>
         {markedMovies.length > 0 && markedMovies.map((markedMovie: any) => (
           !markedMovie.watched && (
             <MovieCard key={markedMovie.movie.tmdbId} id={markedMovie.movie.tmdbId} title={markedMovie.movie.title} poster={markedMovie.movie.poster} year={markedMovie.movie.releaseDate} mediaType={MediaType.movie}>

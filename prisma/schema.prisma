@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../libs/types/src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  name            String?
+  password        String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  setting         setting?
+  userShow        userShow[]
+  userMovie       userMovie[]
+  userShowReview  userShowReview[]
+  userMovieReview userMovieReview[]
+  userGame        userGame[]
+}
+
+model setting {
+  userId String  @id
+  user   user    @relation(fields: [userId], references: [id])
+  public Boolean @default(false)
+}
+
+model movie {
+  id              Int               @id @default(autoincrement())
+  tmdbId          Int               @unique
+  tmdbRating      Float?
+  title           String
+  poster          String?
+  releaseDate     DateTime?
+  overview        String?
+  runtime         Int?
+  genreId         Int[]
+  genre           movieGenre[]
+  userMovie       userMovie[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  userMovieReview userMovieReview[]
+}
+
+model userMovie {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        user      @relation(fields: [userId], references: [id])
+  movieId     Int
+  movie       movie     @relation(fields: [movieId], references: [id])
+  watchedDate DateTime?
+  watched     Boolean
+
+  @@unique([userId, movieId])
+}
+
+model userMovieReview {
+  id      Int     @id @default(autoincrement())
+  userId  String
+  user    user    @relation(fields: [userId], references: [id])
+  movieId Int
+  movie   movie   @relation(fields: [movieId], references: [id])
+  rating  Int?
+  review  String?
+
+  @@unique([userId, movieId])
+}
+
+model show {
+  id             Int              @id @default(autoincrement())
+  tmdbId         Int              @unique
+  tmdbRating     Float?
+  title          String
+  poster         String?
+  releaseDate    DateTime?
+  overview       String?
+  season         season[]
+  genre          movieGenre[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userShow       userShow[]
+  userShowReview userShowReview[]
+}
+
+model userShow {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  user        user      @relation(fields: [userId], references: [id])
+  showId      Int
+  show        show      @relation(fields: [showId], references: [id])
+  episodeId   Int
+  episode     episode   @relation(fields: [episodeId], references: [id])
+  watchedDate DateTime?
+  watched     Boolean
+
+  @@unique([userId, showId, episodeId])
+}
+
+model userShowReview {
+  id     Int     @id @default(autoincrement())
+  userId String
+  user   user    @relation(fields: [userId], references: [id])
+  showId Int
+  show   show    @relation(fields: [showId], references: [id])
+  rating Int?
+  review String?
+
+  @@unique([userId, showId])
+}
+
+model season {
+  id           Int       @id @default(autoincrement())
+  seasonNumber Int
+  title        String
+  poster       String?
+  releaseDate  DateTime?
+  overview     String?
+  episode      episode[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  show         show?     @relation(fields: [showId], references: [id])
+  showId       Int?
+
+  @@unique([showId, seasonNumber])
+}
+
+model episode {
+  id            Int        @id @default(autoincrement())
+  episodeNumber Int
+  title         String
+  overview      String?
+  runtime       Int?
+  releaseDate   DateTime?
+  seasonId      Int
+  season        season     @relation(fields: [seasonId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  userShow      userShow[]
+
+  @@unique([seasonId, episodeNumber])
+}
+
+model movieGenre {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  movie movie[]
+  show  show[]
+}
+
+model game {
+  id               Int         @id
+  name             String
+  status           String
+  genres           gameGenre[]
+  category         String
+  coverId          String?
+  totalRating      Float?
+  totalRatingCount Int?
+  firstReleaseDate DateTime?
+  parentGameId     Int?
+  parentGame       game?       @relation("parentGame", fields: [parentGameId], references: [id])
+  game             game[]      @relation("parentGame")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  userGame         userGame[]
+}
+
+model gameGenre {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  game game[]
+}
+
+model userGame {
+  id           Int       @id @default(autoincrement())
+  userId       String
+  user         user      @relation(fields: [userId], references: [id])
+  gameId       Int
+  game         game      @relation(fields: [gameId], references: [id])
+  startedTime  DateTime?
+  finishedTime DateTime?
+  createdAt    DateTime  @default(now())
+}
+
+enum status {
+  ongoing
+  canceled
+  released
+  finished
+}

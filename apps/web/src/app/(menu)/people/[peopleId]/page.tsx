@@ -45,7 +45,6 @@ export default function PeoplePage({ params }: { params: { peopleId: number } })
                 width={0}
                 height={0}
                 sizes="100vw"
-                objectFit="cover"
                 className="w-[11dvw] h-auto rounded-lg max-w-[11dvw]" />
             </div>
             <div className="flex flex-col items-start w-[50dvw]">

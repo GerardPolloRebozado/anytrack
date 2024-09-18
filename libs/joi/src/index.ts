@@ -1,8 +1,7 @@
 import Joi from "joi";
 export { Joi };
 import { tlds } from "@hapi/tlds";
-import { MediaType } from "@anytrack/type";
-import { group } from "console";
+import { MediaType } from '@anytrack/types';
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
@@ -159,4 +158,12 @@ export const getByTmdbId = Joi.object({
 
 export const getByMediaType = Joi.object({
   mediaType: Joi.string().valid(MediaType.movie, MediaType.show).required()
+})
+
+export const markVGameSchemaForm = Joi.object({
+  startedTime: Joi.date().max("now").when('finalTime', {
+    is: Joi.exist(),
+    then: Joi.required()
+  }),
+  finishedTime: Joi.date().max("now").optional(),
 })

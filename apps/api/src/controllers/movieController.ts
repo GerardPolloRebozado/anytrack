@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { searchMovieService, searchMoviebyIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
-import { genre } from "@prisma/client";
+import { movieGenre } from "@anytrack/types";
 import { SearchMovieRequest } from "moviedb-promise";
 
 export const getMovieByTerm = async (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ export const markMovie = async (req: Request, res: Response) => {
     });
     if (!movieItem) {
       const movie = await searchMoviebyIdService({ id: tmdbId });
-      const genreData = await Promise.all(await movie.genres.map((genre: genre) => prisma.genre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
+      const genreData = await Promise.all(await movie.genres.map((genre: movieGenre) => prisma.movieGenre.upsert({ where: { name: genre.name }, update: { name: genre.name }, create: { name: genre.name } })));
       movieItem = await prisma.movie.create({
         data: {
           tmdbId: movie.id,

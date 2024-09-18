@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import prisma from "../services/prisma"
-import { MediaRuntimeChartData } from "@anytrack/type"
+import { MediaRuntimeChartData } from '@anytrack/types'
 
 export const getMediaRuntimeChart = async (req: Request, res: Response) => {
   try {

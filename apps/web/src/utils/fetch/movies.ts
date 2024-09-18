@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import buildUrl from '../buildUrl';
-import { MediaReviewForm, getMarkedMoviesType } from '@anytrack/type';
+import { MediaReviewForm, getMarkedMoviesType } from '@anytrack/types';
 
 export async function searchMoviebyId(id: number) {
   return await fetch(`/api/v1/movie/${id}`, {

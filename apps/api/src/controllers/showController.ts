@@ -55,7 +55,7 @@ export const markShow = async (req: Request, res: Response) => {
           genre: {
             connect: await Promise.all(tmdbShow.genres.map(async (genre: any) => {
               return {
-                id: (await prisma.genre.upsert({ where: { name: genre.name }, create: { name: genre.name }, update: { name: genre.name } })).id
+                id: (await prisma.movieGenre.upsert({ where: { name: genre.name }, create: { name: genre.name }, update: { name: genre.name } })).id
               }
             })),
           }

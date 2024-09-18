@@ -44,7 +44,6 @@ function SeasonPage({ params }: { params: { id: number, seasonNumber: number } }
                   width={0}
                   height={0}
                   sizes="100vw"
-                  objectFit="cover"
                   className="w-[11dvw] h-auto rounded-lg"
                 />
               </div>)}
