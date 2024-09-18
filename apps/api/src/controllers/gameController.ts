@@ -143,3 +143,23 @@ export const getMarkedVGames = async (req: Request, res: Response) => {
         res.status(500).json({ message: "An unexpected error occurred while marking the game.", error: error.message || error });
     }
 }
+
+export const removeMarkedVGame = async (req: Request, res: Response) => {
+    try {
+        const userId = res.locals.user.id
+        const id = Number(req.params.id)
+        const markedGame = await prisma.userGame.deleteMany({
+            where: {
+                userId,
+                gameId: id
+            }
+        })
+        if (!markedGame) {
+            res.status(404).json({ message: "Game not found" })
+            return
+        }
+        res.status(200).json(markedGame)
+    } catch (error) {
+        res.status(500).json({ message: "An unexpected error occurred while removing the game.", error: error.message || error });
+    }
+}

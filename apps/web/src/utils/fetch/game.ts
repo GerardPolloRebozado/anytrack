@@ -21,3 +21,14 @@ export const getMarkedVGames = async (): Promise<markedGameResponse[]> => {
     })
     return await res.json()
 }
+
+export const removeMarkedVGame = async (id: number) => {
+    const res = await fetch(`/api/v1/vgame/mark/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Cookies.get('token')}`,
+        },
+    })
+    return await res.json()
+}

@@ -4,11 +4,12 @@ import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
 import { MediaType, markedGameResponse } from 'libs/types/src';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
-import { getMarkedVGames } from '@/utils/fetch/game';
+import { getMarkedVGames, removeMarkedVGame } from '@/utils/fetch/game';
 import MediaCard from '@/components/MediaCard/MediaCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import distinctColors from 'distinct-colors';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 function MyGames() {
   const [markedGames, setMarkedGames] = useState<markedGameResponse[]>([])
@@ -51,7 +52,7 @@ function MyGames() {
           <CardTitle> Playtime agrupated by game in minutes</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer height={400}>
             <PieChart>
               <Pie
                 data={markedGames
@@ -74,30 +75,45 @@ function MyGames() {
         </CardContent>
       </Card>
       <h2 className='text-xl my-4'>Played Games</h2>
-      <div className='flex h-[35dvh] gap-4'>
-        {markedGames.length > 0 && markedGames.map((markedGame) => (
-          markedGame.playTime > 0 && (
-            <MediaCard
-              key={markedGame.game.id}
-              id={markedGame.game.id} title={markedGame.game.name}
-              poster={markedGame.game.coverId && `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${markedGame.game.coverId}.jpg` || undefined}
-              year={markedGame.game.firstReleaseDate && new Date(markedGame.game.firstReleaseDate).toLocaleDateString() || undefined} mediaType={MediaType.vgame}
-              playtime={markedGame.playTime}>
-              <Button>Remove</Button>
-            </MediaCard>)
-        ))}
+      <div className='px-10'>
+        <Carousel opts={{ loop: true, align: "start" }}>
+          <CarouselContent className='2xl:h-[35dvh] xl:h-[25dvh] lg:h-[13dvh]'>
+            {markedGames.length > 0 && markedGames.map((markedGame) => (
+              markedGame.playTime > 0 && (
+                <CarouselItem key={markedGame.game.id} className='basis-1/6'>
+                  <MediaCard
+                    id={markedGame.game.id} title={markedGame.game.name}
+                    poster={markedGame.game.coverId && `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${markedGame.game.coverId}.jpg` || undefined}
+                    year={markedGame.game.firstReleaseDate && new Date(markedGame.game.firstReleaseDate).toLocaleDateString() || undefined} mediaType={MediaType.vgame}
+                    playtime={markedGame.playTime}>
+                    <Button onClick={() => removeMarkedVGame(markedGame.game.id)}>Remove</Button>
+                  </MediaCard>
+                </CarouselItem>
+              )))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       </div>
 
       <h2 className='text-xl my-4'>Watchlist</h2>
-      <div className='flex h-[35dvh] gap-4'>
-        {markedGames.length > 0 && markedGames.map((markedGame) => (
-          markedGame.playTime === 0 && (
-            <MediaCard key={markedGame.game.id} id={markedGame.game.id} title={markedGame.game.name} poster={markedGame.game.coverId && `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${markedGame.game.coverId}.jpg` || undefined}
-              year={markedGame.game.firstReleaseDate && new Date(markedGame.game.firstReleaseDate).toLocaleDateString() || undefined} mediaType={MediaType.vgame}>
-              <Button>Remove</Button>
-            </MediaCard>)
-        ))}
-      </div>
+      <div className='px-10'>
+        <Carousel opts={{ loop: true, align: "start" }}>
+          <CarouselContent className='2xl:h-[35dvh] xl:h-[25dvh] lg:h-[13dvh]'>
+            {markedGames.length > 0 && markedGames.map((markedGame) => (
+              markedGame.playTime === 0 && (
+                <CarouselItem key={markedGame.game.id} className='basis-1/6'>
+                  <MediaCard id={markedGame.game.id} title={markedGame.game.name} poster={markedGame.game.coverId && `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${markedGame.game.coverId}.jpg` || undefined}
+                    year={markedGame.game.firstReleaseDate && new Date(markedGame.game.firstReleaseDate).toLocaleDateString() || undefined} mediaType={MediaType.vgame}>
+                    <Button>Remove</Button>
+                  </MediaCard>
+                </CarouselItem>
+              )))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div >
     </ >
   )
 }
