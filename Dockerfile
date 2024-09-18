@@ -10,7 +10,7 @@ COPY . .
 
 EXPOSE 4444
 
-RUN npx prisma generate --schema ./apps/api/prisma/schema.prisma
+RUN npx prisma generate
 RUN npx nx run api:build
 RUN npx nx run web:build
 
