@@ -10,10 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import distinctColors from 'distinct-colors';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Spinner } from '@/components/ui/spinner';
 
 function MyGames() {
-  const [markedGames, setMarkedGames] = useState<markedGameResponse[]>([])
-  const pieColors = distinctColors({ count: markedGames.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
+  const [markedGames, setMarkedGames] = useState<markedGameResponse[] | null>(null)
+  const pieColors = distinctColors({ count: markedGames?.length || 0, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
 
   useEffect(() => {
     async function fetchMarkedVGames() {
@@ -26,27 +27,11 @@ function MyGames() {
     fetchMarkedVGames()
   }, []);
 
+  if (markedGames === null) return <Spinner />
+  if (markedGames.length === 0) return <div className='w-full flex justify-center'><h1 className='text-2xl'>You have not marked any game</h1></div>
+
   return (
     <>
-      {/*
- <Card>
-              <CardHeader>
-                <CardTitle>Watchtime agrupated by show</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <PieChart >
-                    <Pie data={watchedShows} dataKey="watchTime" nameKey="title" fill={'var(--showColor)'} label stroke="var(--primary)">
-                      {watchedShows.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={pieColors[index].hex()} />
-                      ))}
-                    </Pie>
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-    */}
       <Card>
         <CardHeader>
           <CardTitle> Playtime agrupated by game in minutes</CardTitle>
