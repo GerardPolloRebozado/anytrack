@@ -8,7 +8,6 @@ import { convertMs } from '@anytrack/utils';
 
 export default function MediaCard({ id, title, poster, year, children, mediaType, playtime }: { id: string | number, title: string, poster?: string, year: string | undefined, children?: React.ReactNode, mediaType: MediaType, playtime?: number }) {
   const router = useRouter();
-  console.log(year)
   const handleClick = async (e: any) => {
     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
       router.push(`/${mediaType}/${id}`);

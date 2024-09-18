@@ -48,7 +48,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                         if (typeof involvedCompany !== 'object') return null
                         if (typeof involvedCompany.company !== 'object') return null;
                         return (
-                          <CarouselItem key={involvedCompany.id} className={` ml-4 h-[250px] basis-[250px] ${typeof involvedCompany.company.logo === 'object' && typeof involvedCompany.company.logo.image_id === 'string' && typeof involvedCompany.company.logo.width === 'number' && typeof involvedCompany.company.logo.height === 'number' && (involvedCompany.company.logo.width > involvedCompany.company.logo.height ? 'basis-[400px]' : 'basis-[200px]')}`}>
+                          <CarouselItem key={involvedCompany.id} className={` ml-4 h-[250px] ${typeof involvedCompany.company.logo === 'object' && typeof involvedCompany.company.logo.image_id === 'string' && typeof involvedCompany.company.logo.width === 'number' && typeof involvedCompany.company.logo.height === 'number' && (involvedCompany.company.logo.width > involvedCompany.company.logo.height ? 'basis-[400px]' : 'basis-[200px]')}`}>
                             <MediaInfoCard name={involvedCompany.company.name || 'Game company'} cover={typeof involvedCompany.company.logo !== 'number' && involvedCompany.company.logo?.image_id ? `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${involvedCompany.company.logo?.image_id}.jpg` : undefined}>
                               <p>{involvedCompany.company.name}</p>
                               <p>{involvedCompany.developer && 'Developer'}</p>
