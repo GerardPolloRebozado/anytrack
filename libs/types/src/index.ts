@@ -70,7 +70,8 @@ export type getMarkedMoviesType = {
 
 export type groupedFutureMedia = {
   mediaType: MediaType;
-  tmdbId: number;
+  tmdbId?: number;
+  igdbId?: number;
   title: string;
   poster: string;
   releaseDate: Date;

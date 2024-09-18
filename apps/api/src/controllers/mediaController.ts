@@ -39,6 +39,18 @@ export const getManyFutureMedia = async (req: Request, res: Response) => {
         }
       },
     });
+    const futureGames = await prisma.game.findMany({
+      where: {
+        userGame: {
+          some: {
+            userId
+          }
+        },
+        firstReleaseDate: {
+          gte: new Date()
+        }
+      },
+    });
     const groupedFutureMedia: groupedFutureMedia[] = futureEpisodes.map((episode) => ({
       mediaType: MediaType.show,
       tmdbId: episode.season.show.tmdbId,
@@ -56,6 +68,16 @@ export const getManyFutureMedia = async (req: Request, res: Response) => {
         releaseDate: movie.releaseDate
       })
     })
+    futureGames.forEach((game) => {
+      groupedFutureMedia.push({
+        mediaType: MediaType.vgame,
+        igdbId: game.id,
+        title: game.name,
+        poster: game.coverId && `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${game.coverId}.jpg` || undefined,
+        releaseDate: game.firstReleaseDate
+      })
+    })
+
 
     groupedFutureMedia.sort((a, b) => b.releaseDate.getTime() - a.releaseDate.getTime());
     res.status(200).json(groupedFutureMedia)

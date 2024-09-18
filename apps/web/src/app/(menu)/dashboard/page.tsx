@@ -90,7 +90,7 @@ function DashboardPage() {
                 {nextMedia.map((media: groupedFutureMedia) => (
                   <CarouselItem key={media.title} className="basis-[250px] mx-5">
                     <Card className="w-[250px] rounded-lg h-[500px]">
-                      <Link href={`/${media.mediaType}/${media.tmdbId}`}>
+                      <Link href={`/${media.mediaType}/${media.tmdbId || media.igdbId || '1'}`}>
                         <CardContent className="p-0">
                           <div className=" w-[250px] h-[375px] mb-3">
                             <Image
