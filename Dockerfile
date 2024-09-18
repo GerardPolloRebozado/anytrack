@@ -9,7 +9,7 @@ RUN --mount=type=bind,source=package.json,target=package.json \
 COPY . .
 
 EXPOSE 4444
-
+RUN chmod +x ./docker/entrypoint.sh
 RUN npx prisma generate
 RUN npx nx run api:build
 RUN npx nx run web:build
