@@ -1,4 +1,4 @@
-import { setting } from "@anytrack/types";
+import { setting } from "@prisma/client";
 import Cookies from "js-cookie";
 
 export async function getSettings() {

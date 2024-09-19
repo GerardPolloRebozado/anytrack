@@ -1,9 +1,8 @@
 import React from 'react';
 import { Game } from "igdb-api-types";
 import { WatchProviderCountry, WatchProviderResponse } from "moviedb-promise"
-import { episode, game, gameGenre, movie, userGame, userMovie, userShow } from './generated';
-export * from './lib/types';
-export * from './generated';
+import { episode, game, gameGenre, movie, userGame, userMovie, userShow } from '@prisma/client';
+
 
 
 export type signupForm = {

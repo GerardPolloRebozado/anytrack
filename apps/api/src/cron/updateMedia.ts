@@ -1,7 +1,7 @@
 import { CronJob } from "cron";
 import { searchMoviebyIdService, searchShowSeasonsService, searchShowTmdbIdService } from "../services/tmdbService";
 import prisma from "../services/prisma";
-import { movie } from "@anytrack/types";
+import { movie } from "@prisma/client";
 
 export const updateMovies = new CronJob("0 0 */2 * *", async () => {
   try {

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../services/prisma";
-import { setting } from "@anytrack/types";
+import { setting } from "@prisma/client";
 
 export async function changeSettings(req: Request, res: Response) {
   try {
