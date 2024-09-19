@@ -4,7 +4,7 @@ import { triggerUpdateMovies, triggerUpdateShows } from "@/utils/fetch/cron"
 import { useEffect, useState } from "react";
 import { getUser, updateUser } from "@/utils/fetch/users";
 import { changePassword, updateUserForm } from "libs/types/src";
-import { setting } from "@anytrack/types";
+import { setting } from "@prisma/client";
 import { getSettings, updateSettings } from "@/utils/fetch/settings";
 import Cookies from "js-cookie";
 import { changePasswordSchema, updateUserSchemaForm } from "libs/joi/src";
