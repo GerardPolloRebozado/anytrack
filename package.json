@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:web": "nx run web:start --port 4444",
-    "start:api": "nx run api:serve:production"
+    "start:web": "nx start web",
+    "start:api": "nx serve api --configuration=production"
   },
   "private": true,
   "dependencies": {
