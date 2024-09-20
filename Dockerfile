@@ -11,7 +11,7 @@ COPY . .
 EXPOSE 4444
 RUN chmod +x ./docker/entrypoint.sh
 RUN npx prisma generate
-RUN npx nx run api:build
-RUN npx nx run web:build
+RUN npx nx build api
+RUN npx nx build web
 
 CMD ./docker/entrypoint.sh
