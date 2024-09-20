@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Cache Docker layers
         uses: actions/cache@v3
@@ -32,16 +32,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:dev-${{ github.event.pull_request.number }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          REPO_NAME=${{ github.repository }}
+          # Convert repository name to lowercase
+          REPO_NAME=${REPO_NAME,,}
+          if [ "${{ github.event_name }}" == "release" ]; then
+            IMAGE_TAG=ghcr.io/${REPO_NAME}:latest
+          else
+            IMAGE_TAG=ghcr.io/${REPO_NAME}:dev-${{ github.event.pull_request.number }}
+          fi
+          docker buildx build --push --cache-from=type=gha --cache-to=type=gha,mode=max -t $IMAGE_TAG .
 
       - name: Log out from GitHub Container Registry
         run: docker logout ghcr.io
