@@ -19,7 +19,7 @@ function MyGames() {
   useEffect(() => {
     async function fetchMarkedVGames() {
       try {
-        setMarkedGames(await getMarkedVGames())
+        setMarkedGames(await getMarkedVGames({}))
       } catch (error: any) {
         toast({ title: 'Failed to fetch video games', description: error?.message, variant: "destructive" })
       }

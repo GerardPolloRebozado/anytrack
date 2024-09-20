@@ -3,6 +3,7 @@ import prisma from "../services/prisma";
 import { getVGameByIdService } from "../services/igdbService";
 import { Game } from "igdb-api-types";
 import { gameCategoryConverter, gameStatusConverter, markedGameResponse } from '@anytrack/types';
+import { parseBoolean } from "@anytrack/utils";
 
 export const markVGame = async (req: Request, res: Response) => {
     try {
@@ -112,10 +113,13 @@ export const markVGame = async (req: Request, res: Response) => {
 export const getMarkedVGames = async (req: Request, res: Response) => {
     try {
         const userId = res.locals.user.id
+        const played: boolean | null = req.query.played && parseBoolean(req.query.played as string) || null
         const markedGames = new Map<number, markedGameResponse>();
         const markedGamesDb = await prisma.userGame.findMany({
             where: {
                 userId,
+                startedTime: played ? { not: null } : null,
+                finishedTime: played ? { not: null } : null
             },
         })
         if (!markedGamesDb) {

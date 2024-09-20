@@ -10,12 +10,13 @@ import distinctColors from 'distinct-colors';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { Spinner } from '@/components/ui/spinner';
 
 function MyMovies() {
-  const [markedMovies, setMarkedMovies] = useState([])
+  const [markedMovies, setMarkedMovies] = useState<object[] | null>(null);
   const [agrupatedByGenre, setAgrupatedByGenre] = useState<any>();
   const [reload, setReload] = useState(false)
-  const pieColors = distinctColors({ count: markedMovies.length, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
+  const pieColors = distinctColors({ count: markedMovies?.length || 0, chromaMin: 50, lightMin: 30, lightMax: 70, quality: 50 });
 
   useEffect(() => {
     async function fetchMovies(data: getMarkedMoviesType) {
@@ -42,6 +43,9 @@ function MyMovies() {
       toast({ title: 'Failed to delete movie', description: error?.message, variant: "destructive" })
     }
   }
+
+  if (markedMovies === null) return <Spinner />
+  if (markedMovies.length === 0) return <div className='w-full flex justify-center'><h1 className='text-2xl'>You have not marked any movie</h1></div>
 
   return (
     <div>
