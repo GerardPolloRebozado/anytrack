@@ -3,6 +3,10 @@ export function parseBoolean(string: string): boolean {
     return string === "true" ? true : false
 };
 
+export function parseBooleanWithUndefined(string: any): boolean | undefined {
+    return string === "true" ? true : string === "false" ? false : undefined;
+};
+
 export function convertMs(milliseconds: number): string {
     const seconds = Math.floor((milliseconds / 1000) % 60);
     const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
