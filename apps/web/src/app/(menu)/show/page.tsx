@@ -108,28 +108,17 @@ function MyShows() {
       )}
       <h2 className='text-2xl mb-4'>Watched Shows</h2>
       <div className='flex h-[35dvh] gap-4'>
-        {watchedShows === null ? <Spinner /> : watchedShows.length > 0 ? (
-          <>
-            {watchedShows.length > 0 && watchedShows.map((userShow: any) => (
-              <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
-            ))}
-          </>
-        ) : (
-          <h1 className='text-2xl'>You have not marked any show as watched</h1>
-        )}
+        {watchedShows && watchedShows.length > 0 && watchedShows.map((userShow: any) => (
+          <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
+        ))}
+
       </div>
       <>
         <h2 className='text-2xl my-4'>Watchlist</h2>
         <div className='flex h-[35dvh] gap-4'>
-          {watchlistShows === null ? <Spinner /> : watchlistShows.length > 0 ? (
-            <>
-              {watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
-                <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
-              ))}
-            </>
-          ) : (
-            <h1 className='text-2xl'>You have not added any show to your watchlist</h1>
-          )}
+          {watchlistShows && watchlistShows.length > 0 && watchlistShows.map((userShow: any) => (
+            <MediaCard key={userShow.show.tmdbId} id={userShow.show.tmdbId} title={userShow.show.title} poster={userShow.show.poster} year={userShow.show.releaseDate} mediaType={MediaType.show} />
+          ))}
         </div>
       </>
     </ >

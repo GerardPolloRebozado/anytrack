@@ -1,6 +1,5 @@
 import { markedGameResponse, markVGameType } from '@anytrack/types';
 import Cookies from "js-cookie";
-import buildUrl from '../buildUrl';
 
 export const markVGame = async (id: number, data: markVGameType) => {
     return await fetch(`/api/v1/vgame/mark`, {
@@ -13,9 +12,8 @@ export const markVGame = async (id: number, data: markVGameType) => {
     })
 }
 
-export const getMarkedVGames = async (params: { played?: boolean }): Promise<markedGameResponse[]> => {
-    const url = buildUrl(`/api/v1/vgame/mark`, params)
-    const res = await fetch(url, {
+export const getMarkedVGames = async (): Promise<markedGameResponse[]> => {
+    const res = await fetch(`/api/v1/vgame/mark`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('token')}`,

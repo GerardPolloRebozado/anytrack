@@ -50,24 +50,21 @@ function MyMovies() {
   return (
     <div>
       <div className='grid grid-rows-[1fr] grid-cols-[repeat(auto-fill,minmax(550px,1fr))]'>
-        {markedMovies && markedMovies.length > 1 && (
-          <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Movie stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={400}>
-                  <RadarChart data={agrupatedByGenre}>
-                    <PolarGrid color='white' />
-                    <PolarAngleAxis dataKey={'name'} stroke='white' />
-                    <Tooltip content={<AgrByCategoryTooltip />} />
-                    <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </>)}
+        <Card>
+          <CardHeader>
+            <CardTitle>Movie stats</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <RadarChart data={agrupatedByGenre}>
+                <PolarGrid color='white' />
+                <PolarAngleAxis dataKey={'name'} stroke='white' />
+                <Tooltip content={<AgrByCategoryTooltip />} />
+                <Radar name="Genres" dataKey="runtime" fill={pieColors[Math.floor(Math.random() * pieColors.length)]?.hex()} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
       <h2 className='text-xl my-4'>Watched Movies</h2>
       <div className='flex h-[35dvh] gap-4'>

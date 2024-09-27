@@ -3,7 +3,8 @@ import prisma from "../services/prisma";
 import { getVGameByIdService } from "../services/igdbService";
 import { Game } from "igdb-api-types";
 import { gameCategoryConverter, gameStatusConverter, markedGameResponse } from '@anytrack/types';
-import { parseBoolean } from "@anytrack/utils";
+import { parseBoolean, parseBooleanWithUndefined } from "@anytrack/utils";
+import { groupUserGameByGame } from "../utils/gameUtils";
 
 export const markVGame = async (req: Request, res: Response) => {
     try {
@@ -113,34 +114,16 @@ export const markVGame = async (req: Request, res: Response) => {
 export const getMarkedVGames = async (req: Request, res: Response) => {
     try {
         const userId = res.locals.user.id
-        const played: boolean | null = req.query.played && parseBoolean(req.query.played as string) || null
-        const markedGames = new Map<number, markedGameResponse>();
         const markedGamesDb = await prisma.userGame.findMany({
             where: {
                 userId,
-                startedTime: played ? { not: null } : null,
-                finishedTime: played ? { not: null } : null
             },
         })
         if (!markedGamesDb) {
             res.status(404).json({ message: "No marked games found" })
             return
         }
-        for (const markedGame of markedGamesDb) {
-            if (!markedGames.has(markedGame.gameId)) {
-                const game = await prisma.game.findUnique({
-                    where: {
-                        id: markedGame.gameId
-                    }
-                })
-                game.firstReleaseDate = new Date(game.firstReleaseDate)
-                markedGames.set(markedGame.gameId, { game, playHistory: [], playTime: 0 });
-            }
-            if (markedGame.finishedTime && markedGame.startedTime) {
-                markedGames.get(markedGame.gameId).playHistory.push(markedGame)
-                markedGames.get(markedGame.gameId).playTime += (markedGame.finishedTime.getTime() - markedGame.startedTime.getTime())
-            }
-        }
+        const markedGames = await groupUserGameByGame(markedGamesDb)
         res.status(200).json(Array.from(markedGames.values()))
     } catch (error) {
         console.log(error)
