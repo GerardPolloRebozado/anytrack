@@ -167,3 +167,12 @@ export const markVGameSchemaForm = Joi.object({
   }),
   finishedTime: Joi.date().max("now").optional(),
 })
+
+export const markVGameSchema = Joi.object({
+  ...markVGameSchemaForm,
+  id: Joi.number().required()
+})
+
+export const removeMarkedVGameSchema = Joi.object({
+  id: Joi.number().required()
+})
