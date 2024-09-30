@@ -10,6 +10,11 @@ export const createUserSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+export const idSchema = Joi.object({
+  id: Joi.number().required(),
+})
+
+
 export const loginUserSchema = Joi.object({
   email: Joi.string().email({ tlds: { allow: tlds } }).required(),
   password: Joi.string().min(6).required(),
@@ -22,10 +27,6 @@ export const searchMoviesSchema = Joi.object({
 export const searchMovieByIdSchema = Joi.object({
   movieId: Joi.string().required(),
 });
-
-export const deleteMediaSchema = Joi.object({
-  id: Joi.number().required(),
-})
 
 export const markMediaSchema = Joi.object({
   tmdbId: Joi.number().required(),
@@ -71,10 +72,6 @@ export const markShowSchemaForm = Joi.object({
 export const getShowSeasonsSchema = Joi.object({
   tmdbId: Joi.number().required(),
   season: Joi.number().optional()
-})
-
-export const removeMarkedMovieSchema = Joi.object({
-  id: Joi.number().required()
 })
 
 export const getCreditsSchema = Joi.object({
@@ -173,6 +170,7 @@ export const markVGameSchema = Joi.object({
   id: Joi.number().required()
 })
 
-export const removeMarkedVGameSchema = Joi.object({
-  id: Joi.number().required()
+
+export const getVGameByNameSchema = Joi.object({
+  name: Joi.string().required()
 })
