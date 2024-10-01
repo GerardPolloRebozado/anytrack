@@ -4,12 +4,10 @@
     "module": "commonjs"
   },
   "files": [],
-  "include": [
-    "**/*.ts"
-  ],
+  "include": [],
   "references": [
     {
       "path": "./tsconfig.lib.json"
-    },
+    }
   ]
 }

@@ -14,7 +14,6 @@ export const idSchema = Joi.object({
   id: Joi.number().required(),
 })
 
-
 export const loginUserSchema = Joi.object({
   email: Joi.string().email({ tlds: { allow: tlds } }).required(),
   password: Joi.string().min(6).required(),
@@ -165,8 +164,7 @@ export const markVGameSchemaForm = Joi.object({
   finishedTime: Joi.date().max("now").optional(),
 })
 
-export const markVGameSchema = Joi.object({
-  ...markVGameSchemaForm,
+export const markVGameSchema = markVGameSchemaForm.keys({
   id: Joi.number().required()
 })
 
