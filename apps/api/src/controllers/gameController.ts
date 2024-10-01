@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../services/prisma";
 import { getVGameByIdService } from "../services/igdbService";
 import { Game } from "igdb-api-types";
-import { gameCategoryConverter, gameStatusConverter, markedGameResponse } from '@anytrack/types';
-import { parseBoolean, parseBooleanWithUndefined } from "@anytrack/utils";
+import { gameCategoryConverter, gameStatusConverter } from '@anytrack/types';
 import { groupUserGameByGame } from "../utils/gameUtils";
 
 export const markVGame = async (req: Request, res: Response) => {
