@@ -14,7 +14,7 @@ export default function MediaCard({ id, title, poster, year, children, mediaType
     }
   }
   return (
-    <div onClick={handleClick} className='shadow-[rgba(0,0,0,0.5)_0px_20px_30px_-10px] transition-all duration-[0.5s] rounded-[10px] hover:shadow-[rgba(0,0,0,0.7)_5px_25px_35px_-10px] hover:scale-105 group'>
+    <div onClick={handleClick} className='shadow-[rgba(0,0,0,0.5)_0px_20px_30px_-10px] transition-all duration-500 rounded-[10px] hover:shadow-[rgba(0,0,0,0.7)_5px_25px_35px_-10px] hover:scale-105 group'>
       {poster && (
         <Image
           src={poster}
