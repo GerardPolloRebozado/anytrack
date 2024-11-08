@@ -44,7 +44,7 @@ const DropDownMenu: React.FC<DropDownMenuProps> = ({ children, text, icon, menuK
         <IconWrapper IconComponent={icon} className="pr-2" />
         <p>{text}</p>{open ? <ChevronUp className='ml-1' /> : <ChevronDown className='ml-1' />}
       </div>
-      <div ref={contentRef} className="max-h-0 overflow-hidden transition-[max-height] duration-[0.3s] ease-[ease-out]">
+      <div ref={contentRef} className="max-h-0 overflow-hidden transition-[max-height] duration-300 ease-out">
         {React.Children.map(children, (child) => (
           <div className='my-2 p-2 hover:bg-accent rounded-lg flex flex-col w-full items-center justify-center '>{child}</div>
         ))}
