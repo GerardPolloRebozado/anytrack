@@ -4,6 +4,7 @@
   "sourceRoot": "libs/joi/src",
   "projectType": "library",
   "tags": [],
+  "implicitDependencies": ["types"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
