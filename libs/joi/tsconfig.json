@@ -1,7 +1,11 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs"
+    "paths": {
+      "@anytrack/types": [
+        "libs/types/src/index.ts"
+      ],
+    }
   },
   "files": [],
   "include": [],

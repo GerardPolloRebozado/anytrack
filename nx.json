@@ -24,7 +24,12 @@
         "serveStaticTargetName": "serve-static"
       }
     },
-    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    },
     {
       "plugin": "@nx/webpack/plugin",
       "options": {
@@ -35,7 +40,12 @@
     }
   ],
   "generators": {
-    "@nx/next": { "application": { "style": "css", "linter": "eslint" } }
+    "@nx/next": {
+      "application": {
+        "style": "css",
+        "linter": "eslint"
+      }
+    }
   },
   "targetDefaults": {
     "@nx/js:tsc": {
@@ -44,5 +54,6 @@
       "inputs": ["production", "^production"]
     }
   },
-  "nxCloudAccessToken": "OTNmNWVhOTUtZGQ2NC00MzdhLWFmYmUtNTRlMWRlMGJmNWE4fHJlYWQtd3JpdGU="
+  "nxCloudAccessToken": "OTNmNWVhOTUtZGQ2NC00MzdhLWFmYmUtNTRlMWRlMGJmNWE4fHJlYWQtd3JpdGU=",
+  "useLegacyCache": true
 }

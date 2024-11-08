@@ -8,7 +8,7 @@ import { SearchIcon } from "lucide-react";
 export default function SearchBar({ fetchData }: { fetchData: (query: string) => void }) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const query = searchParams.get('query') || '';  // Obtener la consulta de la URL
+  const query = searchParams?.get('query') || '';
 
   useEffect(() => {
     async function fetch() {
