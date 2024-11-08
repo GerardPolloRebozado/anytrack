@@ -41,7 +41,7 @@ jobs:
           else
             IMAGE_TAG=ghcr.io/${REPO_NAME}:dev-${{ github.event.pull_request.number }}
           fi
-          docker buildx build --no-cache --push -t $IMAGE_TAG --debug .
+          docker buildx build --push --cache-from=type=gha --cache-to=type=gha,mode=max -t $IMAGE_TAG .
 
       - name: Log out from GitHub Container Registry
         run: docker logout ghcr.io
