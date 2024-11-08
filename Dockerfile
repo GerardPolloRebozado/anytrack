@@ -30,7 +30,7 @@ COPY --from=builder /workspace/dist /app/dist
 COPY --from=builder /workspace/package.json /app/package.json
 COPY --from=builder /workspace/prisma /app/prisma
 
-RUN npm install --production && npm install nx
+RUN npm install
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
