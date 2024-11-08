@@ -4,6 +4,7 @@
   "sourceRoot": "libs/joi/src",
   "projectType": "library",
   "tags": [],
+  "implicitDependencies": ["types"],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -13,7 +14,8 @@
         "tsConfig": "libs/joi/tsconfig.lib.json",
         "packageJson": "libs/joi/package.json",
         "main": "libs/joi/src/index.ts",
-        "assets": ["libs/joi/*.md"]
+        "assets": ["libs/joi/*.md"],
+        "rootDir": "."
       }
     }
   }
