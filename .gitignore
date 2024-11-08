@@ -44,6 +44,3 @@ Thumbs.db
 # Next.js
 .next
 out
-
-#prisma generatred tipes that are in the libs folder inside types/src/generated
-libs/types/src/generated
