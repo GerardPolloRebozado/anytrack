@@ -11,16 +11,16 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Link from "next/link";
 
 function GameDetails({ params }: { params: { id: number } }) {
-  const [game, setGame] = useState<VGameExpanded>();
+  const [game, setGame] = useState<VGameExpanded>()
 
   useEffect(() => {
     async function fetchGame() {
-      const res = await getVGameById(params.id);
-      const data = await res.json();
-      setGame(await data);
+      const res = await getVGameById(params.id)
+      const data = await res.json()
+      setGame(await data)
     }
-    fetchGame();
-  }, [params.id]);
+    fetchGame()
+  }, [params.id])
 
   return (
     <MediaInfoContainer>
