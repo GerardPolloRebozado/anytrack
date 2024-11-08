@@ -3,8 +3,8 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/joi/src",
   "projectType": "library",
-  "tags": [],
   "implicitDependencies": ["types"],
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
@@ -14,8 +14,7 @@
         "tsConfig": "libs/joi/tsconfig.lib.json",
         "packageJson": "libs/joi/package.json",
         "main": "libs/joi/src/index.ts",
-        "assets": ["libs/joi/*.md"],
-        "rootDir": "."
+        "assets": ["libs/joi/*.md"]
       }
     }
   }
