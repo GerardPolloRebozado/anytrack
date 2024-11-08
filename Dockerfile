@@ -14,4 +14,4 @@ RUN npx prisma generate
 RUN npx nx build api
 RUN npx nx build web
 
-CMD ./docker/entrypoint.sh
+CMD ["./docker/entrypoint.sh"]

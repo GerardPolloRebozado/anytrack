@@ -39,10 +39,8 @@ testem.log
 Thumbs.db
 
 .nx/cache
+.nx/workspace-data
 
 # Next.js
 .next
 out
-
-#prisma generatred tipes that are in the libs folder inside types/src/generated
-libs/types/src/generated
