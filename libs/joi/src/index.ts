@@ -1,7 +1,12 @@
 import Joi from "joi";
 export { Joi };
 import { tlds } from "@hapi/tlds";
-import { MediaType } from '@anytrack/types';
+
+export enum MediaType {
+  show = 'show',
+  movie = 'movie',
+  vgame = 'game',
+}
 
 export const createUserSchema = Joi.object({
   confirmPassword: Joi.ref("password"),
