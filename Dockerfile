@@ -5,7 +5,8 @@ WORKDIR /workspace
 COPY package.json package-lock.json nx.json tsconfig.base.json ./
 COPY prisma/schema.prisma prisma/schema.prisma
 
-RUN npm install --legacy-peer-deps
+RUN apt-get update -y && apt-get install -y openssl
+RUN npm ci
 
 COPY libs/ libs/
 COPY apps/ apps/
@@ -30,7 +31,8 @@ COPY --from=builder /workspace/dist /app/dist
 COPY --from=builder /workspace/package.json /app/package.json
 COPY --from=builder /workspace/prisma /app/prisma
 
-RUN npm install
+RUN apt-get update -y && apt-get install -y openssl
+RUN npm ci
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
