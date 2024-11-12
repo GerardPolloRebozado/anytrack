@@ -1,4 +1,4 @@
-import { Joi } from '@anytrack/joi';
+import Joi from 'joi';
 import { Request, Response, NextFunction } from 'express';
 
 export default function joiMiddleware(schema: Joi.ObjectSchema, location: 'body' | 'params' | 'query') {

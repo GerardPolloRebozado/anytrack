@@ -19,7 +19,7 @@ COPY nx.json ./
 COPY tsconfig.json ./
 COPY tsconfig.base.json ./
 
-RUN npx nx run-many --target=build --all --configuration=production --verbose
+RUN npx nx run-many --target=build
 
 FROM node:20-slim
 
