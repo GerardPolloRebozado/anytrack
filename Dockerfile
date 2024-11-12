@@ -6,7 +6,7 @@ COPY package.json package-lock.json nx.json tsconfig.base.json ./
 COPY prisma/schema.prisma prisma/schema.prisma
 
 RUN apt-get update -y && apt-get install -y openssl
-RUN npm ci
+RUN npm i
 
 COPY libs/ libs/
 COPY apps/ apps/
@@ -19,7 +19,7 @@ COPY nx.json ./
 COPY tsconfig.json ./
 COPY tsconfig.base.json ./
 
-RUN npx nx run-many --target=build --all --configuration=production --verbose
+RUN npx nx run-many --target=build
 
 FROM node:20-slim
 
@@ -32,7 +32,7 @@ COPY --from=builder /workspace/package.json /app/package.json
 COPY --from=builder /workspace/prisma /app/prisma
 
 RUN apt-get update -y && apt-get install -y openssl
-RUN npm ci
+RUN npm i
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
