@@ -22,4 +22,4 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 4444
 
-CMD ["./docker/entrypoint.sh"]
+CMD ["entrypoint.sh"]
