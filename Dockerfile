@@ -17,9 +17,10 @@ RUN npm i
 RUN npx prisma generate
 RUN npm run build
 
-COPY ./docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN mkdir docker
+COPY docker/entrypoint.sh ./docker/entrypoint.sh
+RUN chmod +x ./docker/entrypoint.sh
 
 EXPOSE 4444
 
-CMD ["npx prisma migrate deploy", "npx npm-run-all --parallel start:web start:api"]
+CMD ["./docker/entrypoint.sh"]
