@@ -22,4 +22,4 @@ RUN chmod +x /app/entrypoint.sh
 
 EXPOSE 4444
 
-CMD ["entrypoint.sh"]
+CMD ["npx prisma migrate deploy", "npx npm-run-all --parallel start:web start:api"]
