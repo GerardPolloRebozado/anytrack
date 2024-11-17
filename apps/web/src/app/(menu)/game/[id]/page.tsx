@@ -69,7 +69,7 @@ function GameDetails({ params }: { params: { id: number } }) {
               </TabsList>
               <TabsContent value="involvedCompanies">
                 <Carousel opts={{ loop: true, align: 'start' }}>
-                  <CarouselContent className="w-[50dvw]">
+                  <CarouselContent className="w-[50dvw] content-stretch">
                     {game.involved_companies &&
                       game.involved_companies.map((involvedCompany) => {
                         if (typeof involvedCompany !== 'object') return null;
@@ -78,7 +78,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                         return (
                           <CarouselItem
                             key={involvedCompany.id}
-                            className="ml-4 h-[250px] basis-[300px]"
+                            className="ml-4 basis-[200px]"
                           >
                             <MediaInfoCard
                               name={
@@ -86,7 +86,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                               }
                               cover={
                                 typeof involvedCompany.company.logo !==
-                                  'number' &&
+                                'number' &&
                                 involvedCompany.company.logo?.image_id
                                   ? `https://images.igdb.com/igdb/image/upload/t_cover_big_2x/${involvedCompany.company.logo?.image_id}.jpg`
                                   : undefined
@@ -111,7 +111,7 @@ function GameDetails({ params }: { params: { id: number } }) {
               {game.dlcs && game.dlcs.length > 0 && (
                 <TabsContent value="dlcs">
                   <Carousel opts={{ loop: true, align: 'start' }}>
-                    <CarouselContent className="w-[50dvw]">
+                    <CarouselContent className="w-[50dvw] content-stretch">
                       {game.dlcs.map((dlc) => {
                         if (
                           typeof dlc !== 'number' &&
@@ -121,12 +121,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                           return (
                             <CarouselItem
                               key={dlc.id}
-                              className={`${
-                                (dlc.cover?.width ?? 0) >
-                                (dlc.cover?.height ?? 1)
-                                  ? 'basis-[400px]'
-                                  : 'basis-[220px]'
-                              } ml-4 h-[400px]`}
+                              className="ml-4 basis-[200px]"
                             >
                               <Link href={`/game/${dlc.id}`}>
                                 <MediaInfoCard
@@ -154,7 +149,7 @@ function GameDetails({ params }: { params: { id: number } }) {
               {game.expansions && game.expansions.length > 0 && (
                 <TabsContent value="expansions">
                   <Carousel opts={{ loop: true, align: 'start' }}>
-                    <CarouselContent className="w-[50dvw]">
+                    <CarouselContent className="w-[50dvw] content-stretch">
                       {game.expansions.map((expansion) => {
                         if (
                           typeof expansion !== 'number' &&
