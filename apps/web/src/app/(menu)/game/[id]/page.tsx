@@ -32,6 +32,7 @@ function GameDetails({ params }: { params: { id: number } }) {
       const res = await getVGameById(params.id);
       const data = await res.json();
       setGame(await data);
+      console.log(data)
     }
     fetchGame();
   }, [params.id]);
@@ -50,7 +51,7 @@ function GameDetails({ params }: { params: { id: number } }) {
             )}
           <MediaInfoData>
             <MediaInfoTitle>{game.name}</MediaInfoTitle>
-            {game.genreDb && <MediaInfoTags tags={game.genreDb} />}
+            {game.genresDb && <MediaInfoTags tags={game.genresDb} />}
             {game.total_rating && (
               <MediaScore score={game?.total_rating / 10} source="igdb" />
             )}
