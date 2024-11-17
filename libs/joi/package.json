@@ -1,0 +1,11 @@
+{
+  "name": "@anytrack/joi",
+  "version": "0.0.1",
+  "dependencies": {
+    "@anytrack/joi": "file:",
+    "@anytrack/types": "file:../types/src/index.ts",
+    "@hapi/tlds": "1.0.4",
+    "joi": "17.13.3",
+    "tslib": "2.8.1"
+  }
+}
