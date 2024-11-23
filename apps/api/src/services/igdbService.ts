@@ -1,6 +1,7 @@
 import igdb from "igdb-api-node";
-import { Cover } from "igdb-api-types";
+import { Cover, Genre } from "igdb-api-types";
 import prisma from "./prisma";
+import { VGameExpanded } from '@anytrack/types';
 
 const bearerToken = {
   token: null,
@@ -57,13 +58,12 @@ export const getVGameGenreByIdService = async (id: number) => {
   }
   await checkExpiration();
   const genre = await igdb().fields(['id', 'name']).where(`id = ${id}`).request('/genres');
-  const newGenreDb = await prisma.gameGenre.create({
+  return await prisma.gameGenre.create({
     data: {
       id: genre.data[0].id,
       name: genre.data[0].name,
     }
   });
-  return newGenreDb;
 }
 
 export const getVGameCoverService = async (id: number) => {
@@ -74,7 +74,7 @@ export const getVGameCoverService = async (id: number) => {
   return cover
 }
 
-export const getVGameByIdService = async (id: number, lessData) => {
+export const getVGameByIdService = async (id: number, lessData): Promise<VGameExpanded> => {
   await checkExpiration()
   let gamesQuery
   switch (lessData) {
@@ -96,6 +96,15 @@ export const getVGameByIdService = async (id: number, lessData) => {
     }
   }
   const res = await igdb().multi([gamesQuery]).request('/multiquery');
+  const game: VGameExpanded = res.data[0].result[0];
+  game.genresDb = [];
+
+  for (let i = 0; i < game.genres.length; i++) {
+    const genre: Genre = game.genres[i] as Genre;
+    if (genre.id) {
+      game.genresDb.push(await getVGameGenreByIdService(genre.id));
+    }
+  }
   return await res.data[0].result[0];
 }
 

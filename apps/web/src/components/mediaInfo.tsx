@@ -5,8 +5,8 @@ import { tag } from '@anytrack/types';
 import { Card } from './ui/card';
 
 export function MediaInfoContainer({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode;
 }) {
   return <div className="flex gap-x-12 ml-24 mt-8">{children}</div>;
@@ -57,22 +57,22 @@ export function MediaInfoTags({ tags }: { tags: tag[] }) {
 }
 
 export function Overview({ children }: { children: React.ReactNode }) {
-  return <p className="my-4">{children}</p>;
+  return <p className="my-4 line-clamp-2 hover:line-clamp-none">{children}</p>;
 }
 
 export function MediaInfoCard({
-  children,
-  cover,
-  name,
-}: {
+                                children,
+                                cover,
+                                name,
+                              }: {
   children?: React.ReactNode;
   cover?: string | undefined;
   name: string;
 }) {
   return (
-    <Card>
+    <Card className={'h-full'}>
       {cover && (
-        <div className="relative aspect-[3/1] rounded-lg overflow-hidden">
+        <div className="relative aspect-square rounded-lg">
           <Image src={cover} alt={name} fill className="object-contain" />
         </div>
       )}
