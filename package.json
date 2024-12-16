@@ -62,7 +62,7 @@
     "@nx/node": "20.0.11",
     "@nx/web": "20.0.11",
     "@nx/webpack": "20.1.2",
-    "@nx/workspace": "20.0.11",
+    "@nx/workspace": "20.2.2",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@svgr/webpack": "8.0.1",
     "@types/cors": "2.8.17",
