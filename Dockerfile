@@ -1,5 +1,4 @@
-FROM --platform=$BUILDPLATFORM node:20-slim
-
+FROM --platform=$BUILDPLATFORM node:22-alpine
 WORKDIR /app
 
 COPY package.json package-lock.json nx.json tsconfig.base.json .eslintignore .eslintrc.json .prettierrc ./
@@ -12,7 +11,7 @@ COPY nx.json ./
 COPY tsconfig.json ./
 COPY tsconfig.base.json ./
 
-RUN apt-get update -y && apt-get install -y openssl
+RUN apk update && apk add openssl
 RUN npm i
 RUN npx prisma generate
 RUN npm run build

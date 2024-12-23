@@ -274,7 +274,7 @@ export const gameCategoryConverter = (category: number | string) => {
 
 export type tag = { id: number, name: string }
 
-export type VGameExpanded = Game & { genreDb?: gameGenre[], dlcsExpanded?: Game[] }
+export type VGameExpanded = Game & { genresDb?: gameGenre[], dlcsExpanded?: Game[] }
 
 export type markVGameType = {
   startedTime?: Date,
