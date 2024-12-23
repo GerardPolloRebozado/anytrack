@@ -17,7 +17,6 @@ export default async function Company({ params }: { params: { slug: string } }) 
     return <MediaInfoContainer>Company not found</MediaInfoContainer>
   }
   const company: VGameCompany = await res.json();
-  console.log(company)
   return (
     <MediaInfoContainer>
       {company.logo && typeof company.logo === 'object' && company.logo.image_id && (
