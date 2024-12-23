@@ -11,8 +11,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        with:
-          driver: containerd
 
       - name: Cache Docker layers
         id: docker-cache
@@ -25,7 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --cache-from=type=local,src=/tmp/.buildx-cache --cache-to=type=local,dest=/tmp/.buildx-cache-new -t anytrack:latest .
+          docker build --cache-from=type=gha --cache-to=type=gha,dest=/tmp/.buildx-cache-new -t anytrack:latest .
 
       - name: Cleanup Docker cache
         if: steps.docker-cache.outputs.cache-hit != 'true'
