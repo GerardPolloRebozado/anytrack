@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../services/prisma";
-import { getVGameByIdService } from "../services/igdbService";
+import { getVGameByIdService } from "../services/igdb/igdbGameService";
 import { Game } from "igdb-api-types";
 import { gameCategoryConverter, gameStatusConverter } from '@anytrack/types';
 import { groupUserGameByGame } from "../utils/gameUtils";

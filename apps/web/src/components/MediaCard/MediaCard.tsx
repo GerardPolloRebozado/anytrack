@@ -10,7 +10,7 @@ export default function MediaCard({ id, title, poster, year, children, mediaType
   const router = useRouter();
   const handleClick = async (e: any) => {
     if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-      router.push(`/${mediaType}/${id}`);
+      router.push(`/${mediaType}/info/${id}`);
     }
   }
   return (

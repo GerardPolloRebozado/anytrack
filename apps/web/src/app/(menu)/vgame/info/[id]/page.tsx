@@ -1,7 +1,7 @@
 'use client';
 
 import withProtectedRoute from '@/components/Hocs/withProtectedRoute';
-import { getVGameById } from '@/utils/fetch/igdb';
+import { getVGameById } from '@/utils/fetch/vgame/igdb';
 import { useEffect, useState } from 'react';
 import {
   MediaInfoCard,
@@ -26,6 +26,7 @@ import Link from 'next/link';
 
 function GameDetails({ params }: { params: { id: number } }) {
   const [game, setGame] = useState<VGameExpanded>();
+  console.log('game')
 
   useEffect(() => {
     async function fetchGame() {
@@ -81,6 +82,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                             key={involvedCompany.id}
                             className="ml-4 basis-[200px]"
                           >
+                            <Link href={`/vgame/company/${involvedCompany.company.slug}`}>
                             <MediaInfoCard
                               name={
                                 involvedCompany.company.name || 'Game company'
@@ -101,6 +103,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                                 {involvedCompany.supporting && 'Supporting'}
                               </p>
                             </MediaInfoCard>
+                            </Link>
                           </CarouselItem>
                         );
                       })}
@@ -124,7 +127,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                               key={dlc.id}
                               className="ml-4 basis-[200px]"
                             >
-                              <Link href={`/game/${dlc.id}`}>
+                              <Link href={`/vgame/info/${dlc.id}`}>
                                 <MediaInfoCard
                                   name={dlc.name}
                                   cover={
@@ -167,7 +170,7 @@ function GameDetails({ params }: { params: { id: number } }) {
                                   : 'basis-[220px]'
                               } ml-4 h-[400px]`}
                             >
-                              <Link href={`/game/${expansion.id}`}>
+                              <Link href={`/vgame/${expansion.id}`}>
                                 <MediaInfoCard
                                   name={expansion.name}
                                   cover={
