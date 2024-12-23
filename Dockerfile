@@ -11,7 +11,7 @@ COPY nx.json ./
 COPY tsconfig.json ./
 COPY tsconfig.base.json ./
 
-RUN apt-get update -y && apt-get install -y openssl
+RUN apk update && apk add openssl
 RUN npm i
 RUN npx prisma generate
 RUN npm run build
