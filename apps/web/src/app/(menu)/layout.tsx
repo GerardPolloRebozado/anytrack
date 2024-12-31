@@ -26,10 +26,10 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
           </Link>
         </DropDownMenu>
         <DropDownMenu text='Games' icon={<Gamepad2 color='var(--gameColor)' />} menuKey='dropdownShows'>
-          <Link href="/game/search">
+          <Link href="/vgame/search">
             <p>Search Games</p>
           </Link>
-          <Link href="/game">
+          <Link href="/vgame">
             <p>My Games</p>
           </Link>
         </DropDownMenu>
